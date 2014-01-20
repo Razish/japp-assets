@@ -1,0 +1,3034 @@
+//--------------------------------------------------------------
+//
+// SETUP MENU
+//
+//--------------------------------------------------------------
+
+#define EDITFIELD_BACKGROUND "clear"
+//#define EDITFIELD_BACKGROUND "gfx/2d/select"
+
+#define COMMON( n, g, t, r ) \
+name n \
+group g \
+type t \
+rect r \
+mouseEnter { setitemrect highlight r } \
+mouseExit { setitemrect highlight 0 0 0 0 }
+
+#define DISABLED( n, g, t, r ) \
+name n \
+group g \
+type t \
+rect r \
+decoration \
+mouseEnter { setitemrect darklight r } \
+mouseExit { setitemrect darklight 0 0 0 0 }
+
+#define TEXT_DEFAULTS \
+font 7 \
+textscale .375 \
+forecolor .615 .615 .956 1 \
+backcolor 1 1 1 1 \
+textstyle ITEM_TEXTSTYLE_SHADOWED
+
+#define TEXT_APPLY \
+font 7 \
+textscale .5 \
+forecolor 1 0 0 1
+
+#define MISC_DEFAULTS \
+border 0 \
+visible 0
+
+#define BORDER_DEFAULTS \
+border 1 \
+bordercolor .5 .5 .75 1.0 \
+bordersize 0.25
+
+#define SLIDER_DEFAULTS \
+slider 92.0 20.0 8.0 20.0
+
+
+#define BUTTON_DEFAULTS action { play "sound/interface/button1" }
+#define BUTTON_CHANGEPP action { show applyPPChanges; play "sound/interface/button1" }
+#define BUTTON_CHANGESOUND action { show applySoundChanges; play "sound/interface/button1" }
+
+{
+	menuDef 
+	{
+		name					"ingame_setup"
+		visible					0
+		fullscreen				0
+		outOfBoundsClick									// this closes the window if it gets a click out of the rectangle
+		rect					0 32 640 480
+		focusColor				1 1 1 1								// Focus color for text and items
+		style					1
+		border					0
+		descX					368
+		descY					440
+		descScale				1
+		descColor				1 .5 .2 1					// Focus color for text and items
+		descAlignment			ITEM_ALIGN_CENTER		
+
+		onOpen 
+		{
+			uiScript		getvideosetup		// Get video settings
+
+			show			tabWindowGameplay
+			hide			tabWindowVisuals
+			hide			tabWindowViewCamera
+			hide			tabWindowHUD2D
+			hide			tabWindowEffects
+			hide			tabWindowRenderer
+			hide			tabWindowPostprocess
+			hide			tabWindowNetPerf
+			hide			tabWindowSound
+			hide			applyChanges
+			hide			applyPPChanges
+			hide			applySoundChanges
+			hide			vidrestart
+
+			setitemcolor	setup_submenu forecolor .682 .682 1 1
+			setitemcolor	tabButtonGameplay forecolor 1 0.2 0 1
+		}
+			
+		onESC 
+		{ 
+			play				"sound/interface/button1"
+			defer				VideoSetup	videowarningMenu
+
+			close				ingame_setup
+		}
+		onClose
+		{
+			setitemrect			highlight 0 0 0 0
+		}
+
+		itemDef 
+		{// Background
+			name				background
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 640 448
+			background			"gfx/menus/menu_box_ingame"
+			visible				1
+			decoration
+		}
+		itemDef 
+		{// Overlay
+			name				background
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 640 448
+			background			"gfx/2d/droid_view"
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{// darken the contents
+			name				tabBackground
+			group				none
+			style				WINDOW_STYLE_FILLED
+			rect				96 0 544 448
+			backcolor			0 0 0 0.25
+			forecolor			1 0 0 1
+			border				0
+			bordercolor			0 0 .6 1
+			visible				1
+			decoration
+		}
+		itemDef 
+		{//border
+			name				tabBackground
+			group				none
+			style				WINDOW_STYLE_FILLED
+			rect				96 0 1 448
+			backcolor			.375 .375 1 .5
+			forecolor			1 1 1 1
+			border				0
+			visible				1
+			decoration
+		}
+
+		itemDef
+		{//button highlight
+			name				highlight
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 0 0
+			background			"powerups/rezout"
+		//	background			"gfx/menus/menu_box_ingame"
+		//	background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}
+
+		itemDef
+		{//button highlight
+			name				darklight
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 0 0
+		//	background			"powerups/rezout"
+			background			"gfx/menus/menu_box_ingame"
+		//	background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}
+
+
+		//	================================
+		//	TAB BUTTONS
+		//	================================
+
+		itemDef
+		{//Gameplay
+			name				tabButtonGameplay
+			group				setup_submenu
+			text				"Gameplay"
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				8 8 88 16
+			font				7
+			textscale			0.5
+			textalignx			28
+			textaligny			-4
+			textstyle			3
+			forecolor			.682 .682 1 1
+			border				0
+			bordercolor			1 1 1 1
+			visible				1
+			descText			"Configure gameplay settings"
+			mouseEnter			{ setitemrect highlight 0 8 96 16 }
+			mouseExit			{ setitemrect highlight 0 8 0 0 }
+			action 
+			{ 
+				play			"sound/interface/button1"
+				defer			VideoSetup	videowarningMenu
+
+				show 			tabWindowGameplay
+				hide			tabWindowVisuals
+				hide			tabWindowViewCamera
+				hide			tabWindowHUD2D
+				hide			tabWindowEffects
+				hide			tabWindowRenderer
+				hide			tabWindowPostprocess
+				hide			tabWindowNetPerf
+				hide			tabWindowSound
+				hide			applyChanges
+				hide			applyPPChanges
+				hide			applySoundChanges
+				hide			vidrestart
+
+				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
+				setitemcolor	tabButtonGameplay	forecolor	1 0.2 0 1
+			}
+		}
+
+		itemDef
+		{//Visuals
+			name				tabButtonVisuals
+			group				setup_submenu
+			text				"Visuals"
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				8 32 88 16
+			font				7
+			textscale			0.5
+			textalignx			36
+			textaligny			-4
+			textstyle			3
+			forecolor			.682 .682 1 1
+			border				0
+			bordercolor			1 1 1 1
+			visible				1
+			descText			"Configure visual settings"
+			mouseEnter			{ setitemrect highlight 0 32 96 16 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{ 
+				play			"sound/interface/button1"
+				defer			VideoSetup	videowarningMenu
+
+				show 			tabWindowVisuals
+				hide			tabWindowGameplay
+				hide			tabWindowViewCamera
+				hide			tabWindowHUD2D
+				hide			tabWindowEffects
+				hide			tabWindowRenderer
+				hide			tabWindowPostprocess
+				hide			tabWindowNetPerf
+				hide			tabWindowSound
+				hide			applyChanges
+				hide			applyPPChanges
+				hide			applySoundChanges
+				hide			vidrestart
+
+				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
+				setitemcolor	tabButtonVisuals	forecolor	1 0.2 0 1
+			}
+		}
+
+		itemDef
+		{//View + Camera
+			name				tabButtonViewCamera
+			group				setup_submenu
+			text				"View/Camera"
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				8 56 88 16
+			font				7
+			textscale			0.5
+			textalignx			7
+			textaligny			-4
+			textstyle			3
+			forecolor			.682 .682 1 1
+			border				0
+			bordercolor			1 1 1 1
+			visible				1
+			descText			"Configure camera settings"
+			mouseEnter			{ setitemrect highlight 0 56 96 16 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{ 
+				play			"sound/interface/button1"
+				defer			VideoSetup	videowarningMenu
+
+				show 			tabWindowViewCamera
+				hide			tabWindowGameplay
+				hide			tabWindowVisuals
+				hide			tabWindowHUD2D
+				hide			tabWindowEffects
+				hide			tabWindowRenderer
+				hide			tabWindowPostprocess
+				hide			tabWindowNetPerf
+				hide			tabWindowSound
+				hide			applyChanges
+				hide			applyPPChanges
+				hide			applySoundChanges
+				hide			vidrestart
+
+				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
+				setitemcolor	tabButtonViewCamera	forecolor	1 0.2 0 1
+			}
+		}
+
+		itemDef
+		{//HUD + 2D
+			name				tabButtonHUD2D
+			group				setup_submenu
+			text				"HUD/2D"
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				8 80 88 16
+			font				7
+			textscale			0.5
+			textalignx			42
+			textaligny			-4
+			textstyle			3
+			forecolor			.682 .682 1 1
+			border				0
+			bordercolor			1 1 1 1
+			visible				1
+			descText			"Configure HUD settings"
+			mouseEnter			{ setitemrect highlight 0 80 96 16 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{ 
+				play			"sound/interface/button1"
+				defer			VideoSetup	videowarningMenu
+
+				show 			tabWindowHUD2D
+				hide			tabWindowGameplay
+				hide			tabWindowVisuals
+				hide			tabWindowViewCamera
+				hide			tabWindowEffects
+				hide			tabWindowRenderer
+				hide			tabWindowPostprocess
+				hide			tabWindowNetPerf
+				hide			tabWindowSound
+				hide			applyChanges
+				hide			applyPPChanges
+				hide			applySoundChanges
+				hide			vidrestart
+
+				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
+				setitemcolor	tabButtonHUD2D		forecolor	1 0.2 0 1
+			}
+		}
+
+		itemDef
+		{//Effects
+			name				tabButtonEffects
+			group				setup_submenu
+			text				"Effects"
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				8 104 88 16
+			font				7
+			textscale			0.5
+			textalignx			36
+			textaligny			-4
+			textstyle			3
+			forecolor			.682 .682 1 1
+			border				0
+			bordercolor			1 1 1 1
+			visible				1
+			descText			"Configure special effects settings"
+			mouseEnter			{ setitemrect highlight 0 104 96 16 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{ 
+				play			"sound/interface/button1"
+				defer			VideoSetup	videowarningMenu
+
+				show 			tabWindowEffects
+				hide			tabWindowGameplay
+				hide			tabWindowVisuals
+				hide			tabWindowViewCamera
+				hide			tabWindowHUD2D
+				hide			tabWindowRenderer
+				hide			tabWindowPostprocess
+				hide			tabWindowNetPerf
+				hide			tabWindowSound
+				hide			applyChanges
+				hide			applyPPChanges
+				hide			applySoundChanges
+				hide			vidrestart
+
+
+				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
+				setitemcolor	tabButtonEffects	forecolor	1 0.2 0 1
+			}
+		}
+
+		itemDef
+		{//Renderer
+			name				tabButtonRenderer
+			group				setup_submenu
+			text				"Renderer"
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				8 128 88 16
+			font				7
+			textscale			0.5
+			textalignx			28
+			textaligny			-4
+			textstyle			3
+			forecolor			.682 .682 1 1
+			border				0
+			bordercolor			1 1 1 1
+			visible				1
+			descText			"Configure renderer settings"
+			mouseEnter			{ setitemrect highlight 0 128 96 16 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{ 
+				play			"sound/interface/button1"
+				uiScript		getvideosetup // Get video settings
+
+				show 			tabWindowRenderer
+				hide			tabWindowGameplay
+				hide			tabWindowVisuals
+				hide			tabWindowViewCamera
+				hide			tabWindowHUD2D
+				hide			tabWindowEffects
+				hide			tabWindowPostprocess
+				hide			tabWindowNetPerf
+				hide			tabWindowSound
+				hide			applyChanges
+				hide			applyPPChanges
+				hide			applySoundChanges
+				hide			vidrestart
+
+
+				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
+				setitemcolor	tabButtonRenderer	forecolor	1 0.2 0 1
+			}
+		}
+
+		itemDef
+		{//Post processing
+			name				tabButtonPostprocess
+			group				setup_submenu
+			text				"Post-process"
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				8 152 88 16
+			font				7
+			textscale			0.5
+			textalignx			0
+			textaligny			-4
+			textstyle			3
+			forecolor			.682 .682 1 1
+			border				0
+			bordercolor			1 1 1 1
+			visible				1
+			descText			"Configure post-process settings"
+			mouseEnter			{ setitemrect highlight 0 152 96 16 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{ 
+				play			"sound/interface/button1"
+				defer			VideoSetup	videowarningMenu
+
+				show 			tabWindowPostprocess
+				hide			tabWindowGameplay
+				hide			tabWindowVisuals
+				hide			tabWindowViewCamera
+				hide			tabWindowHUD2D
+				hide			tabWindowEffects
+				hide			tabWindowRenderer
+				hide			tabWindowNetPerf
+				hide			tabWindowSound
+				hide			applyChanges
+				hide			applyPPChanges
+				hide			applySoundChanges
+				hide			vidrestart
+
+
+				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
+				setitemcolor	tabButtonPostprocess	forecolor	1 0.2 0 1
+			}
+		}
+
+		itemDef
+		{//Network + Performance
+			name				tabButtonNetPerf
+			group				setup_submenu
+			text				"Net/Perf"
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				8 176 88 16
+			font				7
+			textscale			0.5
+			textalignx			28
+			textaligny			-4
+			textstyle			3
+			forecolor			.682 .682 1 1
+			border				0
+			bordercolor			1 1 1 1
+			visible				1
+			descText			"Configure network and performance settings"
+			mouseEnter			{ setitemrect highlight 0 176 96 16 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{ 
+				play			"sound/interface/button1"
+				defer			VideoSetup	videowarningMenu
+
+				show 			tabWindowNetPerf
+				hide			tabWindowGameplay
+				hide			tabWindowVisuals
+				hide			tabWindowViewCamera
+				hide			tabWindowHUD2D
+				hide			tabWindowEffects
+				hide			tabWindowRenderer
+				hide			tabWindowPostprocess
+				hide			tabWindowSound
+				hide			applyChanges
+				hide			applyPPChanges
+				hide			applySoundChanges
+				hide			vidrestart
+
+
+				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
+				setitemcolor	tabButtonNetPerf	forecolor	1 0.2 0 1
+			}
+		}
+
+		itemDef
+		{//Sound
+			name				tabButtonSound
+			group				setup_submenu
+			text				"Sound"
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				8 200 88 16
+			font				7
+			textscale			0.5
+			textalignx			48
+			textaligny			-4
+			textstyle			3
+			forecolor			.682 .682 1 1
+			border				0
+			bordercolor			1 1 1 1
+			visible				1
+			descText			"Configure sound settings"
+			mouseEnter			{ setitemrect highlight 0 200 96 16 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{ 
+				play			"sound/interface/button1"
+				defer			VideoSetup	videowarningMenu
+
+				show 			tabWindowSound
+				hide			tabWindowGameplay
+				hide			tabWindowVisuals
+				hide			tabWindowViewCamera
+				hide			tabWindowHUD2D
+				hide			tabWindowEffects
+				hide			tabWindowRenderer
+				hide			tabWindowPostprocess
+				hide			tabWindowNetPerf
+				hide			applyChanges
+				hide			applyPPChanges
+				hide			applySoundChanges
+				hide			vidrestart
+
+
+				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
+				setitemcolor	tabButtonSound	forecolor	1 0.2 0 1
+			}
+		}
+
+		//	================================
+		//	GAMEPLAY TAB
+		//	================================
+
+		itemDef {// Pain events (cg_oldPainSounds)
+			COMMON( painsounds, tabWindowGameplay, ITEM_TYPE_YESNO, 108 20 192 20 )
+      		type				ITEM_TYPE_YESNO
+			text				"Old pain events:"
+			cvar				"cg_oldPainSounds"
+			textalignx			5
+			descText			"Use old method of detecting pain events for yourself"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Auto switch (cg_autoswitch)
+			COMMON( autoswitch, tabWindowGameplay, ITEM_TYPE_MULTI, 108 40 192 20 )
+			text				"Auto switch:"
+			cvar				"cg_autoswitch"
+			cvarFloatList		{ "Never" 0 "Safe weapons only" 1 "Always switch" 2 }
+			textalignx			25
+			descText			"Automatically switch weapons when you pick them up"// (0 = never switch, 1 = switch to "safe" weapons, 2 = always switch)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Ragdoll (broadsword)
+			COMMON( ragdoll, tabWindowGameplay, ITEM_TYPE_MULTI, 108 60 192 20 )
+			text				"Ragdoll:"
+			cvar				"broadsword"
+			cvarFloatList		{ "Never" 0 "Enabled" 1 "Crazy" 2 }
+			textalignx			45
+			descText			"Use ragdoll deaths"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Jump Sounds (cg_jumpSounds)
+			COMMON( jumpsounds, tabWindowGameplay, ITEM_TYPE_YESNO, 108 80 192 20 )
+			text				"Jump sounds:"
+			cvar				"cg_jumpSounds"
+			textalignx			25
+			descText			"Play a sound when someone jumps"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Defer players (cg_deferPlayers)
+			COMMON( deferplayers, tabWindowGameplay, ITEM_TYPE_YESNO, 108 100 192 20 )
+			text				"Defer players:"
+			cvar				"cg_deferPlayers"
+			textalignx			15
+			descText			"Only load player models when checking scoreboard (avoids random freezes)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Team chat only (cg_teamChatsOnly)
+			COMMON( teamchatonly, tabWindowGameplay, ITEM_TYPE_YESNO, 108 120 192 20 )
+			text				"Team chat only:"
+			cvar				"cg_teamChatsOnly"
+			textalignx			10
+			descText			"Only show chat messages from team-mates in team gametypes"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Ghost predict (cg_attemptGhostPredict)
+			COMMON( ghostpredict, tabWindowGameplay, ITEM_TYPE_YESNO, 108 140 192 20 )
+			text				"Ghost prediction:"
+			cvar				"cg_attemptGhostPredict"
+			textalignx			0
+			descText			"Attempt to predict if you're ghosted and can walk smoothly through people"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Disable Taunts (cg_noTaunt)
+			COMMON( notaunt, tabWindowGameplay, ITEM_TYPE_YESNO, 108 160 192 20 )
+			text				"Disable taunts:"
+			cvar				"cg_noTaunt"
+			textalignx			10
+			descText			"Disable all taunt sounds"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Smart Entities (cg_smartEntities)
+			COMMON( smartentities, tabWindowGameplay, ITEM_TYPE_YESNO, 108 180 192 20 )
+			text				"Smart Entities:"
+			cvar				"cg_smartEntities"
+			textalignx			10
+			descText			"Increase performance by not rendering players behind walls"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Console log (cg_log)
+			COMMON( consolelog, tabWindowGameplay, ITEM_TYPE_EDITFIELD, 108 200 192 20 )
+			text				"Console log:"
+			cvar				"cg_log"
+			textalignx			25
+			descText			"Log console to file"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Chat log (cg_logChat)
+			COMMON( chatlog, tabWindowGameplay, ITEM_TYPE_EDITFIELD, 108 220 192 20 )
+			text				"Chat log:"
+			cvar				"cg_logChat"
+			textalignx			40
+			descText			"Log chat to file"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Sync console log (cg_logSync)
+			COMMON( syncconsolelog, tabWindowGameplay, ITEM_TYPE_YESNO, 108 240 192 20 )
+			text				"Sync console log:"
+			cvar				"cg_logSync"
+			textalignx			0
+			descText			"Immediately write console log to disk, or buffer"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Sync chat log (cg_logChatSync)
+			COMMON( syncchatlog, tabWindowGameplay, ITEM_TYPE_YESNO, 108 260 192 20 )
+			text				"Sync chat log:"
+			cvar				"cg_logChatSync"
+			textalignx			15
+			descText			"Immediately write chat log to disk, or buffer"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		//	================================
+		//	VISUALS TAB
+		//	================================
+
+		itemDef {// SFX Sabers (cg_saberBladeStyle)
+			COMMON( sfxsabers, tabWindowVisuals, ITEM_TYPE_YESNO, 108 20 192 20 )
+			text				"SFX Sabers:"
+			cvar				"cg_saberBladeStyle"
+			textalignx			40
+			descText			"Use SFX sabers or basejka sabers"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// basejka saber trail (cg_saberTrail)
+			COMMON( sabertrail, tabWindowVisuals, ITEM_TYPE_MULTI, 108 40 192 20 )
+			text				"Saber trail:"
+			cvar				"cg_saberTrail"
+			cvarFloatList		{ @MENUS_OFF 0 @MENUS_ON 1 "Refracted" 2 "Always" 3 }
+			cvarTest			"cg_saberBladeStyle"
+			hideCvar			{ "1" }
+			textalignx			35
+			descText			"Choose the saber trail type for basejka sabers"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// basejka saber trail length (cg_saberTrailLength)
+			COMMON( sabertraillength, tabWindowVisuals, ITEM_TYPE_SLIDER, 108 60 192 20 )
+			text				"Saber trail length:"
+			cvarfloat			"cg_saberTrailLength" 0.7 0.1 3.0
+			cvarTest			"cg_saberBladeStyle"
+			hideCvar			{ "1" }
+			SLIDER_DEFAULTS
+			textalignx			0
+			descText			"Choose the saber trail length for basejka sabers"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// basejka saber width (cg_saberWidth)
+			COMMON( saberwidth, tabWindowVisuals, ITEM_TYPE_SLIDER, 108 80 192 20 )
+			text				"Saber width:"
+			cvarfloat			"cg_saberWidth" 0.7 0.1 4.0
+			cvarTest			"cg_saberBladeStyle"
+			hideCvar			{ "1" }
+			SLIDER_DEFAULTS
+			textalignx			35
+			descText			"Choose the saber width for basejka sabers"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// SFX saber trail (N/A)
+			DISABLED( sfxsabertrail, tabWindowVisuals, ITEM_TYPE_MULTI, 108 40 192 20 )
+			text				"Saber trail:"
+			cvar				"cg_saberBladeStyle"
+			cvarFloatList		{ @MENUS_OFF 0 @MENUS_ON 1 }
+			cvarTest			"cg_saberBladeStyle"
+			hideCvar			{ "0" }
+			textalignx			35
+			descText			"SFX sabers always have a trail"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// SFX saber glow width (cg_saberBladeGlowMulti)
+			COMMON( sfxsaberglowwidth, tabWindowVisuals, ITEM_TYPE_SLIDER, 108 60 192 20 )
+			text				"Saber glow width:"
+			cvarfloat			"cg_saberBladeGlowMulti" 1.25 0.1 4.0
+			cvarTest			"cg_saberBladeStyle"
+			hideCvar			{ "0" }
+			SLIDER_DEFAULTS
+			textalignx			10
+			descText			"Choose the saber glow width for SFX sabers"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// SFX saber width (cg_saberBladeCoreMulti)
+			COMMON( sfxsaberwidth, tabWindowVisuals, ITEM_TYPE_SLIDER, 108 80 192 20 )
+			text				"Saber width:"
+			cvarfloat			"cg_saberBladeCoreMulti" 0.7 0.1 4.0
+			cvarTest			"cg_saberBladeStyle"
+			hideCvar			{ "0" }
+			SLIDER_DEFAULTS
+			textalignx			35
+			descText			"Choose the saber core width for SFX sabers"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Team RGB Sabers (cg_teamSabersRGB)
+			COMMON( teamrgbsaber, tabWindowVisuals, ITEM_TYPE_MULTI, 108 100 192 20 )
+			text				"Team RGB sabers:"
+			cvar				"cg_teamSabersRGB"
+			cvarFloatList		{ "Team colours always" 0 "RGB for self" 1 "RGB always" 2 }
+			textalignx			15
+			descText			"Force team colours for sabers, or allow RGB saber colours"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Speed Trail (cg_speedTrail)
+			COMMON( speedtrail, tabWindowVisuals, ITEM_TYPE_YESNO, 108 120 192 20 )
+			text				"Speed trail:"
+			cvar				"cg_speedTrail"
+			textalignx			35
+			descText			"Show a ghost effect behind players using force speed"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Sight Shell (cg_auraShell)
+			COMMON( sightshell, tabWindowVisuals, ITEM_TYPE_YESNO, 108 140 192 20 )
+			text				"Sight shell:"
+			cvar				"cg_auraShell"
+			textalignx			35
+			descText			"Show an outline around players when using force sight"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Repeater Orb (cg_repeaterOrb)
+			COMMON( repeaterorb, tabWindowVisuals, ITEM_TYPE_YESNO, 108 160 192 20 )
+			text				"Repeater Orb:"
+			cvar				"cg_repeaterOrb"
+			textalignx			30
+			descText			"Use a special effect for the heavy repeater's alternate fire"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Dismemberment (cg_dismember)
+			COMMON( dismemberment, tabWindowVisuals, ITEM_TYPE_MULTI, 108 180 192 20 )
+			text				"Dismemberment:"
+			cvar				"cg_dismember"
+			cvarFloatList		{ @MENUS_OFF 0 @MENUS_ON 1 "Violent" 2 }
+			textalignx			25
+			descText			"Choose the level of detail for dismemberment"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Force Models (cg_forceModel)
+			COMMON( forcemodel, tabWindowVisuals, ITEM_TYPE_YESNO, 108 200 192 20 )
+			text				"Force model:"
+			cvar				"cg_forceModel"
+			textalignx			35
+			descText			"Force all player models to be the same as yours"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Shield Style (cg_shieldStyle)
+			COMMON( shieldstyle, tabWindowVisuals, ITEM_TYPE_MULTI, 108 220 192 20 )
+			text				"Shield style:"
+			cvar				"cg_shieldStyle"
+			cvarFloatList		{ "basejka" -1 "SP Shield" 0 "Protect" 1 "Sight 1" 2 "Force shell" 3 "Sight 2" 4 "Half shield" 5 "Cloak" 6 }
+			textalignx			30
+			descText			"Shader to use for \"player hit\" shield effect"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Shield Test (cg_shieldTest)
+			COMMON( shieldtest, tabWindowVisuals, ITEM_TYPE_YESNO, 108 240 192 20 )
+			text				"Shield test:"
+			cvar				"cg_shieldTest"
+			cvarTest			"cg_shieldStyle"
+			hideCvar			{ "-1" }
+			textalignx			35
+			descText			"Always show the \"player hit\" shield effect (for customisation)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Shield Colour Background
+			name				shieldcolourBackground
+			group				tabWindowVisuals
+			style				WINDOW_STYLE_SHADER
+			rect				203 261 95 18
+			background			EDITFIELD_BACKGROUND
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Shield Colour (cg_shieldColour)
+			COMMON( shieldcolour, tabWindowVisuals, ITEM_TYPE_EDITFIELD, 108 260 192 20 )
+			text				"Shield colour:"
+			cvar				"cg_shieldColour"
+			cvarTest			"cg_shieldStyle"
+			hideCvar			{ "-1" }
+			textalignx			25
+			descText			"Colour of the \"player hit\" shield effect + force transparency"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Shield Layers Background
+			name				shieldlayersBackground
+			group				tabWindowVisuals
+			style				WINDOW_STYLE_SHADER
+			rect				203 281 20 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+			cvarTest			"cg_shieldStyle"
+			hideCvar			{ "-1" }
+		}
+		itemDef {// Shield Layers (cg_shieldLayers)
+			COMMON( shieldlayers, tabWindowVisuals, ITEM_TYPE_NUMERICFIELD, 108 280 192 20 )
+			text				"Shield layers:"
+			cvar				"cg_shieldLayers"
+			cvarTest			"cg_shieldStyle"
+			hideCvar			{ "-1" }
+			textalignx			25
+			descText			"How many times to render the \"player hit\" shield effect"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Duel Style (cg_duelShaderStyle)
+			COMMON( duelstyle, tabWindowVisuals, ITEM_TYPE_MULTI, 108 300 192 20 )
+			text				"Duel style:"
+			cvar				"cg_duelShaderStyle"
+			cvarFloatList		{ "Sight 1" 0 "Protect" 1 "SP Shield" 2 "Force shell" 3 "Sight 2" 4 "Half shield" 5 "Cloak" 6 }
+			textalignx			40
+			descText			"Shader to use for dueling players"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Duel Test (cg_duelShaderTest)
+			COMMON( dueltest, tabWindowVisuals, ITEM_TYPE_YESNO, 108 320 192 20 )
+			text				"Duel test:"
+			cvar				"cg_duelShaderTest"
+			textalignx			45
+			descText			"Always show the duel effect (for customisation)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Duel Colour Background
+			name				duelcolourBackground
+			group				tabWindowVisuals
+			style				WINDOW_STYLE_SHADER
+			rect				203 341 95 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Duel Colour (cg_duelColour)
+			COMMON( duelcolour, tabWindowVisuals, ITEM_TYPE_EDITFIELD, 108 340 192 20 )
+			text				"Duel colour:"
+			cvar				"cg_duelColour"
+			textalignx			35
+			maxchars			17
+			maxPaintChars		17
+			descText			"Colour of the duel effect + force transparency"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Dueling Sabers (cg_showDuelSabers)
+			COMMON( duelsabers, tabWindowVisuals, ITEM_TYPE_YESNO, 108 360 192 20 )
+			text				"Dueling sabers:"
+			cvar				"cg_showDuelSabers"
+			textalignx			20
+			descText			"Hide or show sabers of dueling players"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Alt-dim Visibility (cg_altDimA)
+			COMMON( altdimvis, tabWindowVisuals, ITEM_TYPE_SLIDER, 108 380 192 20 )
+			text				"Altdim visibility:"
+			cvarFloat			"cg_altDimA" 96 0 255
+			SLIDER_DEFAULTS
+			textalignx			5
+			descText			"Adjust the transparency of players not in the same dimension as you"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		//################
+		// Second column
+		//################
+
+		itemDef {// Strafe Trail (cg_strafeTrail)
+			COMMON( strafetrail, tabWindowVisuals, ITEM_TYPE_MULTI, 368 20 192 20 )
+			text				"Strafe trail:"
+			cvar				"cg_strafeTrail"
+			cvarFloatList		{ @MENUS_OFF 0 "Ghost" 1 "Line" 2 }
+			textalignx			5
+			descText			"Show a trail behind fast-moving players"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Strafe Trail Weights Background
+			name				strafetrailweightsBackground
+			group				tabWindowVisuals
+			style				WINDOW_STYLE_SHADER
+			rect				438 41 55 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+			cvarTest			"cg_strafeTrail"
+			hideCvar			{ "0" }
+		}
+		itemDef {// Strafe Trail Weights (cg_strafeTrailWeights)
+			COMMON( strafetrailweights, tabWindowVisuals, ITEM_TYPE_EDITFIELD, 368 40 192 20 )
+			text				"Trail weights:"
+			cvar				"cg_strafeTrailWeights"
+			cvarTest			"cg_strafeTrail"
+			hideCvar			{ "0" }
+			textalignx			0
+			maxchars			9
+			maxpaintchars		9
+			descText			"Set the minimum and maximum speed for drawing strafe trails"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Strafe Helper (cg_strafeHelper)
+			COMMON( strafehelper, tabWindowVisuals, ITEM_TYPE_MULTI, 368 60 192 20 )
+			text				"Strafe helper:"
+			cvar				"cg_strafeHelper"
+			cvarFloatList		{ @MENUS_OFF 0 @MENUS_ON 1 "Inverted" 2 }
+			textalignx			0
+			descText			"Show the ideal angles for various strafing styles"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Strafe Velocity (cg_strafeHelperVelocity)
+			COMMON( strafevelocity, tabWindowVisuals, ITEM_TYPE_YESNO, 368 80 192 20 )
+			text				"SH velocity:"
+			cvar				"cg_strafeHelperVelocity"
+			textalignx			10
+			descText			"Show velocity vector"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Strafe Helper Colour Background
+			name				strafehelpercolourBackground
+			group				tabWindowVisuals
+			style				WINDOW_STYLE_SHADER
+			rect				438 101 85 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Strafe Helper Colour (cg_strafeHelperColor)
+			COMMON( strafehelpercolour, tabWindowVisuals, ITEM_TYPE_EDITFIELD, 368 100 192 20 )
+			text				"SH colour:"
+			cvar				"cg_strafeHelperColor"
+			textalignx			20
+			maxchars			15
+			maxpaintchars		15
+			descText			"Colour of the strafe helper lines"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Strafe Helper Radius (cg_strafeHelperRadius)
+			COMMON( strafehelperradius, tabWindowVisuals, ITEM_TYPE_SLIDER, 368 120 192 20 )
+			text				"SH radius:"
+			cvarFloat			"cg_strafeHelperRadius" 1 0 6
+			SLIDER_DEFAULTS
+			textalignx			20
+			descText			"Radius of the strafe helper lines"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Strafe Helper Length (cg_strafeHelperLength)
+			COMMON( strafehelperlength, tabWindowVisuals, ITEM_TYPE_SLIDER, 368 140 192 20 )
+			text				"SH length:"
+			cvarFloat			"cg_strafeHelperLength" 100 32 384
+			SLIDER_DEFAULTS
+			textalignx			20
+			descText			"Length of the strafe helper lines"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Strafe Helper Angle (cg_strafeHelperAngle)
+			COMMON( strafehelperangle, tabWindowVisuals, ITEM_TYPE_SLIDER, 368 160 192 20 )
+			text				"SH angle:"
+			cvarFloat			"cg_strafeHelperAngle" 20 0 180
+			SLIDER_DEFAULTS
+			textalignx			25
+			descText			"Angle between strafe helper lines"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+
+		//	================================
+		//	VIEW / CAMERA TAB
+		//	================================
+
+		itemDef {// Third Person (cg_thirdPerson)
+			COMMON( thirdperson, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 20 192 20 )
+			text				"Third person:"
+			cvar				"cg_thirdPerson"
+			textalignx			15
+			descText			"Use third person camera mode"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Action Cam (cg_thirdPersonSpecialCam)
+			COMMON( actioncam, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 40 192 20 )
+			text				"Action cam:"
+			cvar				"cg_thirdPersonSpecialCam"
+			textalignx			25
+			descText			"Use dramatic \"action cam\" for special saber moves"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Field of View (cg_fov)
+			COMMON( fov, tabWindowViewCamera, ITEM_TYPE_SLIDER, 108 60 192 20 )
+			text				"Field of view:"
+			cvarfloat			"cg_fov" 80.0 40.0 180.0
+			SLIDER_DEFAULTS
+			textalignx			10
+			descText			"Field of view"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Draw Gun (cg_drawGun)
+			COMMON( drawgun, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 80 192 20 )
+			text				"Draw gun:"
+			cvar				"cg_drawGun"
+			textalignx			35
+			descText			"Hide/show current weapon in first-person view"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Gun Align Background
+			name				gunalignBackground
+			group				tabWindowViewCamera
+			style				WINDOW_STYLE_SHADER
+			rect				188 101 95 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Gun Align (cg_gunAlign)
+			COMMON( gunalign, tabWindowViewCamera, ITEM_TYPE_EDITFIELD, 108 100 192 20 )
+			text				"Gun align:"
+			cvar				"cg_gunAlign"
+			textalignx			30
+			descText			"Alignment of first-person weapon model"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Smooth Camera (cg_smoothCamera)
+			COMMON( smoothcamera, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 120 192 20 )
+			text				"Smooth camera:"
+			cvar				"cg_smoothCamera"
+			textalignx			10
+			descText			"Use a smooth third-person camera"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// View Bob Height (cg_bobup)
+			COMMON( bobup, tabWindowViewCamera, ITEM_TYPE_SLIDER, 108 140 192 20 )
+			text				"View bob height:"
+			cvarFloat			"cg_bobup" 0.005 0.0 0.03
+			SLIDER_DEFAULTS
+			textalignx			0
+			descText			"View swaying factor for height"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// View Bob Pitch (cg_bobpitch)
+			COMMON( bobpitch, tabWindowViewCamera, ITEM_TYPE_SLIDER, 108 160 192 20 )
+			text				"View bob pitch:"
+			cvarFloat			"cg_bobpitch" 0.002 0.0 0.015
+			SLIDER_DEFAULTS
+			textalignx			5
+			descText			"View swaying factor for pitch"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// View Bob Roll (cg_bobroll)
+			COMMON( bobroll, tabWindowViewCamera, ITEM_TYPE_SLIDER, 108 180 192 20 )
+			text				"View bob roll:"
+			cvarFloat			"cg_bobroll" 0.002 0.0 0.015
+			SLIDER_DEFAULTS
+			textalignx			10
+			descText			"View swaying factor for roll"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// View Bob Fall (cg_bobfall)
+			COMMON( bobfall, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 200 192 20 )
+			text				"View bob fall:"
+			cvar				"cg_bobfall"
+			textalignx			10
+			descText			"Bob camera when landing on the ground"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Gun Bobbing (cg_gunBobEnable)
+			COMMON( gunbobenable, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 220 192 20 )
+			text				"Gun bobbing:"
+			cvar				"cg_gunBobEnable"
+			textalignx			20
+			descText			"Enable weapon viewmodel bob when running"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Gun Bob Amount Background
+			name				gunbobamountBackground
+			group				tabWindowViewCamera
+			style				WINDOW_STYLE_SHADER
+			rect				188 241 105 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Gun Bob Amount (cg_gunBob)
+			COMMON( gunbobamount, tabWindowViewCamera, ITEM_TYPE_EDITFIELD, 108 240 192 20 )
+			text				"Bob amount:"
+			cvar				"cg_gunBob"
+			textalignx			25
+			maxchars			19
+			maxpaintchars		19
+			descText			"Control the pitch/yaw/roll amount of weapon viewmodel bobbing"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Gun Drift (cg_gunIdleDriftEnable)
+			COMMON( gunidledriftenable, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 260 192 20 )
+			text				"Gun drift:"
+			cvar				"cg_gunIdleDriftEnable"
+			textalignx			30
+			descText			"Enable weapon viewmodel drift when idle"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Drift Amount Background
+			name				driftamountBackground
+			group				tabWindowViewCamera
+			style				WINDOW_STYLE_SHADER
+			rect				188 281 110 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Drift Amount (cg_gunIdleDrift)
+			COMMON( driftamount, tabWindowViewCamera, ITEM_TYPE_NUMERICFIELD, 108 280 192 20 )
+			text				"Drift amount:"
+			cvar				"cg_gunIdleDrift"
+			textalignx			15
+			maxchars			20
+			maxpaintchars		20
+			descText			"Control the pitch/yaw/roll + speed of gun idle drift"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// View Shake (cg_viewShake)
+			COMMON( viewshake, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 300 192 20 )
+			text				"View shake:"
+			cvar				"cg_viewShake"
+			textalignx			25
+			descText			"Enable view shaking (e.g. when charging pistol)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// View Kick (cg_viewKickDamage)
+			COMMON( viewkick, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 320 192 20 )
+			text				"View kick:"
+			cvar				"cg_viewKickDamage"
+			textalignx			30
+			descText			"Enable view kicking when taking damage"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Instant Duck (cg_instantDuck)
+			COMMON( instantduck, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 340 192 20 )
+			text				"Instant duck:"
+			cvar				"cg_instantDuck"
+			textalignx			15
+			descText			"Instantly move the camera when ducking, or interpolate the camera position over time"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		//################
+		// Second column
+		//################
+
+		itemDef {// True Guns (cg_trueGuns)
+			COMMON( trueguns, tabWindowViewCamera, ITEM_TYPE_YESNO, 368 20 192 20 )
+			text				"True guns:"
+			cvar				"cg_trueGuns"
+			textalignx			45
+			descText			"Use a realistic view for guns in first person"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// True Roll (cg_trueRoll)
+			COMMON( trueroll, tabWindowViewCamera, ITEM_TYPE_MULTI, 368 40 192 20 )
+			text				"True roll:"
+			cvar				"cg_trueRoll"
+			cvarFloatList		{ @MENUS_OFF 0 "Simple" 1 "Advanced" 2 }
+			textalignx			45
+			descText			"Affect the camera's roll in trueview"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// True Flip (cg_trueFlip)
+			COMMON( trueflip, tabWindowViewCamera, ITEM_TYPE_MULTI, 368 60 192 20 )
+			text				"True flip:"
+			cvar				"cg_trueFlip"
+			cvarFloatList		{ @MENUS_OFF 0 "Simple" 1 "Advanced" 2 }
+			textalignx			45
+			descText			"Affect the camera's pitch in trueview"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// True Spin (cg_trueSpin)
+			COMMON( truespin, tabWindowViewCamera, ITEM_TYPE_MULTI, 368 80 192 20 )
+			text				"True spin:"
+			cvar				"cg_trueSpin"
+			cvarFloatList		{ @MENUS_OFF 0 "Simple" 1 "Advanced" 2 }
+			textalignx			45
+			descText			"Affect the camera's yaw in trueview"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// True Move Roll (cg_trueMoveRoll)
+			COMMON( truemoveroll, tabWindowViewCamera, ITEM_TYPE_YESNO, 368 100 192 20 )
+			text				"True move roll:"
+			cvar				"cg_trueMoveRoll"
+			textalignx			20
+			descText			"Affect the camera's roll in trueview for all animations"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// True Saber Only (cg_trueSaberOnly)
+			COMMON( truesaberonly, tabWindowViewCamera, ITEM_TYPE_YESNO, 368 120 192 20 )
+			text				"True saber only:"
+			cvar				"cg_trueSaberOnly"
+			textalignx			15
+			descText			"Only show your saber blade when in trueview with lightsaber"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Invert True Saber (cg_trueInvertSaber)
+			COMMON( trueinvertsaber, tabWindowViewCamera, ITEM_TYPE_YESNO, 368 140 192 20 )
+			text				"Invert true saber:"
+			cvar				"cg_trueInvertSaber"
+			textalignx			5
+			descText			"Invert first/third person when using saber"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// True Eye Offset (cg_trueEyePosition)
+			COMMON( trueeyeoffset, tabWindowViewCamera, ITEM_TYPE_SLIDER, 368 160 192 20 )
+			text				"True eye offset:"
+			cvarFloat			"cg_trueEyePosition" 0 -8 8
+			SLIDER_DEFAULTS
+			textalignx			15
+			descText			"Offset your eye position to avoid camera clipping"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// True FoV (cg_trueFOV)
+			COMMON( trueeyeoffset, tabWindowViewCamera, ITEM_TYPE_SLIDER, 368 180 192 20 )
+			text				"True FoV:"
+			cvarFloat			"cg_trueFOV" 80 40 180
+			SLIDER_DEFAULTS
+			textalignx			50
+			descText			"Field of view when using trueview"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+
+		//	================================
+		//	HUD / 2D TAB
+		//	================================
+
+		itemDef {// Draw 2D (cg_draw2D)
+			COMMON( draw2d, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 20 192 20 )
+			text				"Draw 2D:"
+			cvar				"cg_draw2D"
+			textalignx			55
+			descText			"Toggle visibility of all 2D elements"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// HUD Style (cg_hudFiles)
+			COMMON( hudstyle, tabWindowHUD2D, ITEM_TYPE_MULTI, 108 40 192 20 )
+			text				"HUD style:"
+			cvar				"cg_hudFiles"
+			cvarStrList			{ "Graphical", "ui/jahud.txt", "Simple", "1" }
+			textalignx			45
+			descText			"Choose between a graphical or simplified HUD"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// New Scoreboard (cg_newScoreboard)
+			COMMON( newscoreboard, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 60 192 20 )
+			text				"New scoreboard:"
+			cvar				"cg_newScoreboard"
+			textalignx			20
+			descText			"Choose between the basejka scoreboard or the new scoreboard"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Player Status (cg_drawStatus)
+			COMMON( playerstatus, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 80 192 20 )
+			text				"Player status:"
+			cvar				"cg_drawStatus"
+			textalignx			25
+			descText			"Toggle visibility of player status 2D elements (health, armor, force, ammo)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Map Timer (cg_drawTimer)
+			COMMON( maptimer, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 100 192 20 )
+			text				"Map timer:"
+			cvar				"cg_drawTimer"
+			textalignx			45
+			descText			"Show the elapsed map time in the top-right corner"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// FPS counter (cg_drawFPS)
+			COMMON( fpscounter, tabWindowHUD2D, ITEM_TYPE_MULTI, 108 120 192 20 )
+			text				"FPS counter:"
+			cvar				"cg_drawFPS"
+			cvarFloatList		{ @MENUS_OFF 0 "Simple" 1 "Advanced" 2 }
+			textalignx			35
+			descText			"Show your current FPS (Frames per second) in the top-right to measure performance"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Show Lagometer (cg_lagometer)
+			COMMON( showlagometer, tabWindowHUD2D, ITEM_TYPE_MULTI, 108 140 192 20 )
+			text				"Show lagometer:"
+			cvar				"cg_lagometer"
+			cvarFloatList		{ @MENUS_OFF 0 "Simple" 1 "Advanced" 2 }
+			textalignx			20
+			descText			"Show your snapshot ping and dropped packets in a small graph"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Lagometer Position Background
+			name				lagometerpositionBackground
+			group				tabWindowHUD2D
+			style				WINDOW_STYLE_SHADER
+			rect				203 161 45 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Lagometer position (cg_hudLagometerPos)
+			COMMON( lagometerposition, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 108 160 192 20 )
+			text				"Lagometer position:"
+			cvar				"cg_hudLagometerPos"
+			textalignx			0
+			maxchars			7
+			maxpaintchars		7
+			descText			"Position of the lagometer"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Show Radar (cg_drawRadar)
+			COMMON( showradar, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 180 192 20 )
+			text				"Show radar:"
+			cvar				"cg_drawRadar"
+			textalignx			40
+			descText			"Show the radar in team gametypes"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Show Leader (cg_drawEnemyInfo)
+			COMMON( showleader, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 200 192 20 )
+			text				"Show leader:"
+			cvar				"cg_drawEnemyInfo"
+			textalignx			35
+			descText			"Show the leader in the top-right corner"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Crosshair (N/A)
+			COMMON( crosshair, tabWindowHUD2D, ITEM_TYPE_OWNERDRAW, 108 220 192 20 )
+			ownerdraw			UI_CROSSHAIR
+			text				"Crosshair:"
+			textalignx			45
+			descText			"Choose which crosshair to use"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Crosshair Size (cg_crosshairSize)
+			COMMON( crosshairsize, tabWindowHUD2D, ITEM_TYPE_SLIDER, 108 240 192 20 )
+			text				"Crosshair size:"
+			cvarFloat			"cg_crosshairSize" 24 8 64
+			SLIDER_DEFAULTS
+			textalignx			20
+			descText			"Size of your crosshair"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Crosshair Health (cg_crosshairHealth)
+			COMMON( crosshairhealth, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 260 192 20 )
+			text				"Crosshair health:"
+			cvar				"cg_crosshairHealth"
+			textalignx			10
+			descText			"Colour your crosshair based on your health"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Crosshair Names (cg_drawCrosshairNames)
+			COMMON( crosshairnames, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 280 192 20 )
+			text				"Crosshair names:"
+			cvar				"cg_drawCrosshairNames"
+			textalignx			15
+			maxchars			20
+			maxpaintchars		20
+			descText			"Display names of enemies when looking at them"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Dynamic Crosshair (cg_dynamicCrosshair)
+			COMMON( dynamiccrosshair, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 300 192 20 )
+			text				"Dynamic crosshair:"
+			cvar				"cg_dynamicCrosshair"
+			textalignx			5
+			descText			"Show crosshair where your weapon is pointing (dynamic), or at the center of the screen (static)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Precise Crosshair (cg_dynamicCrosshairPrecision)
+			COMMON( precisecrosshair, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 320 192 20 )
+			text				"Precise crosshair:"
+			cvar				"cg_dynamicCrosshairPrecision"
+			textalignx			5
+			descText			"Performs collisions against Ghoul2 player models for a more precise (dynamic) crosshair"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Vehicle Crosshair (cg_drawVehLeadIndicator)
+			COMMON( vehiclecrosshair, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 340 192 20 )
+			text				"Vehicle crosshair:"
+			cvar				"cg_drawVehLeadIndicator"
+			textalignx			5
+			descText			"Show the ideal spot to shoot enemy fighters (vehicles)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Team Icons (cg_drawFriend)
+			COMMON( teamicons, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 360 192 20 )
+			text				"Team icons:"
+			cvar				"cg_drawFriend"
+			textalignx			40
+			descText			"Show team icons above allies in team games"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Score Plums (cg_scorePlums)
+			COMMON( scoreplums, tabWindowHUD2D, ITEM_TYPE_MULTI, 108 380 192 20 )
+			text				"Score plums:"
+			cvar				"cg_scorePlums"
+			cvarFloatList		{ @MENUS_OFF 0 @MENUS_ON 1 "Always on frags" 2 }
+			textalignx			35
+			descText			"Show score plums"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		//################
+		// Second column
+		//################
+
+		itemDef {// 3D Models (cg_draw3dIcons)
+			COMMON( models, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 20 192 20 )
+			text				"3D models:"
+			cvar				"cg_draw3dIcons"
+			textalignx			40
+			descText			"Use 3D models for certain HUD elements (Flag carrier)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// 2D Icons (cg_drawIcons)
+			COMMON( icons, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 40 192 20 )
+			text				"2D icons:"
+			cvar				"cg_drawIcons"
+			textalignx			40
+			descText			"Use 2D icons for certain HUD elements (Flag carrier)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Team Scores (cg_drawScores)
+			COMMON( teamscores, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 60 192 20 )
+			text				"Team scores:"
+			cvar				"cg_drawScores"
+			textalignx			25
+			descText			"Show scores in team gametypes"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Team Overlay (cg_drawTeamOverlay)
+			COMMON( teamoverlay, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 80 192 20 )
+			text				"Team overlay:"
+			cvar				"cg_drawTeamOverlay"
+			textalignx			20
+			descText			"Show team overlay in team gametypes (health, armor, weapon, location)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Chat Time Background
+			name				chattimeBackground
+			group				tabWindowHUD2D
+			style				WINDOW_STYLE_SHADER
+			rect				453 101 40 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Chat Time (cg_chatBox)
+			COMMON( chattime, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 100 192 20 )
+			text				"Chat time:"
+			cvar				"cg_chatBox"
+			textalignx			35
+			maxchars			6
+			maxpaintchars		6
+			descText			"How long (in milliseconds) to show chatbox messages (1 = infinite)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// New Chatbox (cg_newChatbox)
+			COMMON( newchatbox, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 120 192 20 )
+			text				"New chatbox:"
+			cvar				"cg_newChatbox"
+			textalignx			25
+			descText			"Use the new JA++ chatbox or the basejka chatbox"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Chat Tabs (cg_chatTabs)
+			COMMON( chattabs, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 140 192 20 )
+			text				"Chat tabs:"
+			cvar				"cg_chatTabs"
+			textalignx			35
+			descText			"Enable use of tabs on the chatbox"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Chat Vars Background
+			name				chatvarsBackground
+			group				tabWindowHUD2D
+			style				WINDOW_STYLE_SHADER
+			rect				453 161 90 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Chat Vars (cg_hudChat)
+			COMMON( chatvars, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 160 192 20 )
+			text				"Chat vars:"
+			cvar				"cg_hudChat"
+			textalignx			35
+			maxchars			16
+			maxpaintchars		16
+			descText			"Set the position, text size, and width of the chatbox"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Chat BG Background
+			name				chatbgBackground
+			group				tabWindowHUD2D
+			style				WINDOW_STYLE_SHADER
+			rect				453 181 90 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Chat BG (cg_hudChatBackground)
+			COMMON( chatbg, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 180 192 20 )
+			text				"Chat BG:"
+			cvar				"cg_hudChatBackground"
+			textalignx			45
+			maxchars			18
+			maxpaintchars		18
+			descText			"Set the colour of the chatbox background"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Chat timestamp (cg_chatTimeStamp)
+			COMMON( chattimestamp, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 200 192 20 )
+			text				"Chat timestamp:"
+			cvar				"cg_chatTimeStamp"
+			textalignx			10
+			descText			"Timestamp messages in the chatbox"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Timestamp Colour (cg_chatTimeColour)
+			COMMON( timestampcolour, tabWindowHUD2D, ITEM_TYPE_MULTI, 368 220 192 20 )
+			text				"Timestamp colour:"
+			cvar				"cg_chatTimeColour"
+			cvarFloatList		{ "^0Black" 0, "^1Red" 1, "^2Green" 2, "^3Yellow" 3, "^4Blue" 4, "^5Cyan" 5, "^6Magenta" 6, "^7White" 7 }
+			textalignx			0
+			descText			"Set the colour of the chatbox timestamp"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Chat Line Height Background
+			name				chatlhBackground
+			group				tabWindowHUD2D
+			style				WINDOW_STYLE_SHADER
+			rect				453 241 25 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Chat Line Height (cg_chatLH)
+			COMMON( chatlh, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 240 192 20 )
+			text				"Chat line height:"
+			cvar				"cg_chatLH"
+			textalignx			0
+			maxchars			3
+			maxpaintchars		3
+			descText			"Control the spacing between lines in the chatbox"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Chat Lines Background
+			name				chatlinesBackground
+			group				tabWindowHUD2D
+			style				WINDOW_STYLE_SHADER
+			rect				453 261 25 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Chat Lines (cg_chatLines)
+			COMMON( chatlines, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 260 192 20 )
+			text				"Chat lines:"
+			cvar				"cg_chatLines"
+			textalignx			30
+			maxchars			3
+			maxpaintchars		3
+			descText			"How many lines to show in the chatbox before you have to scroll"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Stats HUD (cg_statsHUD)
+			COMMON( statshud, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 280 192 20 )
+			text				"Stats HUD:"
+			cvar				"cg_statsHUD"
+			textalignx			35
+			descText			"Show statistics about the current game"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Stats Position Background
+			name				statsposBackground
+			group				tabWindowHUD2D
+			style				WINDOW_STYLE_SHADER
+			rect				453 301 45 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Stats Position (cg_hudStatsPos)
+			COMMON( statspos, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 300 192 20 )
+			text				"Stats position:"
+			cvar				"cg_hudStatsPos"
+			textalignx			10
+			maxchars			7
+			maxpaintchars		7
+			descText			"Position of the statistics HUD"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Stats Size Background
+			name				statssizeBackground
+			group				tabWindowHUD2D
+			style				WINDOW_STYLE_SHADER
+			rect				453 321 45 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Stats Size (cg_hudStatsScale)
+			COMMON( statssize, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 320 192 20 )
+			text				"Stats size:"
+			cvar				"cg_hudStatsScale"
+			textalignx			30
+			maxchars			7
+			maxpaintchars		7
+			descText			"Size of the statistics HUD"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Movement Keys (cg_hudMovementKeys)
+			COMMON( movekeys, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 340 192 20 )
+			text				"Movement keys:"
+			cvar				"cg_hudMovementKeys"
+			textalignx			15
+			descText			"Show which movement keys are being pressed"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Keys Position Background
+			name				keysposBackground
+			group				tabWindowHUD2D
+			style				WINDOW_STYLE_SHADER
+			rect				453 361 45 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Keys Position (cg_hudMovementKeysPos)
+			COMMON( keyspos, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 360 192 20 )
+			text				"Keys position:"
+			cvar				"cg_hudMovementKeysPos"
+			textalignx			15
+			maxchars			7
+			maxpaintchars		7
+			descText			"Position of the movement keys HUD"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Keys Size Background
+			name				keyssizeBackground
+			group				tabWindowHUD2D
+			style				WINDOW_STYLE_SHADER
+			rect				453 381 45 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Keys Size (cg_hudMovementKeysScale)
+			COMMON( keyssize, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 380 192 20 )
+			text				"Keys size:"
+			cvar				"cg_hudMovementKeysScale"
+			textalignx			35
+			maxchars			7
+			maxpaintchars		7
+			descText			"Size of the movement keys HUD"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+
+		//	================================
+		//	EFFECTS TAB
+		//	================================
+
+		itemDef {// Simple Items (cg_simpleItems)
+			COMMON( simpleitems, tabWindowEffects, ITEM_TYPE_YESNO, 108 20 192 20 )
+      		type				ITEM_TYPE_YESNO
+			text				"Simple items:"
+			cvar				"cg_simpleItems"
+			textalignx			20
+			descText			"Replace 3D models for weapons and items with simple icons"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Marks (cg_marks)
+			COMMON( marks, tabWindowEffects, ITEM_TYPE_MULTI, 108 40 192 20 )
+			text				"Marks:"
+			cvar				"cg_marks"
+			cvarFloatList		{ @MENUS_OFF 0 "Expensive" 1 "Fast" 2 }
+			textalignx			55
+			descText			"Add weapon scarring effects on walls"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Ghoul2 Marks Background
+			name				g2marksBackground
+			group				tabWindowEffects
+			style				WINDOW_STYLE_SHADER
+			rect				193 61 20 18
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Ghoul2 Marks (cg_ghoul2Marks)
+			COMMON( g2marks, tabWindowEffects, ITEM_TYPE_NUMERICFIELD, 108 60 192 20 )
+			text				"Ghoul2 marks:"
+			cvar				"cg_ghoul2Marks"
+			textalignx			20
+			descText			"How many weapon scarring effects to show on player models"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Saber Marks (cg_saberContact)
+			COMMON( sabermarks, tabWindowEffects, ITEM_TYPE_YESNO, 108 80 192 20 )
+			text				"Saber marks:"
+			cvar				"cg_saberContact"
+			textalignx			25
+			descText			"Show saber marks on walls"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Footsteps (cg_footsteps)
+			COMMON( footsteps, tabWindowEffects, ITEM_TYPE_MULTI, 108 100 192 20 )
+			text				"Footsteps:"
+			cvar				"cg_footsteps"
+			cvarFloatList		{ @MENUS_OFF 0, "Sounds" 1, "+ FX" 2, "+ FX + Marks" 3, "+ FX + Force marks" 4 }
+			textalignx			35
+			descText			"Choose the level of detail for footsteps"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Shadows (cg_shadows)
+			COMMON( shadows, tabWindowEffects, ITEM_TYPE_MULTI, 108 120 192 20 )
+			text				"Shadows:"
+			cvar				"cg_shadows"
+			cvarFloatList		{ @MENUS_OFF 0, "Blob" 1, "Volumetric" 2, "Stencil" 3 }
+			textalignx			45
+			descText			"Choose the level of detail for shadows"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Refraction (cg_renderToTextureFX)
+			COMMON( refraction, tabWindowEffects, ITEM_TYPE_YESNO, 108 140 192 20 )
+			text				"Refraction:"
+			cvar				"cg_renderToTextureFX"
+			textalignx			30
+			descText			"Use expensive refraction effects"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Disable Skybox (r_fastSky)
+			COMMON( skybox, tabWindowEffects, ITEM_TYPE_YESNO, 108 160 192 20 )
+			text				"Disable skybox:"
+			cvar				"r_fastSky"
+			textalignx			10
+			descText			"Disable skybox rendering to increase performance"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Dynamic Lighting (r_dynamicLight)
+			COMMON( dynamiclight, tabWindowEffects, ITEM_TYPE_YESNO, 108 180 192 20 )
+			text				"Dynamic lighting:"
+			cvar				"r_dynamicLight"
+			textalignx			0
+			descText			"Enable Real-time light sources"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Dynamic Glow (r_dynamicGlow)
+			COMMON( dynamicglow, tabWindowEffects, ITEM_TYPE_YESNO, 108 200 192 20 )
+			text				"Dynamic glow:"
+			cvar				"r_dynamicGlow"
+			textalignx			20
+			descText			"Use expensive dynamic glow effect (Recommend OFF, use bloom!)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Glow Passes Background
+			name				glowpassesBackground
+			group				tabWindowEffects
+			style				WINDOW_STYLE_SHADER
+			rect				193 221 20 18
+			background			EDITFIELD_BACKGROUND
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Glow Passes (r_dynamicGlowPasses)
+			COMMON( glowpasses, tabWindowEffects, ITEM_TYPE_NUMERICFIELD, 108 220 192 20 )
+			text				"Glow passes:"
+			cvar				"r_dynamicGlowPasses"
+			textalignx			25
+			maxchars			2
+			maxpaintchars		2
+			descText			"How many times to apply the dynamic glow effect"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Glow separation (r_dynamicGlowDelta)
+			COMMON( glowseparation, tabWindowEffects, ITEM_TYPE_SLIDER, 108 240 192 20 )
+			text				"Glow separation:"
+			cvarFloat			"r_dynamicGlowDelta" 0.8 0.0 4.0
+			SLIDER_DEFAULTS
+			textalignx			5
+			descText			"Spread between dynamic glow passes"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Glow Intensity (r_dynamicGlowIntensity)
+			COMMON( glowintensity, tabWindowEffects, ITEM_TYPE_SLIDER, 108 260 192 20 )
+			text				"Glow intensity:"
+			cvarFloat			"r_dynamicGlowIntensity" 1.13 0.0 2.0
+			SLIDER_DEFAULTS
+			textalignx			10
+			descText			"Intensity of the glow effect"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Glow Soften (r_dynamicGlowSoft)
+			COMMON( glowsoften, tabWindowEffects, ITEM_TYPE_YESNO, 108 280 192 20 )
+			text				"Glow soften:"
+			cvar				"r_dynamicGlowSoft"
+			textalignx			25
+			descText			"Intensity of the glow effect"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Glow Width (r_dynamicGlowWidth)
+			COMMON( glowwidth, tabWindowEffects, ITEM_TYPE_NUMERICFIELD, 108 300 192 20 )
+			text				"Glow width:"
+			cvar				"r_dynamicGlowWidth"
+			textalignx			30
+			descText			"Width of the dynamic glow texture"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Glow Height (r_dynamicGlowHeight)
+			COMMON( glowheight, tabWindowEffects, ITEM_TYPE_NUMERICFIELD, 108 320 192 20 )
+			text				"Glow height:"
+			cvar				"r_dynamicGlowHeight"
+			textalignx			25
+			descText			"Height of the dynamic glow texture"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+
+		//	================================
+		//	RENDERER TAB
+		//	================================
+
+		itemDef 
+		{// Resolution (r_mode)
+			name				resolution
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_MULTI
+			text				"Resolution:"
+			cvarFloatList		{  @MENUS_640_X_480 3 @MENUS_800_X_600 4  @MENUS_1024_X_768 6 @MENUS_1152_X_864 7  @MENUS_1280_X_1024 8  @MENUS_1600_X_1200 9  @MENUS_2048_X_1536 10 @MENUS_2400_X_600 12 "Custom resolution" -1 }
+			cvar				"ui_r_mode"
+			rect				108 20 192 20
+			font 				7
+			textscale 			.375
+			textalignx			40
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			@MENUS_CHANGE_THE_DISPLAY_RESOLUTION
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 20 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{
+				play			"sound/interface/button1"
+				setcvar			ui_r_modified 1
+				show			applyChanges
+			}
+		}
+
+		itemDef 
+		{// Custom resolution text
+			name				wxh
+			group				tabWindowRenderer
+			text				"Width x Height:"
+			rect				108 40 192 20
+			textalignx			20
+			textaligny			0
+			outlinecolor		1 .5 .5 .5
+			backcolor			0 0 0 0
+			font				7
+			textscale			0.375
+			forecolor			.615 .615 .956 1
+			border				0
+			bordercolor			1 1 1 1
+			visible				0
+			cvarTest			ui_r_mode
+			showCvar			{ "-1" }
+			decoration
+		}
+		itemDef
+		{// Custom resolution extra text
+			name				x
+			group				tabWindowRenderer
+			text				"X"
+			rect				242 40 8 20
+			textalign			ITEM_ALIGN_CENTER
+			textaligny			2
+			outlinecolor		1 .5 .5 .5
+			font				7
+			textscale			0.375
+			forecolor			.615 .615 .956 1
+			visible				0
+			cvarTest			ui_r_mode
+			showCvar			{ "-1" }
+			decoration
+		}
+		itemDef 
+		{// Custom width background
+			name				customWidthBackground
+			group				tabWindowRenderer
+			style				WINDOW_STYLE_SHADER
+			rect				208 40 28 20
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+			cvarTest			ui_r_mode
+			showCvar			{ "-1" }
+		}
+		itemDef
+		{// Custom width field
+			name				customWidth
+			group				tabWindowRenderer
+			type				ITEM_TYPE_EDITFIELD
+			style 				0
+			text				""
+			descText			""
+			textaligny			2
+			textalignx			4
+			cvar				"r_customWidth"
+			maxchars			6
+			maxPaintChars		6
+			rect				208 40 28 20
+			font				7
+			textscale			0.375
+			forecolor			1 1 1 1
+			visible				0
+			cvarTest			ui_r_mode
+			showCvar			{ "-1" }
+			action 
+			{
+				play			"sound/interface/button1"
+				setcvar			ui_r_modified	1
+				show			applyChanges
+			}
+		}
+		itemDef 
+		{// Custom height background
+			name				customHeightBackground
+			group				tabWindowRenderer
+			style				WINDOW_STYLE_SHADER
+			rect				248 40 28 20
+			background			"gfx/menus/menu_box_ingame"
+			background			EDITFIELD_BACKGROUND
+			border				0
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+			cvarTest			ui_r_mode
+			showCvar			{ "-1" }
+			action 
+			{
+				play			"sound/interface/button1"
+				setcvar			ui_r_modified 1
+				show			applyChanges
+			}
+		}
+		itemDef
+		{// Custom height field
+			name				customHeight
+			group				tabWindowRenderer
+			type				ITEM_TYPE_EDITFIELD
+			style 				0
+			text				""
+			descText			""
+			textaligny			2
+			textalignx			4
+			cvar				"r_customHeight"
+			maxchars			6
+			maxPaintChars		6
+			rect				248 40 28 20
+			font				7
+			textscale			0.375
+			forecolor			1 1 1 1
+			visible				0
+			cvarTest			ui_r_mode
+			showCvar			{ "-1" }
+			action 
+			{
+				play			"sound/interface/button1"
+				setcvar			ui_r_modified	1
+				show			applyChanges
+			}
+		}
+
+		itemDef 
+		{// Fullscreen (r_fullscreen)
+			name				fullscreen
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_YESNO
+			text				"Fullscreen:"
+			cvarFloatList		{ @MENUS_YES 1 @MENUS_NO 0 }
+			cvar				"ui_r_fullscreen"
+			rect				108 60 192 20
+			font 				7
+			textscale 			.375
+			textalignx			40
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			"Play fullscreen or in a window"
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 60 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{
+				play			"sound/interface/button1"
+				setcvar			ui_r_modified 1
+				show			applyChanges
+			}
+		}
+
+		itemDef 
+		{// Color format (r_colorbits)
+			name				colorbits
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_MULTI
+			text				"Color format:"
+			cvarFloatList		{ "Native" 0 "16-bit" 16 "32-bit" 32 }
+			cvar				"ui_r_colorbits"
+			rect				108 80 192 20
+			font 				7
+			textscale 			.375
+			textalignx			30
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			"Change the color depth"
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 80 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{
+				play			"sound/interface/button1"
+				setcvar			ui_r_modified 1
+				show			applyChanges
+			}
+		}
+
+		itemDef 
+		{// Texture format (r_texturebits)
+			name				texturebits
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_MULTI
+			text				"Texture format:"
+			cvarFloatList		{ "Native" 0 "16-bit" 16 "32-bit" 32 }
+			cvar				"ui_r_texturebits"
+			rect				108 100 192 20
+			font 				7
+			textscale 			.375
+			textalignx			20
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			"Change the color depth for textures"
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 100 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{
+				play			"sound/interface/button1"
+				setcvar			ui_r_modified 1
+				show			applyChanges
+			}
+		}
+
+		itemDef 
+		{// Depth Format (r_depthbits)
+			name				depthbits
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_MULTI
+			text				"Depth format:"
+			cvarFloatList		{ "Native" 0 "8-bit" 8 "16-bit" 16 "24-bit" 24 "32-bit" 32 }
+			cvar				"ui_r_depthbits"
+			rect				108 120 192 20
+			font 				7
+			textscale 			.375
+			textalignx			30
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			"Precision of the depth buffer (high values avoid Z-fighting)"
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 120 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{
+				play			"sound/interface/button1"
+				setcvar			ui_r_modified 1
+				show			applyChanges
+			}
+		}
+
+		itemDef 
+		{// Stencil Format (r_stencilbits)
+			name				stencilbits
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_MULTI
+			text				"Stencil format:"
+			cvarFloatList		{ "Native" 0 "8-bit" 8 "16-bit" 16 "24-bit" 24 "32-bit" 32 }
+			cvar				"ui_r_stencilbits"
+			rect				108 140 192 20
+			font 				7
+			textscale 			.375
+			textalignx			20
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			"Precision of the stencil buffer (for shadows)"
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 140 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{
+				play			"sound/interface/button1"
+				setcvar			ui_r_modified 1
+				show			applyChanges
+			}
+		}
+
+		itemDef 
+		{// Model Detail (r_lodbias)
+			name				lodbias
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_MULTI
+			text				"Model detail:"
+			cvarFloatList		{ @MENUS_HIGH 0 @MENUS_MEDIUM 1 @MENUS_LOW 2 }
+			cvar				"r_lodbias"
+			rect				108 160 192 20
+			font 				7
+			textscale 			.375
+			textalignx			30
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			"Change the number of polygons displayed on player and weapon models"
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 160 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action				{ play "sound/interface/button1" }
+		}
+
+		itemDef 
+		{// Map Detail (r_subdivisions)
+			name				subdivisions
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_MULTI
+			text				"Map detail:"
+			cvarFloatList		{ @MENUS_VERY_HIGH 1 @MENUS_HIGH 4 @MENUS_MEDIUM 12 @MENUS_LOW 20 "Pr0" 80 }
+			cvar				"ui_r_subdivisions"
+			rect				108 180 192 20
+			font 				7
+			textscale 			.375
+			textalignx			40
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			"Change the number of polygons displayed on certain map geometry"
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 180 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{
+				play			"sound/interface/button1"
+				setcvar			ui_r_modified 1
+				show			applyChanges
+			}
+		}
+
+		itemDef 
+		{// Texture Quality (r_picmip)
+			name				picmip
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_MULTI
+			text				"Texture quality:"
+			cvarFloatList		{ @MENUS_VERY_HIGH 0 @MENUS_HIGH 1 @MENUS_MEDIUM 2 @MENUS_LOW 4 "Pr0" 16 }
+			cvar				"ui_r_picmip"
+			rect				108 200 192 20
+			font 				7
+			textscale 			.375
+			textalignx			15
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			"Force low resolution textures"
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 200 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{
+				play			"sound/interface/button1"
+				setcvar			ui_r_modified 1
+				show			applyChanges
+			}
+		}
+
+		itemDef 
+		{// Full Bright (r_fullbright)
+			name				fullbright
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_YESNO
+			text				"Full bright:"
+			cvar				"r_fullbright"
+			rect				108 220 192 20
+			font 				7
+			textscale 			.375
+			textalignx			35
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			"Disable the lightmap, making all map geometry \"fullbright\""
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 220 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action				{ play "sound/interface/button1" }
+		}
+
+		itemDef 
+		{// Texture Brightness (r_intensity)
+			name				intensity
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_SLIDER
+			text				"Texture brightness:"
+			cvarfloat			"ui_r_intensity" 1 0 2
+			rect				108 240 192 20
+			slider				92.0 20.0 8.0 20.0
+			font 				7
+			textscale 			.375
+			textalignx			0
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			"Control the brightness of textures"
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 240 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{
+				play			"sound/interface/button1"
+				setcvar			ui_r_modified 1
+				show			applyChanges
+			}
+		}
+
+		itemDef 
+		{// Texture Filtering (r_textureMode)
+			name				filtering
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_MULTI
+			text				"Texture filtering:"
+			cvarStrList			{ "NEAREST", "GL_NEAREST", @MENUS_BILINEAR, "GL_LINEAR_MIPMAP_NEAREST", @MENUS_TRILINEAR, "GL_LINEAR_MIPMAP_LINEAR" }
+			cvar				"r_textureMode"
+			rect				108 260 192 20
+			font 				7
+			textscale 			.375
+			textalignx			5
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			"Filtering mode of textures (crisp or smooth)"
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 260 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action				{ play "sound/interface/button1" }
+		}
+
+		itemDef 
+		{// Anisotropy (r_ext_texture_filter_anisotropic)
+			name				anisotropy
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_SLIDER
+			text				"Anisotropy:"
+			cvarfloat			"r_ext_texture_filter_anisotropic" 16 1 16
+			rect				108 280 192 20
+			slider				92.0 20.0 8.0 20.0
+			font 				7
+			textscale 			.375
+			textalignx			40
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			"Control the brightness of textures"
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 280 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action				{ play "sound/interface/button1" }
+		}
+
+		itemDef 
+		{// Detail Textures (r_detailtextures)
+			name				detailtex
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_YESNO
+			text				"Detail textures:"
+			cvar				"ui_r_detailtextures"
+			rect				108 300 192 20
+			font 				7
+			textscale 			.375
+			textalignx			15
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			"Show textures considered to be detail/non-essential"
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 300 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{
+				play			"sound/interface/button1"
+				setcvar			ui_r_modified 1
+				show			applyChanges
+			}
+		}
+
+		itemDef 
+		{// Compress Textures (r_ext_compress_textures)
+			name				compresstex
+			group				tabWindowRenderer
+      		type				ITEM_TYPE_YESNO
+			text				"Compress textures:"
+			cvar				"ui_r_ext_compress_textures"
+			rect				108 320 192 20
+			font 				7
+			textscale 			.375
+			textalignx			5
+			border				0
+			bordercolor			1 1 1 1
+			forecolor			.615 .615 .956 1
+			descText			"Compress textures to save memory with a small performance hit"
+			visible				0
+			mouseEnter			{ setitemrect highlight 108 320 192 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action 
+			{
+				play			"sound/interface/button1"
+				setcvar			ui_r_modified 1
+				show			applyChanges
+			}
+		}
+
+
+
+		itemDef
+		{// APPLY CHANGES
+			name				applyChanges
+			text				@MENUS_APPLY_CHANGES
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				323 380 90 20
+			font				7
+			textscale			0.5
+			textalignx			0
+			textaligny			0
+			textstyle			3
+			forecolor			1 0 0 1
+			backcolor			0 0 1 0
+			visible				0
+			mouseEnter			{ setitemrect highlight 323 380 90 20 }
+			mouseExit			{ setitemrect highlight 0 0 0 0 }
+			action
+			{
+				play			"sound/interface/button1"
+				show			vidrestart
+				hide			tabWindowRenderer
+				setitemrect		highlight 0 0 0 0
+			}
+		}
+
+		//	================================
+		//	VID_RESTART PROMPT
+		//	================================
+		//----------------------------------------------------------------------------------------------
+		//
+		//	VIDEO RESTART
+		//
+		//----------------------------------------------------------------------------------------------
+		// Faint red box
+		itemDef 
+		{
+			name				vidrestart_background
+			group				vidrestart
+			style				WINDOW_STYLE_SHADER
+			rect				210 41 302 252	
+			background			"gfx/menus/menu_boxred"					// Frame
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			name				vidrestart_text1
+			group				vidrestart
+			text				@MENUS_THIS_WILL_APPLY_VIDEO
+			text2				@MENUS_AND_RETURNTO_GAME
+			rect				210 100 300 20
+			textalign			ITEM_ALIGN_CENTER
+			text2aligny			18
+			textalignx			150
+			font				2
+			textscale			1        
+			forecolor			1 1 0 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			name				vidrestart_text2
+			group				vidrestart
+			text				@MENUS_VID_RESTART3
+			rect				210 160 256 20
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			150
+			font				2
+			textscale			1        
+			forecolor			1 1 0 1
+			visible				0
+		}
+
+
+
+		itemDef 
+		{
+			name			vidrestart_yes_button
+			style			WINDOW_STYLE_SHADER
+			rect			367 241 120 32 
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor		1 1 1 1
+			decoration
+			visible			0 
+		}
+
+		// YES button
+		itemDef 
+		{
+			name				vidrestart_yes
+			group				vidrestart
+			text				@MENUS_YES
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				367 241 120 32 
+			font				2
+			textscale			1        
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			60
+			textaligny			0
+			descText			@MENUS_APPLY_CHANGES_AND_THEN
+			forecolor			1 .682 0 1
+			visible				-1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav"
+				close			all
+				uiScript		updatevideosetup
+			}
+			mouseEnter			{ show vidrestart_yes_button }
+			mouseExit			{ hide vidrestart_yes_button }	  	  
+
+		}
+	
+		itemDef 
+		{
+			name			vidrestart_no_button
+			style			WINDOW_STYLE_SHADER
+			rect			240 241 120 32 
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor		1 1 1 1
+			decoration
+			visible		0
+			// appearance_slot 3
+		}
+
+		// CANCEL button
+		itemDef 
+		{
+			name				vidrestart_no
+			group				vidrestart
+			text				@MENUS_NO
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				240 241 120 32 
+			font				2
+			textscale			1        
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			60
+			textaligny			-1
+			descText			@MENUS_DO_NOT_APPLY_CHANGES
+			forecolor			1 .682 0 1
+			visible			0
+			action 
+			{ 
+				play			"sound/interface/button1"
+				hide			setup_background
+				hide 			vidrestart
+				show			video
+				hide			video2
+				show			applyChanges
+				hide			vidrestart_yes_button
+				hide			vidrestart_no_button
+			}
+			mouseEnter			{ show vidrestart_no_button }
+			mouseExit			{ hide vidrestart_no_button }	  	  
+		}
+
+
+		//	================================
+		//	POST-PROCESS TAB
+		//	================================
+
+		itemDef {// Post Processing (r_postprocess_enable)
+			COMMON( postprocess, tabWindowPostprocess, ITEM_TYPE_YESNO, 108 20 192 20 )
+			text				"Post processing:"
+			cvar				"r_postprocess_enable"
+			textalignx			10
+			descText			"Enable or disable expensive post processing effects"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Bloom (r_postprocess_bloom)
+			COMMON( bloom, tabWindowPostprocess, ITEM_TYPE_YESNO, 108 40 192 20 )
+			text				"Bloom:"
+			cvar				"r_postprocess_bloom"
+			textalignx			60
+			descText			"Enable bloom effect"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Brightpass Method (r_postprocess_brightPassStyle)
+			COMMON( brightpassmethod, tabWindowPostprocess, ITEM_TYPE_MULTI, 108 60 192 20 )
+			text				"Brightpass method:"
+			cvar				"r_postprocess_brightPassStyle"
+			cvarFloatList		{ "Subtract" 1, "Multiply" 2, "Blend" 3 }
+			textalignx			0
+			descText			"How to determine bright pixels"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Bloom Threshold (r_postprocess_brightPassThres)
+			COMMON( bloomthres, tabWindowPostprocess, ITEM_TYPE_SLIDER, 108 80 192 20 )
+			text				"Bloom threshold:"
+			cvarFloat			"r_postprocess_brightPassThres" 0.5 0.0 1.0
+			SLIDER_DEFAULTS
+			textalignx			10
+			descText			"Pixels brighter than this will be subject to blooming"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Bloom Intensity (r_postprocess_bloomMulti)
+			COMMON( bloomintensity, tabWindowPostprocess, ITEM_TYPE_SLIDER, 108 100 192 20 )
+			text				"Bloom intensity:"
+			cvarFloat			"r_postprocess_bloomMulti" 1.0 0.0 4.0
+			SLIDER_DEFAULTS
+			textalignx			10
+			descText			"Intensity of the bloom texture"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Scene Intensity (r_postprocess_bloomSceneMulti)
+			COMMON( sceneintensity, tabWindowPostprocess, ITEM_TYPE_SLIDER, 108 120 192 20 )
+			text				"Scene intensity:"
+			cvarFloat			"r_postprocess_bloomSceneMulti" 1.0 0.0 4.0
+			textalignx			10
+			SLIDER_DEFAULTS
+			descText			"Intensity of the scene texture"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Bloom Saturation (r_postprocess_bloomSat)
+			COMMON( bloomsaturation, tabWindowPostprocess, ITEM_TYPE_SLIDER, 108 140 192 20 )
+			text				"Bloom saturation:"
+			cvarFloat			"r_postprocess_bloomSat" 1.0 0.0 4.0
+			SLIDER_DEFAULTS
+			textalignx			5
+			descText			"Saturation of the bloom texture"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Scene Saturation (r_postprocess_bloomSceneSat)
+			COMMON( scenesaturation, tabWindowPostprocess, ITEM_TYPE_SLIDER, 108 160 192 20 )
+			text				"Scene Saturation:"
+			cvarFloat			"r_postprocess_bloomSceneSat" 1.0 0.0 4.0
+			SLIDER_DEFAULTS
+			textalignx			5
+			descText			"Saturation of the scene texture"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Bloom Method (r_postprocess_bloomStyle)
+			COMMON( bloommethod, tabWindowPostprocess, ITEM_TYPE_MULTI, 108 180 192 20 )
+			text				"Bloom method:"
+			cvar				"r_postprocess_bloomStyle"
+			cvarFloatList		{ "Additive" 1, "Blend" 2 }
+			textalignx			25
+			descText			"How to apply the bloom texture"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Bloom Size Background
+			name				bloomsizeBackground
+			group				tabWindowPostprocess
+			style				WINDOW_STYLE_SHADER
+			rect				198 201 30 18
+			background			EDITFIELD_BACKGROUND
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Bloom Size (r_postprocess_bloomSize)
+			COMMON( bloomsize, tabWindowPostprocess, ITEM_TYPE_NUMERICFIELD, 108 200 192 20 )
+			text				"Bloom size:"
+			cvar				"r_postprocess_bloomSize"
+			textalignx			35
+			maxchars			4
+			maxpaintchars		4
+			descText			"Size of the bloom texture (0 = native resolution)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_CHANGEPP
+		}
+
+		itemDef {// Bloom Steps Background
+			name				bloomstepsBackground
+			group				tabWindowPostprocess
+			style				WINDOW_STYLE_SHADER
+			rect				198 221 15 18
+			background			EDITFIELD_BACKGROUND
+			visible				0
+			BORDER_DEFAULTS
+			decoration
+		}
+		itemDef {// Bloom Steps (r_postprocess_bloomSteps)
+			COMMON( bloomsteps, tabWindowPostprocess, ITEM_TYPE_NUMERICFIELD, 108 220 192 20 )
+			text				"Bloom steps:"
+			cvar				"r_postprocess_bloomSteps"
+			textalignx			30
+			maxchars			1
+			maxpaintchars		1
+			descText			"How many times to downscale the bloom texture before blurring"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_CHANGEPP
+		}
+
+		itemDef {// Blur Size (r_postprocess_bloomBlurStyle)
+			COMMON( blursize, tabWindowPostprocess, ITEM_TYPE_MULTI, 108 240 192 20 )
+			text				"Blur size:"
+			cvar				"r_postprocess_bloomBlurStyle"
+			cvarFloatList		{ "3x3" 1, "6x6" 2, "6x3" 3, "3x6" 4 }
+			textalignx			40
+			descText			"Size of the gaussian blur used by bloom"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Apply post-process changes (postprocess_reload)
+			COMMON( applyPPChanges, tabWindowPostprocess, ITEM_TYPE_BUTTON, 323 380 90 20 )
+			text				@MENUS_APPLY_CHANGES
+			style				WINDOW_STYLE_EMPTY
+			textalignx			0
+			descText			"Reload the post-processing system to apply changes"
+			TEXT_APPLY MISC_DEFAULTS
+			action				{ exec "postprocess_reload"; play "sound/interface/button1" }
+		}
+
+
+		//	================================
+		//	NET / PERF TAB
+		//	================================
+
+		itemDef {// Transfer Rate (rate)
+			COMMON( transferrate, tabWindowNetPerf, ITEM_TYPE_NUMERICFIELD, 108 20 192 20 )
+			text				"Transfer rate:"
+			cvar				"rate"
+			textalignx			20
+			maxchars			5
+			maxpaintchars		5
+			descText			"Maximum bytes per second (Recommend 25000, minimum 16000)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Incoming packets (snaps)
+			COMMON( incomingpackets, tabWindowNetPerf, ITEM_TYPE_NUMERICFIELD, 108 40 192 20 )
+			text				"Incoming packets:"
+			cvar				"snaps"
+			textalignx			5
+			maxchars			3
+			maxpaintchars		3
+			descText			"How many snapshots to process per second (Recommend matching sv_fps, default 20)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Outgoing Packets (cl_maxPackets)
+			COMMON( outgoingpackets, tabWindowNetPerf, ITEM_TYPE_NUMERICFIELD, 108 60 192 20 )
+			text				"Outgoing packets:"
+			cvar				"cl_maxPackets"
+			textalignx			5
+			maxchars			3
+			maxpaintchars		3
+			descText			"How many movement packets to send per second (Recommend equal-to or half of your FPS)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Duplicate Packets (cl_packetDup)
+			COMMON( duplicatepackets, tabWindowNetPerf, ITEM_TYPE_NUMERICFIELD, 108 80 192 20 )
+			text				"Duplicate packets:"
+			cvar				"cl_packetDup"
+			textalignx			0
+			maxchars			1
+			maxpaintchars		1
+			descText			"Duplicate outgoing packets to compensate for packetloss (Recommend 1 or 2)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Max FPS (com_maxFPS)
+			COMMON( maxfps, tabWindowNetPerf, ITEM_TYPE_NUMERICFIELD, 108 100 192 20 )
+			text				"Max FPS:"
+			cvar				"com_maxFPS"
+			textalignx			50
+			maxchars			4
+			maxpaintchars		4
+			descText			"Set your maximum framerate (Recommend 125)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Vertical Sync (r_swapInterval)
+			COMMON( sceneintensity, tabWindowNetPerf, ITEM_TYPE_YESNO, 108 120 192 20 )
+			text				"Vertical sync:"
+			cvar				"r_swapInterval"
+			textalignx			20
+			descText			"Synchronise framerate with monitor refresh rate (Recommend OFF for max speed, ON for smooth picture with input lag)"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+
+		//	================================
+		//	SOUND TAB
+		//	================================
+
+		itemDef {// Sound Quality (s_khz)
+			COMMON( soundquality, tabWindowSound, ITEM_TYPE_MULTI, 108 20 192 20 )
+			text				"Sound quality:"
+			cvar				"s_khz"
+			cvarFloatList		{ @MENUS_LOW 11 @MENUS_MEDIUM 22 @MENUS_HIGH 44 }
+			textalignx			15
+			descText			"Choose the bitrate for sounds"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_CHANGESOUND
+		}
+
+		itemDef {// Stereo Separation (s_separation)
+			COMMON( stereoseparation, tabWindowSound, ITEM_TYPE_SLIDER, 108 40 192 20 )
+			text				"Stero separation:"
+			cvarFloat			"s_separation" 0.5 0.0 1.0
+			SLIDER_DEFAULTS
+			textalignx			0
+			descText			"How far to spread spatialised sounds over headphones/2+ speakers"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Music Volume (s_musicVolume)
+			COMMON( musicvolume, tabWindowSound, ITEM_TYPE_SLIDER, 108 60 192 20 )
+			text				"Music volume:"
+			cvarFloat			"s_musicVolume" 0.25 0.0 1.0
+			SLIDER_DEFAULTS
+			textalignx			20
+			descText			"Volume control for background music"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Effects Volume (s_volume)
+			COMMON( effectsvolume, tabWindowSound, ITEM_TYPE_SLIDER, 108 80 192 20 )
+			text				"Effects volume:"
+			cvarFloat			"s_volume" 0.5 0.0 1.0
+			SLIDER_DEFAULTS
+			textalignx			10
+			descText			"Volume control for various effects"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Voice Volume (s_volumeVoice)
+			COMMON( voicevolume, tabWindowSound, ITEM_TYPE_SLIDER, 108 100 192 20 )
+			text				"Voice volume:"
+			cvarFloat			"s_volumeVoice" 1.0 0.0 1.0
+			SLIDER_DEFAULTS
+			textalignx			20
+			descText			"Volume control for character voices"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+		}
+
+		itemDef {// Use EAX (s_UseOpenAL)
+			COMMON( useeax, tabWindowSound, ITEM_TYPE_YESNO, 108 120 192 20 )
+			text				"Use EAX:"
+			cvar				"s_UseOpenAL"
+			textalignx			45
+			descText			"Use Creative Labs Enhanced Audio"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_CHANGESOUND
+		}
+
+		itemDef {// Language (s_language)
+			COMMON( language, tabWindowSound, ITEM_TYPE_MULTI, 108 140 192 20 )
+			text				"Language:"
+			cvar				"s_language"
+			cvarStrList			{ "English", "english", @MENUS_LANG_FRENCH, "francais", "Deutsch", "deutsch", "Español", "espanol" }
+			textalignx			40
+			descText			"Set your locale for voices"
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_CHANGESOUND
+		}
+
+		itemDef {// Apply sound changes (snd_restart)
+			COMMON( applySoundChanges, tabWindowSound, ITEM_TYPE_BUTTON, 323 380 90 20 )
+			text				@MENUS_APPLY_CHANGES
+			style				WINDOW_STYLE_EMPTY
+			textalignx			0
+			descText			"Reload the sound system to apply changes"
+			TEXT_APPLY MISC_DEFAULTS
+			action				{ exec "snd_restart"; play "sound/interface/button1" }
+		}
+	}
+}

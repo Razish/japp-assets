@@ -1,0 +1,39 @@
+repeatDelay				200
+
+OrientedParticle
+{
+	flags				depthHack useAlpha
+
+	spawnFlags			rgbComponentInterpolation
+
+	count				1
+
+	life				2000
+
+	rotation			0 360
+
+	rotationDelta		-20
+
+	rgb
+	{
+		start			0 0.5 1 0 0 1
+	}
+
+	alpha
+	{
+		end				0
+		flags			linear
+	}
+
+	size
+	{
+		start			48
+		end				0
+		parm			0.5
+	}
+
+	shaders
+	[
+		wake
+	]
+}
