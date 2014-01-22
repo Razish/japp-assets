@@ -1,5 +1,5 @@
 JPLua = setmetatable( {}, {
-	__index = { version = 4 },
+	__index = { version = 5 },
 	__newindex = function() error( "Attempt to modify read-only data!" ) end
 } )
 

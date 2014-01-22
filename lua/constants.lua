@@ -165,6 +165,30 @@ CSF = setmetatable( {}, {
 	__newindex = function() error( "Attempt to modify read-only data!" ) end
 } )
 
+CPD = setmetatable( {}, {
+	__index = {
+		NEWDRAINEFX			= 0x00000001,
+		DUELSEEOTHERS		= 0x00000002,
+		ENDDUELROTATION		= 0x00000004,
+		BLACKSABERSDISABLE	= 0x00000008,
+		AUTOREPLYDISABLE	= 0x00000010,
+		NEWFORCEEFFECT		= 0x00000020,
+		NEWDEATHMSG_DISABLE	= 0x00000040,
+		NEWSIGHTEFFECT		= 0x00000080,
+		NOALTDIMEFFECT		= 0x00000100,
+		HOLSTEREDSABER		= 0x00000200,
+		LEDGEGRAB			= 0x00000400,
+		NEWDFAPRIM			= 0x00000800,
+		NEWDFAALT			= 0x00001000,
+		NOSPCARTWHEEL		= 0x00002000,
+		ALLOWLIBCURL		= 0x00004000,
+		NOKATA				= 0x00008000,
+		NOBUTTERFLY			= 0x00010000,
+		NOSTAB				= 0x00020000,
+		NODFA				= 0x00040000 },
+	__newindex = function() error( "Attempt to modify read-only data!" ) end
+} )
+
 SSF = setmetatable( {}, {
 	__index = {
 		GRAPPLE_SWING			= 0x01,
@@ -172,7 +196,8 @@ SSF = setmetatable( {}, {
 		SCOREBOARD_KD			= 0x04,
 		CHAT_FILTERS			= 0x08,
 		FIXED_WEAP_ANIMS		= 0x10,
-		MERC_FLAMETHROWER		= 0x20 },
+		MERC_FLAMETHROWER		= 0x20,
+		SPECTINFO				= 0x40 },
 	__newindex = function() error( "Attempt to modify read-only data!" ) end
 } )
 
