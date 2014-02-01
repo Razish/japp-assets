@@ -2,10 +2,14 @@
 	JA++ Assets Package Script
 	by Raz0r
 
-	Requires lua, lua-filesystem, 7zip
+	Requires lua 5.1, lua-filesystem, 7zip
 --]]
 
 require "lfs" -- lua filesystem
+
+if lfs == nil then
+	error( 'lua-filesystem not available for this version of lua (' .. _VERSION .. ')' )
+end
 
 local paks = {
 	['sh'] = {
@@ -77,6 +81,30 @@ local paks = {
 			'ui/jamp/joinserver.menu',
 			'ui/jamp/player.menu',
 			'ui/jamp/saber.menu'
+		},
+		["lua_ignorebot"] = {
+			'lua/cl/ignorebot/plugin.lua',
+		},
+		["lua_japlusadmguns"] = {
+			'lua/cl/japlusadmguns/plugin.lua',
+		},
+		["lua_japluscompat"] = {
+			'lua/cl/japluscompat/plugin.lua',
+		},
+		["lua_razhud"] = {
+			'lua/cl/razhud/plugin.lua',
+		},
+		["lua_strafehud"] = {
+			'lua/cl/strafehud/plugin.lua',
+		}
+	},
+
+	['sv'] = {
+		["lua_duelwhois"] = {
+			'lua/sv/duelwhois/plugin.lua',
+		},
+		["lua_motd"] = {
+			'lua/sv/motd/plugin.lua',
 		},
 	}
 }
