@@ -12,16 +12,16 @@ JPMath = setmetatable( {}, {
 
 		-- Convert viewangles to a direction vector
 		AngleVectors = function( angles, forward, right, up )
-			local angle = angles.y * (math.pi*2.0 / 360.0)
+			local angle = angles.yaw * (math.pi*2.0 / 360.0)
 			local sy = math.sin( angle )
 			local cy = math.cos( angle )
-			angle = angles.x * (math.pi*2.0 / 360.0)
+			angle = angles.pitch * (math.pi*2.0 / 360.0)
 			local sp = math.sin( angle )
 			local cp = math.cos( angle )
-			angle = angles.z * (math.pi*2.0 / 360.0)
+			angle = angles.roll * (math.pi*2.0 / 360.0)
 			local sr = math.sin( angle )
 			local cr = math.cos( angle )
-			
+
 			if ( forward == true ) then
 				return { x = (cp*cy), y = (cp*sy), z = (sp*-1.0) }
 			elseif ( right == true ) then
@@ -31,6 +31,7 @@ JPMath = setmetatable( {}, {
 			end
 		end,
 
+		-- Convert direction vector to viewangles
 		VectorAngles = function( vector )
 			local forward
 			local yaw
@@ -63,7 +64,7 @@ JPMath = setmetatable( {}, {
 				end
 			end
 
-			return { x = -pitch, y = yaw, z = 0.0 }
+			return { pitch = -pitch, yaw = yaw, roll = 0.0 }
 		end,
 
 		-- Matches VectorMA from JA
@@ -71,18 +72,27 @@ JPMath = setmetatable( {}, {
 			return { x = v.x+b.x*s, y = v.y+b.y*s, z = v.z+b.z*s }
 		end,
 
+		-- Scale a 3D vector
+		Vector3Scale = function( v, s )
+			return JPMath.Vector3( v.x*s, v.y*s, v.z*s )
+		end,
+
 		-- Normalises a 3D vector
 		Vector3Normalise = function( v )
-			local length = math.sqrt( v.x*v.x + v.y*v.y + v.z*v.z )
-			local out = {}
+			local length = JPMath.DotProduct( v )
 			if ( length ) then
-				local ilength = 1.0/length
-				out.x = v.x * ilength
-				out.y = v.y * ilength
-				out.z = v.z * ilength
+				return JPMath.Vector3Scale( v, 1.0/math.sqrt( length ) )
 			end
-			return out
-		end
+			return v
+		end,
+
+		DotProduct = function( v1, v2 )
+			if v2 == nil then
+				return v1.x*v1.x + v1.y*v1.y + v1.z*v1.z
+			else
+				return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
+			end
+		end,
 	},
 
 	__newindex = function() error( "Attempt to modify read-only data!" ) end
