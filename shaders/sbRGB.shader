@@ -1,5 +1,4 @@
-gfx/effects/sabers/RGBglow1
-{
+gfx/effects/sabers/RGBglow1 {
 	nopicmip
 	cull twosided
 	{
@@ -10,8 +9,7 @@ gfx/effects/sabers/RGBglow1
 	}
 }
 
-gfx/effects/sabers/RGBcore1
-{
+gfx/effects/sabers/RGBcore1 {
 	nopicmip
 	cull twosided
 	{
@@ -21,8 +19,7 @@ gfx/effects/sabers/RGBcore1
 	}
 }
 
-gfx/effects/sabers/RGBglow2
-{
+gfx/effects/sabers/RGBglow2 {
 	nopicmip
 	cull twosided
 	{
@@ -33,8 +30,7 @@ gfx/effects/sabers/RGBglow2
 	}
 }
 
-gfx/effects/sabers/RGBcore2
-{
+gfx/effects/sabers/RGBcore2 {
 	nopicmip
 	cull twosided
 	{
@@ -44,8 +40,7 @@ gfx/effects/sabers/RGBcore2
 	}
 }
 
-gfx/effects/sabers/RGBglow3
-{
+gfx/effects/sabers/RGBglow3 {
 	nopicmip
 	cull twosided
 	{
@@ -56,8 +51,7 @@ gfx/effects/sabers/RGBglow3
 	}
 }
 
-gfx/effects/sabers/RGBcore3
-{
+gfx/effects/sabers/RGBcore3 {
 	nopicmip
 	cull twosided
 	{
@@ -67,8 +61,7 @@ gfx/effects/sabers/RGBcore3
 	}
 }
 
-gfx/effects/sabers/RGBglow4
-{
+gfx/effects/sabers/RGBglow4 {
 	nopicmip
 	cull twosided
 	{
@@ -79,8 +72,7 @@ gfx/effects/sabers/RGBglow4
 	}
 }
 
-gfx/effects/sabers/RGBcore4
-{
+gfx/effects/sabers/RGBcore4 {
 	nopicmip
 	cull twosided
 	{
@@ -90,8 +82,7 @@ gfx/effects/sabers/RGBcore4
 	}
 }
 
-gfx/effects/sabers/RGBglow5
-{
+gfx/effects/sabers/RGBglow5 {
 	nopicmip
 	cull twosided
 	{
@@ -102,8 +93,7 @@ gfx/effects/sabers/RGBglow5
 	}
 }
 
-gfx/effects/sabers/RGBcore5
-{
+gfx/effects/sabers/RGBcore5 {
 	nopicmip
 	cull twosided
 	{
@@ -113,8 +103,7 @@ gfx/effects/sabers/RGBcore5
 	}
 }
 
-gfx/effects/sabers/blackglow
-{
+gfx/effects/sabers/blackglow {
 	nopicmip
 	cull twosided
 	{
@@ -125,8 +114,7 @@ gfx/effects/sabers/blackglow
 	}
 }
 
-gfx/effects/sabers/blackcore
-{
+gfx/effects/sabers/blackcore {
 	nopicmip
 	cull twosided
 	{
@@ -137,8 +125,7 @@ gfx/effects/sabers/blackcore
 	}
 }
 
-gfx/effects/sabers/blacktrail
-{
+gfx/effects/sabers/blacktrail {
 	nopicmip
 	cull twosided
 	{
@@ -155,8 +142,7 @@ gfx/effects/sabers/blacktrail
 	}
 }
 
-gfx/effects/sabers/RGBtrail2
-{
+gfx/effects/sabers/RGBtrail2 {
 	nopicmip
 	cull disable
 	{
@@ -171,8 +157,7 @@ gfx/effects/sabers/RGBtrail2
 	}
 }
 
-gfx/effects/sabers/RGBtrail3
-{
+gfx/effects/sabers/RGBtrail3 {
 	nopicmip
 	cull disable
 	{
@@ -187,20 +172,17 @@ gfx/effects/sabers/RGBtrail3
 	}
 }
 
-gfx/effects/sabers/RGBglow4
-{
+gfx/effects/sabers/RGBglow4 {
 	nopicmip
 	cull twosided
 	{
 		map gfx/effects/sabers/RGBglow4
 		blendFunc GL_ONE GL_ONE
-		
 		rgbGen vertex
 	}
 }
 
-gfx/effects/sabers/RGBtrail4
-{
+gfx/effects/sabers/RGBtrail4 {
 	nopicmip
 	cull disable
 	{

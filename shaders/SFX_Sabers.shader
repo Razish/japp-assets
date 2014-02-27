@@ -1,5 +1,4 @@
-gfx/sfx_sabers/saber_trail
-{
+gfx/sfx_sabers/saber_trail {
 	nopicmip
 	cull twosided
 	{
@@ -9,8 +8,7 @@ gfx/sfx_sabers/saber_trail
 	}
 }
 
-gfx/sfx_sabers/saber_blade
-{
+gfx/sfx_sabers/saber_blade {
 	notc
 	nopicmip
 	cull twosided
@@ -21,8 +19,7 @@ gfx/sfx_sabers/saber_blade
 	}
 }
 
-gfx/sfx_sabers/saber_blade_rgb
-{
+gfx/sfx_sabers/saber_blade_rgb {
 	notc
 	nopicmip
 	cull twosided
@@ -33,8 +30,7 @@ gfx/sfx_sabers/saber_blade_rgb
 	}
 }
 
-gfx/sfx_sabers/saber_end
-{
+gfx/sfx_sabers/saber_end {
 	notc
 	nopicmip
 	cull twosided
@@ -45,8 +41,7 @@ gfx/sfx_sabers/saber_end
 	}
 }
 
-gfx/sfx_sabers/saber_end_rgb
-{
+gfx/sfx_sabers/saber_end_rgb {
 	notc
 	nopicmip
 	cull twosided

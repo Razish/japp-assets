@@ -1,5 +1,4 @@
-gfx/effects/sabers/red_glow
-	{
+gfx/effects/sabers/red_glow {
 	nopicmip
 	cull twosided
 	{
@@ -10,8 +9,7 @@ gfx/effects/sabers/red_glow
 	}
 }
 
-gfx/effects/sabers/red_line
-{
+gfx/effects/sabers/red_line {
 	nopicmip
 	cull twosided
 	{
@@ -21,8 +19,7 @@ gfx/effects/sabers/red_line
 	}
 }
 
-gfx/effects/sabers/orange_glow
-{
+gfx/effects/sabers/orange_glow {
 	nopicmip
 	cull twosided
 	{
@@ -33,8 +30,7 @@ gfx/effects/sabers/orange_glow
 	}
 }
 
-gfx/effects/sabers/orange_line
-{
+gfx/effects/sabers/orange_line {
 	nopicmip
 	cull twosided
 	{
@@ -44,8 +40,7 @@ gfx/effects/sabers/orange_line
 	}
 }
 
-gfx/effects/sabers/yellow_glow
-{
+gfx/effects/sabers/yellow_glow {
 	nopicmip
 	cull twosided
 	{
@@ -56,8 +51,7 @@ gfx/effects/sabers/yellow_glow
 	}
 }
 
-gfx/effects/sabers/yellow_line
-{
+gfx/effects/sabers/yellow_line {
 	nopicmip
 	cull twosided
 	{
@@ -67,8 +61,7 @@ gfx/effects/sabers/yellow_line
 	}
 }
 
-gfx/effects/sabers/green_glow
-{
+gfx/effects/sabers/green_glow {
 	nopicmip
 	cull twosided
 	{
@@ -79,8 +72,7 @@ gfx/effects/sabers/green_glow
 	}
 }
 
-gfx/effects/sabers/green_line
-{
+gfx/effects/sabers/green_line {
 	nopicmip
 	cull twosided
 	{
@@ -90,8 +82,7 @@ gfx/effects/sabers/green_line
 	}
 }
 
-gfx/effects/sabers/blue_glow
-{
+gfx/effects/sabers/blue_glow {
 	nopicmip
 	cull twosided
 	{
@@ -102,8 +93,7 @@ gfx/effects/sabers/blue_glow
 	}
 }
 
-gfx/effects/sabers/blue_line
-{
+gfx/effects/sabers/blue_line {
 	nopicmip
 	cull twosided
 	{
@@ -113,8 +103,7 @@ gfx/effects/sabers/blue_line
 	}
 }
 
-gfx/effects/sabers/purple_glow
-{
+gfx/effects/sabers/purple_glow {
 	nopicmip
 	cull twosided
 	{
@@ -125,8 +114,7 @@ gfx/effects/sabers/purple_glow
 	}
 }
 
-gfx/effects/sabers/purple_line
-{
+gfx/effects/sabers/purple_line {
 	nopicmip
 	cull twosided
 	{
@@ -136,8 +124,7 @@ gfx/effects/sabers/purple_line
 	}
 }
 
-gfx/effects/sabers/saberBlur
-{
+gfx/effects/sabers/saberBlur {
 	nopicmip
 	cull twosided
 	{
@@ -153,8 +140,7 @@ gfx/effects/sabers/saberBlur
 	}
 }
 
-gfx/effects/sabers/swordTrail
-{
+gfx/effects/sabers/swordTrail {
 	qer_editorimage	gfx/effects/sabers/blurglow
 	nopicmip
 	nomipmaps

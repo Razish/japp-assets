@@ -1,9 +1,8 @@
-menu/new/sliderthumbdefault
-{
+menu/new/sliderthumbdefault {
 	nopicmip
 	nomipmaps
-    {
-        map menu/new/sliderthumbdefault
-        blendFunc GL_ONE GL_ONE
-    }
+	{
+		map menu/new/sliderthumbdefault
+		blendFunc GL_ONE GL_ONE
+	}
 }
