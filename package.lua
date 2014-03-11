@@ -106,6 +106,9 @@ local paks = {
 		["lua_motd"] = {
 			'lua/sv/motd/plugin.lua',
 		},
+		["lua_spawnhealth"] = {
+			'lua/sv/spawnhealth/plugin.lua',
+		},
 	}
 }
 
