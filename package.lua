@@ -103,6 +103,9 @@ local paks = {
 		["lua_duelwhois"] = {
 			'lua/sv/duelwhois/plugin.lua',
 		},
+		["lua_japluscompat"] = {
+			'lua/sv/japluscompat/plugin.lua',
+		},
 		["lua_motd"] = {
 			'lua/sv/motd/plugin.lua',
 		},

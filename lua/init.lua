@@ -1,8 +1,3 @@
-JPLua = setmetatable( {}, {
-	__index = { version = 6 },
-	__newindex = function() error( "Attempt to modify read-only data!" ) end
-} )
-
 require "utils.lua"
 require "math.lua"
 require "events.lua"
