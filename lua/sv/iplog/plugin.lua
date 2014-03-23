@@ -42,7 +42,7 @@ AddListener( 'JPLUA_EVENT_CLIENTCONNECT', function( id, info, ip, firsttime )
 
 	local pos = ip:find( ':' )
 	if pos ~= nil then
-		ip = ip:sub( 1, ip:find( ':' )-1 )
+		ip = ip:sub( 1, pos-1 )
 	end
 
 	local name = info['name']
