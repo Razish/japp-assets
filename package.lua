@@ -106,6 +106,9 @@ local paks = {
 		["lua_japluscompat"] = {
 			'lua/sv/japluscompat/plugin.lua',
 		},
+		["lua_iplog"] = {
+			'lua/sv/iplog/plugin.lua',
+		},
 		["lua_motd"] = {
 			'lua/sv/motd/plugin.lua',
 		},
@@ -114,6 +117,8 @@ local paks = {
 		},
 	}
 }
+
+local linux = true and package.config:find( '/' ) or false
 
 for prefix,pak in pairs( paks ) do
 	for pakname,files in pairs( pak ) do
@@ -136,6 +141,10 @@ for prefix,pak in pairs( paks ) do
 		end
 
 		print( 'creating "' .. outname .. '"' )
-		os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >/dev/null 2>&1' )
+		if linux ~= false then
+			os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >/dev/null 2>&1' )
+		else
+			os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >nul 2>&1' )
+		end
 	end
 end
