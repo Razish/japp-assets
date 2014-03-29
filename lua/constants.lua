@@ -207,6 +207,15 @@ Gender = setmetatable( {}, {
 	__newindex = function() error( "Attempt to modify read-only data!" ) end
 } )
 
+KeyCatcher = setmetatable( {}, {
+	__index = {
+		CONSOLE	= 0x01,
+		UI		= 0x02,
+		MESSAGE	= 0x04,
+		CGAME	= 0x08 },
+	__newindex = function() error( "Attempt to modify read-only data!" ) end
+} )
+
 MOD = setmetatable( {}, {
 	__index = {
 		UNKNOWN					= 0,
