@@ -85,6 +85,9 @@ local paks = {
 		["lua_ignorebot"] = {
 			'lua/cl/ignorebot/plugin.lua',
 		},
+		["lua_chatstyle"] = {
+			'lua/cl/chatstyle/plugin.lua',
+		},
 		["lua_japlusadmguns"] = {
 			'lua/cl/japlusadmguns/plugin.lua',
 		},
