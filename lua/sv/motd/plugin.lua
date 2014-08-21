@@ -1,4 +1,4 @@
-local motd = RegisterPlugin( 'MotD', '1.0' )
+local motd = RegisterPlugin( 'MotD', '1.1' )
 
 local cvars = {
 	['japp_motd']		= CreateCvar( 'japp_motd', "Hello!\\nThis server is running JA++\\n\\nEnjoy your stay!", CvarFlags.ARCHIVE ),
@@ -50,7 +50,8 @@ function SendCommand( clientNum, levelTime )
 	end
 end
 
-AddClientCommand( 'ammotd', function( clientNum, args )
+AddClientCommand( 'ammotd', function( client, args )
+	local clientNum = client:GetID()
 	local levelTime = GetTime()
 	joinTimes[clientNum] = levelTime
 	msgTimes[clientNum] = levelTime
@@ -58,7 +59,8 @@ AddClientCommand( 'ammotd', function( clientNum, args )
 	SendCommand( clientNum, levelTime )
 end )
 
-AddListener( 'JPLUA_EVENT_CLIENTSPAWN', function( clientNum, firstSpawn )
+AddListener( 'JPLUA_EVENT_CLIENTSPAWN', function( client, firstSpawn )
+	local clientNum = client:GetID()
 	if firstSpawn then
 		if cvars['japp_motdType']:GetInteger() == 3 then
 			local levelTime = GetTime()
