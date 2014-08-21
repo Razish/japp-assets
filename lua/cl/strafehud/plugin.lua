@@ -18,6 +18,7 @@ local lastVelocity = { x=0, y=0, z=0 }
 local lastSpeed = 0.0
 --local accelSamples = {}
 AddListener( "JPLUA_EVENT_HUD", function()
+	local strafeHUD = cvars["cg_strafeHUD"]:GetInteger()
 	local fontIndex = Fonts.JAPPLARGE
 	local fontScale = 0.5
 	local y = 300
@@ -68,28 +69,28 @@ AddListener( "JPLUA_EVENT_HUD", function()
 	-- Accelerometer end
 
 	-- Current UPS
-	if bit32.band( cvars["cg_strafeHUD"]:GetInteger(), 1 ) ~= 0 then
+	if bit32.band( strafeHUD, 1 ) ~= 0 then
 		local msg = string.format( "%06.2f", speed)
 		DrawText( 320-Font_StringLengthPixels( msg, fontScale, fontIndex )/2.0, y, msg, { 0.567, 0.685, 1.0, 1.0 }, fontScale, TextStyle.SHADOWED, fontIndex )
 		y = y + lineHeight
 	end
 
 	-- Highest UPS in last 2000ms
-	if bit32.band( cvars["cg_strafeHUD"]:GetInteger(), 2 ) ~= 0 then
+	if bit32.band( strafeHUD, 2 ) ~= 0 then
 		local msg = string.format( "%06.2f", bestSpeed.speed)
 		DrawText( 320-Font_StringLengthPixels( msg, fontScale, fontIndex )/2.0, y, msg, { 0.42525, 0.51375, 0.75, 1.0 }, fontScale, TextStyle.SHADOWED, fontIndex )
 		y = y + lineHeight
 	end
 
 	-- Viewangles
-	if bit32.band( cvars["cg_strafeHUD"]:GetInteger(), 4 ) ~= 0 then
+	if bit32.band( strafeHUD, 4 ) ~= 0 then
 		local msg = string.format( "%06.3f / %06.3f", angles.yaw, -angles.pitch )
 		DrawText( 320-Font_StringLengthPixels( msg, fontScale, fontIndex )/2.0, y, msg, { 1.0, 0.5, 0.0, 1.0 }, fontScale, TextStyle.SHADOWED, fontIndex )
 		y = y + lineHeight
 	end
 
 	-- Position
-	if bit32.band( cvars["cg_strafeHUD"]:GetInteger(), 8 ) ~= 0 then
+	if bit32.band( strafeHUD, 8 ) ~= 0 then
 		local msg = string.format( "%06.3f", position.x )
 		DrawText( 320-Font_StringLengthPixels( msg, fontScale, fontIndex )/2.0, y, msg, { 0.6, 0.6, 0.6, 1.0 }, fontScale, TextStyle.SHADOWED, fontIndex )
 		y = y + lineHeight
@@ -105,7 +106,7 @@ AddListener( "JPLUA_EVENT_HUD", function()
 
 	-- Accelerometer
 	--[[
-	if bit32.band( cvars["cg_strafeHUD"]:GetInteger(), 16 ) ~= 0 then
+	if bit32.band( strafeHUD, 16 ) ~= 0 then
 		local pos = { x=320, y=360 }
 		local size = { width=128, height=20 }
 
