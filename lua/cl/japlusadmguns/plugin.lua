@@ -9,7 +9,7 @@ local function GetTarget()
 	local mask = 1184515 -- MASK_OPAQUE|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE
 	local tr = RayTrace( pos, 1.0, endPos, self:GetID(), mask )
 	if tr.entityNum >= 0 and tr.entityNum < 32 then
-		return tr.entityNum
+		return tr.entityNum, GetPlayer( tr.entityNum )
 	else
 		return nil
 	end
@@ -73,10 +73,14 @@ AddConsoleCommand( "gunmerc", function( args )
 	target = GetTarget()
 	if target ~= nil then SendServerCommand( string.format( "ammerc %i", target ) ) end
 end )
-AddConsoleCommand( "gunsay", function( args )
+AddConsoleCommand( "gunannounce", function( args )
 	message = table.concat( args, ' ' )
 	target = GetTarget()
 	if target ~= nil then SendServerCommand( string.format( "ampsay %i %s", target, message ) ) end
+end )
+AddConsoleCommand( "gunsay", function( args )
+	_, target = GetTarget()
+	if target ~= nil then SendChatText( string.format( "^7Client ID of \"%s^7\" is: ^5%02i", target.GetName(), target.GetID() ) ) end
 end )
 AddConsoleCommand( "gunslay", function( args )
 	target = GetTarget()

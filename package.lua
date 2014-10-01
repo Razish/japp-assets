@@ -82,11 +82,11 @@ local paks = {
 			'ui/jamp/player.menu',
 			'ui/jamp/saber.menu'
 		},
-		["lua_ignorebot"] = {
-			'lua/cl/ignorebot/plugin.lua',
-		},
 		["lua_chatstyle"] = {
 			'lua/cl/chatstyle/plugin.lua',
+		},
+		["lua_ignorebot"] = {
+			'lua/cl/ignorebot/plugin.lua',
 		},
 		["lua_japlusadmguns"] = {
 			'lua/cl/japlusadmguns/plugin.lua',
@@ -103,14 +103,17 @@ local paks = {
 	},
 
 	['sv'] = {
+		["lua_automsg"] = {
+			'lua/sv/automsg/plugin.lua',
+		},
 		["lua_duelwhois"] = {
 			'lua/sv/duelwhois/plugin.lua',
 		},
-		["lua_japluscompat"] = {
-			'lua/sv/japluscompat/plugin.lua',
-		},
 		["lua_iplog"] = {
 			'lua/sv/iplog/plugin.lua',
+		},
+		["lua_japluscompat"] = {
+			'lua/sv/japluscompat/plugin.lua',
 		},
 		["lua_motd"] = {
 			'lua/sv/motd/plugin.lua',

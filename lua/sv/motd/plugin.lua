@@ -1,4 +1,4 @@
-local motd = RegisterPlugin( 'MotD', '1.1' )
+local motd = RegisterPlugin( 'MotD', '1.2' )
 
 local cvars = {
 	['japp_motd']		= CreateCvar( 'japp_motd', "Hello!\\nThis server is running JA++\\n\\nEnjoy your stay!", CvarFlags.ARCHIVE ),
@@ -41,7 +41,7 @@ function SendCommand( clientNum, levelTime )
 	elseif type == 3 then
 		message = string.gsub( message, '\\n', '\n' )
 		local out = 'cp "' .. message .. '\n'
-		if msgTimes[clientNum] ~= nil then
+		if firstMsgTime[clientNum] ~= nil then
 			out = out .. 'Time left: ' .. math.ceil( (firstMsgTime[clientNum]-levelTime + (cvars['japp_motdTime']:GetInteger()*1000))/1000 ) .. '"'
 		else
 			out = out .. '"'
