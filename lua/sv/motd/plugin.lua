@@ -81,14 +81,19 @@ AddListener( 'JPLUA_EVENT_RUNFRAME', function()
 	local msg = nil
 	local levelTime = GetTime()
 	local msgTime = cvars['japp_motdTime']:GetInteger() * 1000
-	for i=0,31 do
-		if joinTimes[i] ~= nil and joinTimes[i] > levelTime-msgTime then
-			if msgTimes[i] ~= nil and msgTimes[i] < levelTime-1000 then
-				if firstMsgTime[i] == nil then
-					firstMsgTime[i] = levelTime
+	for _,ply in ipairs(GetPlayers()) do
+		if ply:IsBot() then
+			-- ignore
+		else
+			local i = ply:GetID()
+			if joinTimes[i] ~= nil and joinTimes[i] > levelTime-msgTime then
+				if msgTimes[i] ~= nil and msgTimes[i] < levelTime-1000 then
+					if firstMsgTime[i] == nil then
+						firstMsgTime[i] = levelTime
+					end
+					msgTimes[i] = levelTime
+					SendCommand( i, levelTime )
 				end
-				msgTimes[i] = levelTime
-				SendCommand( i, levelTime )
 			end
 		end
 	end

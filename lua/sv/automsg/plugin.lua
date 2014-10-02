@@ -6,7 +6,7 @@ local cvars = {
 	['japp_autoMsgDelay']	= CreateCvar( 'japp_autoMsgDelay', "900", CvarFlags.ARCHIVE ),
 }
 
-local msgTime
+local msgTime = 0
 
 function SendMessage( clientNum )
 	local type = cvars['japp_autoMsgType']:GetInteger()
@@ -53,15 +53,12 @@ AddListener( 'JPLUA_EVENT_CLIENTSPAWN', function( client, firstSpawn )
 end )
 
 AddListener( 'JPLUA_EVENT_RUNFRAME', function()
-	if cvars['japp_autoMsgType']:GetInteger() ~= 3 then
-		return
-	end
-
-	local msgDelay = cvars['japp_autoMsgTime']:GetInteger() * 1000
+	local msgDelay = cvars['japp_autoMsgDelay']:GetInteger() * 1000
 	if msgTime < GetTime() - msgDelay then
-		local plys = GetPlayers()
-		for ply in pairs(plys) do
-			SendCommand( ply:GetID() )
+		print( 'derp' )
+		for _,ply in ipairs(GetPlayers()) do
+			SendMessage( ply:GetID() )
 		end
+		msgTime = GetTime()
 	end
 end )
