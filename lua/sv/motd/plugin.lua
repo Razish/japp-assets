@@ -1,4 +1,4 @@
-local motd = RegisterPlugin( 'MotD', '1.2' )
+local motd = RegisterPlugin( 'MotD', '1.3' )
 
 local cvars = {
 	['japp_motd']		= CreateCvar( 'japp_motd', "Hello!\\nThis server is running JA++\\n\\nEnjoy your stay!", CvarFlags.ARCHIVE ),

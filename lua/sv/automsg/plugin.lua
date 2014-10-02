@@ -1,4 +1,4 @@
-local automsg = RegisterPlugin( 'AutoMsg', '1.0' )
+local automsg = RegisterPlugin( 'AutoMsg', '1.1' )
 
 local cvars = {
 	['japp_autoMsgText']	= CreateCvar( 'japp_autoMsgText', "^7Have a nice day :-)\nRemember to have fun!", CvarFlags.ARCHIVE ),
