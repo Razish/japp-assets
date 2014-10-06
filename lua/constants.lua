@@ -276,6 +276,13 @@ SSF = {
 	SPECTINFO			= 0x0040
 }
 
+Team = {
+	FREE		= 0,
+	RED			= 1,
+	BLUE		= 2,
+	SPECTATOR	= 3
+}
+
 TextStyle = {
 	NORMAL			= 0,
 	BLINK			= 1,
