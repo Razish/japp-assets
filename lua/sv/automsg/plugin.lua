@@ -1,4 +1,4 @@
-local automsg = RegisterPlugin( 'AutoMsg', '1.1' )
+local automsg = RegisterPlugin( 'AutoMsg', '1.2' )
 
 local cvars = {
 	['japp_autoMsgText']	= CreateCvar( 'japp_autoMsgText', "^7Have a nice day :-)\nRemember to have fun!", CvarFlags.ARCHIVE ),
@@ -55,7 +55,6 @@ end )
 AddListener( 'JPLUA_EVENT_RUNFRAME', function()
 	local msgDelay = cvars['japp_autoMsgDelay']:GetInteger() * 1000
 	if msgTime < GetTime() - msgDelay then
-		print( 'derp' )
 		for _,ply in ipairs(GetPlayers()) do
 			SendMessage( ply:GetID() )
 		end
