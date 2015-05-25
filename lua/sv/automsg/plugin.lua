@@ -43,12 +43,12 @@ function SendMessage( clientNum )
 end
 
 AddClientCommand( 'amautomsg', function( client, args )
-	SendMessage( client:GetID() )
+	SendMessage( client.id )
 end )
 
 AddListener( 'JPLUA_EVENT_CLIENTSPAWN', function( client, firstSpawn )
 	if firstSpawn then
-		SendCommand( client:GetID() )
+		SendCommand( client.id )
 	end
 end )
 
@@ -56,7 +56,7 @@ AddListener( 'JPLUA_EVENT_RUNFRAME', function()
 	local msgDelay = cvars['japp_autoMsgDelay']:GetInteger() * 1000
 	if msgTime < GetTime() - msgDelay then
 		for _,ply in ipairs(GetPlayers()) do
-			SendMessage( ply:GetID() )
+			SendMessage( ply.id )
 		end
 		msgTime = GetTime()
 	end

@@ -30,10 +30,10 @@ AddListener( "JPLUA_EVENT_HUD", function()
 	end
 
 	local self = GetPlayer(nil)
-	local velocity = self:GetVelocity()
-	local angles = self:GetAngles()
+	local velocity = self.velocity
+	local angles = self.angles
 	local speed = math.sqrt( velocity.x*velocity.x + velocity.y*velocity.y )
-	local position = self:GetPosition()
+	local position = self.position
 
 	if ( speed > bestSpeed.speed ) then
 		bestSpeed.speed = speed

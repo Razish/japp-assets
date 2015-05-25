@@ -149,13 +149,13 @@ local cvars = {
 
 AddListener( "JPLUA_EVENT_HUD", function()
 	local self = GetPlayer( nil )
-	local health = self:GetHealth()
-	local armor = self:GetArmor()
-	local force = self:GetForce()
-	local weapon = self:GetWeapon()
-	local ammo = self:GetAmmo( weapon )
-	local maxammo = self:GetMaxAmmo( weapon )
-	local saberStyle = self:GetSaberStyle()
+	local health = self.health
+	local armor = self.armor
+	local force = self.force
+	local weapon = self.weapon
+	local ammo = self.ammo[weapon]
+	local maxammo = self.maxAmmo[weapon]
+	local saberStyle = self.saberStyle
 
 	local data = {}
 

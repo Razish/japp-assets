@@ -51,7 +51,7 @@ function SendCommand( clientNum, levelTime )
 end
 
 AddClientCommand( 'ammotd', function( client, args )
-	local clientNum = client:GetID()
+	local clientNum = client.id
 	local levelTime = GetTime()
 	joinTimes[clientNum] = levelTime
 	msgTimes[clientNum] = levelTime
@@ -60,7 +60,7 @@ AddClientCommand( 'ammotd', function( client, args )
 end )
 
 AddListener( 'JPLUA_EVENT_CLIENTSPAWN', function( client, firstSpawn )
-	local clientNum = client:GetID()
+	local clientNum = client.id
 	if firstSpawn then
 		if cvars['japp_motdType']:GetInteger() == 3 then
 			local levelTime = GetTime()
@@ -82,10 +82,10 @@ AddListener( 'JPLUA_EVENT_RUNFRAME', function()
 	local levelTime = GetTime()
 	local msgTime = cvars['japp_motdTime']:GetInteger() * 1000
 	for _,ply in ipairs(GetPlayers()) do
-		if ply:IsBot() then
+		if ply.isBot then
 			-- ignore
 		else
-			local i = ply:GetID()
+			local i = ply.id
 			if joinTimes[i] ~= nil and joinTimes[i] > levelTime-msgTime then
 				if msgTimes[i] ~= nil and msgTimes[i] < levelTime-1000 then
 					if firstMsgTime[i] == nil then
