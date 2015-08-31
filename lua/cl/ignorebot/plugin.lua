@@ -13,6 +13,8 @@ local function SplitChatMessage( msg )
 		local name = string.sub( splitMsg[2], 2, string.len(splitMsg[2])-2 ) -- strip the '(' at the start and ^7 at the end
 		local message = string.sub( splitMsg[4], 4 ) -- strip the ': ^3' at the start
 		return name, message
+	else
+		return nil, nil
 	end
 end
 

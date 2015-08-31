@@ -1,3 +1,6 @@
+SCREEN_WIDTH = 640.0
+SCREEN_HEIGHT = 480.0
+
 Contents = {
 	Solid		= 0x00000001,	-- Default setting. An eye is never valid in a solid
 	Lava		= 0x00000002,
