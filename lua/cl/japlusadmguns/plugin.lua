@@ -1,4 +1,4 @@
-local japlusadmguns = RegisterPlugin( "JA+ Admin Guns", "1.0" ) -- encapsulate all plugin data and functions in this table
+local japlusadmguns = RegisterPlugin( 'JA+ Admin Guns', '1.0.0', '13.0.0' )
 
 local function GetTarget()
 	local self = GetPlayer(nil)
@@ -15,79 +15,79 @@ local function GetTarget()
 	end
 end
 
-AddConsoleCommand( "gunslap", function( args )
+AddConsoleCommand( 'gunslap', function( args )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "amslap %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'amslap %i', target ) ) end
 end )
-AddConsoleCommand( "gunsilence", function( args )
+AddConsoleCommand( 'gunsilence', function( args )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "amsilence %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'amsilence %i', target ) ) end
 end )
-AddConsoleCommand( "gununsilence", function( args )
+AddConsoleCommand( 'gununsilence', function( args )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "amunsilence %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'amunsilence %i', target ) ) end
 end )
-AddConsoleCommand( "gunprotect", function( args )
+AddConsoleCommand( 'gunprotect', function( args )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "amprotect %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'amprotect %i', target ) ) end
 end )
-AddConsoleCommand( "gunsleep", function( args )
+AddConsoleCommand( 'gunsleep', function( args )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "amsleep %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'amsleep %i', target ) ) end
 end )
-AddConsoleCommand( "gunwake", function( args )
+AddConsoleCommand( 'gunwake', function( args )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "amwake %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'amwake %i', target ) ) end
 end )
-AddConsoleCommand( "gunmindtrick", function( args )
+AddConsoleCommand( 'gunmindtrick', function( args )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "ammindtrick %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'ammindtrick %i', target ) ) end
 end )
-AddConsoleCommand( "gununmindtrick", function( args )
+AddConsoleCommand( 'gununmindtrick', function( args )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "ammindtrick %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'ammindtrick %i', target ) ) end
 end )
-AddConsoleCommand( "gunkick", function( args )
+AddConsoleCommand( 'gunkick', function( args )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "amkick %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'amkick %i', target ) ) end
 end )
-AddConsoleCommand( "gunban", function( args )
+AddConsoleCommand( 'gunban', function( args )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "amban %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'amban %i', target ) ) end
 end )
-AddConsoleCommand( "gunghost", function( args )
+AddConsoleCommand( 'gunghost', function( args )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "amghost %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'amghost %i', target ) ) end
 end )
-AddConsoleCommand( "gunpunish", function( args )
+AddConsoleCommand( 'gunpunish', function( args )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "ampunish %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'ampunish %i', target ) ) end
 end )
 local GunEmpower = function()
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "amempower %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'amempower %i', target ) ) end
 end
-AddConsoleCommand( "gunemp", GunEmpower )
-AddConsoleCommand( "gunempower", GunEmpower )
-AddConsoleCommand( "gunmerc", function( args )
+AddConsoleCommand( 'gunemp', GunEmpower )
+AddConsoleCommand( 'gunempower', GunEmpower )
+AddConsoleCommand( 'gunmerc', function( args )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "ammerc %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'ammerc %i', target ) ) end
 end )
-AddConsoleCommand( "gunannounce", function( args )
+AddConsoleCommand( 'gunannounce', function( args )
 	message = table.concat( args, ' ' )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "ampsay %i %s", target, message ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'ampsay %i %s', target, message ) ) end
 end )
-AddConsoleCommand( "gunsay", function( args )
+AddConsoleCommand( 'gunsay', function( args )
 	_, target = GetTarget()
-	if target ~= nil then SendChatText( string.format( "^7Client ID of \"%s^7\" is: ^5%02i", target.GetName(), target.GetID() ) ) end
+	if target ~= nil then SendChatText( string.format( '^7Client ID of \"%s^7\" is: ^5%02i', target.GetName(), target.GetID() ) ) end
 end )
-AddConsoleCommand( "gunslay", function( args )
+AddConsoleCommand( 'gunslay', function( args )
 	target = GetTarget()
-	if target ~= nil then SendServerCommand( string.format( "amslay %i", target ) ) end
+	if target ~= nil then SendServerCommand( string.format( 'amslay %i', target ) ) end
 end )
 
-AddConsoleCommand( "clguntele", function( args )
+AddConsoleCommand( 'clguntele', function( args )
 	local self = GetPlayer(nil)
 	local pos = self:GetPosition()
 	pos.z = pos.z + 36.0 -- move to eye-position
@@ -99,6 +99,6 @@ AddConsoleCommand( "clguntele", function( args )
 	if tr2.allsolid or tr2.startsolid then
 		print( 'Refusing to teleport: would end up inside a wall\n' )
 	else
-		SendServerCommand( string.format( "amtele %i %.2f %.2f %.2f %i", self:GetID(), tr2.endpos.x, tr2.endpos.y, tr2.endpos.z, self:GetAngles().y ) )
+		SendServerCommand( string.format( 'amtele %i %.2f %.2f %.2f %i', self:GetID(), tr2.endpos.x, tr2.endpos.y, tr2.endpos.z, self:GetAngles().y ) )
 	end
 end )

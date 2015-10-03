@@ -1,6 +1,19 @@
 SCREEN_WIDTH = 640.0
 SCREEN_HEIGHT = 480.0
 
+ChatColours = {
+	Black = '^0',
+	Red = '^1',
+	Green = '^2',
+	Yellow = '^3',
+	Blue = '^4',
+	Cyan = '^5',
+	Magenta = '^6',
+	White = '^7',
+	Orange = '^8',
+	Grey = '^9'
+}
+
 Contents = {
 	Solid		= 0x00000001,	-- Default setting. An eye is never valid in a solid
 	Lava		= 0x00000002,

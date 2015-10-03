@@ -1,9 +1,9 @@
-local motd = RegisterPlugin( 'MotD', '1.3' )
+local motd = RegisterPlugin( 'MotD', '1.3.1', '13.0.0' )
 
 local cvars = {
-	['japp_motd']		= CreateCvar( 'japp_motd', "Hello!\\nThis server is running JA++\\n\\nEnjoy your stay!", CvarFlags.ARCHIVE ),
-	['japp_motdType']	= CreateCvar( 'japp_motdType', "3", CvarFlags.ARCHIVE ),
-	['japp_motdTime']	= CreateCvar( 'japp_motdTime', "5", CvarFlags.ARCHIVE ),
+	['japp_motd']		= CreateCvar( 'japp_motd', 'Hello!\\nThis server is running JA++\\n\\nEnjoy your stay!', CvarFlags.ARCHIVE ),
+	['japp_motdType']	= CreateCvar( 'japp_motdType', '3', CvarFlags.ARCHIVE ),
+	['japp_motdTime']	= CreateCvar( 'japp_motdTime', '5', CvarFlags.ARCHIVE ),
 }
 
 local joinTimes = {}
@@ -12,7 +12,7 @@ local msgTimes = {}
 
 function SendCommand( clientNum, levelTime )
 	local type = cvars['japp_motdType']:GetInteger()
-	local message = cvars["japp_motd"]:GetString()
+	local message = cvars['japp_motd']:GetString()
 
 	-- console
 	if type == 1 then
@@ -93,6 +93,14 @@ AddListener( 'JPLUA_EVENT_RUNFRAME', function()
 					end
 					msgTimes[i] = levelTime
 					SendCommand( i, levelTime )
+				end
+			elseif joinTimes[i] ~= nil and joinTimes[i] > levelTime-msgTime-1000 then
+				if msgTimes[i] ~= nil and msgTimes[i] < levelTime-1000 then
+					if firstMsgTime[i] == nil then
+						firstMsgTime[i] = levelTime
+					end
+					msgTimes[i] = levelTime
+					SendReliableCommand( i, 'cp ""' )
 				end
 			end
 		end

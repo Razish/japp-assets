@@ -1,8 +1,8 @@
-local ignorebot = RegisterPlugin( "IgnoreBot", "1.2" ) -- encapsulate all plugin data and functions in this table
+local ignorebot = RegisterPlugin( 'IgnoreBot', '1.2.0', '13.0.0' )
 
 --Return a table of strings split up by JA's chat message escape character.
 local function SplitChatMessage( msg )
-	local splitMsg = JPUtil.explode( string.format( "%c", 0x19 ), msg )
+	local splitMsg = JPUtil.explode( string.format( '%c', 0x19 ), msg )
 	local len = #splitMsg
 
 	if len == 2 then -- for regular messages, only one escape character
@@ -20,7 +20,7 @@ end
 
 -- Cancel JPLUA_EVENT_CHATMSGRECV if the message was from a bot.
 -- Uses an unreliable name-match, will NOT cancel the event if multiple clients are found to have that name
-AddListener( "JPLUA_EVENT_CHATMSGRECV", function( msg )
+AddListener( 'JPLUA_EVENT_CHATMSGRECV', function( msg )
 	sender, message = SplitChatMessage( msg )
 	ply = GetPlayer( sender )
 	if ply and ply.isBot then

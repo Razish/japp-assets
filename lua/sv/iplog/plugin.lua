@@ -1,5 +1,5 @@
 -- Authors: EpicLoyd, Raz0r
-local plugin = RegisterPlugin( 'iplog', '0.2' )
+local plugin = RegisterPlugin( 'iplog', '0.2.0', '13.0.0' )
 
 local iplist = {}
 local logname = 'ips.json'
@@ -25,7 +25,7 @@ AddServerCommand( 'iplog', function( args )
 	if #args == 0 then
 		print( 'Usage: \\iplog [clear]' )
 	elseif #args == 1 then
-		if args[1] == "clear" then
+		if args[1] == 'clear' then
 			print( 'Clearing IP log...' )
 			for k in pairs( iplist ) do
 				iplist[k] = nil
@@ -36,7 +36,7 @@ AddServerCommand( 'iplog', function( args )
 end )
 
 AddListener( 'JPLUA_EVENT_CLIENTCONNECT', function( id, info, ip, firsttime )
-	if ip == "Bot" or not firsttime then
+	if ip == 'Bot' or not firsttime then
 		return nil
 	end
 

@@ -43,6 +43,24 @@ JPUtil = setmetatable( {}, {
 				faded = false
 			end
 			return newcolour,faded
+		end,
+		
+		--Return a table of strings split up by JA's chat message escape character.
+		SplitChatMessage = function( msg )
+			local splitMsg = JPUtil.explode( string.format( "%c", 0x19 ), msg )
+			local len = #splitMsg
+		
+			if len == 2 then -- for regular messages, only one escape character
+				local name = string.sub( splitMsg[1], 1, string.len(splitMsg[1])-2 ) -- strip the ^7 at the end
+				local message = string.sub( splitMsg[2], 3 ) -- strip the ': ' before each message
+				return name, message
+			elseif len == 4 then -- for JA+ admin messages...
+				local name = string.sub( splitMsg[2], 2, string.len(splitMsg[2])-2 ) -- strip the '(' at the start and ^7 at the end
+				local message = string.sub( splitMsg[4], 4 ) -- strip the ': ^3' at the start
+				return name, message
+			else
+				return nil, nil
+			end
 		end
 	},
 

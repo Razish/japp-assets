@@ -1,4 +1,4 @@
-local dwi = RegisterPlugin( 'DuelWhois', '1.0' )
+local dwi = RegisterPlugin( 'DuelWhois', '1.0.0', '13.0.0' )
 
 AddClientCommand( 'duelwhois', function( ply, args )
 	local partners = {}

@@ -3,4 +3,4 @@ require "math.lua"
 require "events.lua"
 require "constants.lua"
 
-print( "Version: " .. JPLua.version .. " on " .. _VERSION .. "\n" )
+print( ChatColours.Cyan .. 'Loaded JPLua (' .. JPLua.version.major .. '.' .. JPLua.version.minor .. '.' .. JPLua.version.patch .. ' on ' .. _VERSION .. ')' )

@@ -1,16 +1,16 @@
-local automsg = RegisterPlugin( 'AutoMsg', '1.2' )
+local automsg = RegisterPlugin( 'AutoMsg', '1.2.0', '13.0.0' )
 
 local cvars = {
-	['japp_autoMsgText']	= CreateCvar( 'japp_autoMsgText', "^7Have a nice day :-)\nRemember to have fun!", CvarFlags.ARCHIVE ),
-	['japp_autoMsgType']	= CreateCvar( 'japp_autoMsgType', "2", CvarFlags.ARCHIVE ),
-	['japp_autoMsgDelay']	= CreateCvar( 'japp_autoMsgDelay', "900", CvarFlags.ARCHIVE ),
+	['japp_autoMsgText']	= CreateCvar( 'japp_autoMsgText', '^7Have a nice day :-)\nRemember to have fun!', CvarFlags.ARCHIVE ),
+	['japp_autoMsgType']	= CreateCvar( 'japp_autoMsgType', '2', CvarFlags.ARCHIVE ),
+	['japp_autoMsgDelay']	= CreateCvar( 'japp_autoMsgDelay', '900', CvarFlags.ARCHIVE ),
 }
 
 local msgTime = 0
 
 function SendMessage( clientNum )
 	local type = cvars['japp_autoMsgType']:GetInteger()
-	local message = cvars["japp_autoMsgText"]:GetString()
+	local message = cvars['japp_autoMsgText']:GetString()
 
 	-- console
 	if type == 1 then
