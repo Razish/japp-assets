@@ -1,17 +1,17 @@
-SCREEN_WIDTH = 640.0
-SCREEN_HEIGHT = 480.0
+screenWidth		= 640.0
+screenHeight	= 480.0
 
 ChatColours = {
-	Black = '^0',
-	Red = '^1',
-	Green = '^2',
-	Yellow = '^3',
-	Blue = '^4',
-	Cyan = '^5',
-	Magenta = '^6',
-	White = '^7',
-	Orange = '^8',
-	Grey = '^9'
+	Black	= '^0',
+	Red		= '^1',
+	Green	= '^2',
+	Yellow	= '^3',
+	Blue	= '^4',
+	Cyan	= '^5',
+	Magenta	= '^6',
+	White	= '^7',
+	Orange	= '^8',
+	Grey	= '^9'
 }
 
 Contents = {
@@ -175,10 +175,10 @@ Fonts = {
 }
 
 FSMode = {
-	READ		= 0,
-	WRITE		= 1,
-	APPEND		= 2,
-	APPEND_SYNC	= 3
+	Read		= 0,
+	Write		= 1,
+	Append		= 2,
+	AppendSync	= 3
 }
 
 Gametypes = {
@@ -196,16 +196,16 @@ Gametypes = {
 }
 
 Gender = {
-	MALE	= 0,
-	FEMALE	= 1,
-	NEUTER	= 2
+	Male	= 0,
+	Female	= 1,
+	Neuter	= 2
 }
 
 KeyCatcher = {
-	CONSOLE	= 0x01,
+	Console	= 0x01,
 	UI		= 0x02,
-	MESSAGE	= 0x04,
-	CGAME	= 0x08
+	Message	= 0x04,
+	CGame	= 0x08
 }
 
 MOD = {
@@ -255,31 +255,31 @@ MOD = {
 }
 
 SaberStyle = {
-	NONE	= 0,
-	FAST	= 1,
-	MEDIUM	= 2,
-	STRONG	= 3,
-	DESANN	= 4,
-	TAVION	= 5,
-	DUAL	= 6,
-	STAFF	= 7
+	None	= 0,
+	Fast	= 1,
+	Medium	= 2,
+	Strong	= 3,
+	Desann	= 4,
+	Tavion	= 5,
+	Dual	= 6,
+	Staff	= 7
 }
 
 SoundChannel = {
-	AUTO			= 0,	-- auto-picks an empty channel to play sound on
-	LOCAL			= 1,	-- menu sounds, etc
-	WEAPON			= 2,
-	VOICE			= 3,	-- voice sounds cause mouth animation
-	VOICE_ATTEN		= 4,	-- causes mouth animation but still use normal sound falloff
-	ITEM			= 5,
-	BODY			= 6,
-	AMBIENT			= 7,	-- added for ambient sounds
-	LOCAL_SOUND		= 8,	-- chat messages, etc
-	ANNOUNCER		= 9,	-- announcer voices, etc
-	LESS_ATTEN		= 10,	-- attenuates similar to chan_voice, but uses empty channel auto-pick behaviour
-	MENU1			= 11,	-- menu stuff, etc
-	VOICE_GLOBAL	= 12,	-- causes mouth animation and is broadcast, like announcer
-	MUSIC			= 13	-- music played as a looping sound
+	Auto			= 0,	-- auto-picks an empty channel to play sound on
+	Local			= 1,	-- menu sounds, etc
+	Weapon			= 2,
+	Voice			= 3,	-- voice sounds cause mouth animation
+	VoiceAtten		= 4,	-- causes mouth animation but still use normal sound falloff
+	Item			= 5,
+	Body			= 6,
+	Ambient			= 7,	-- added for ambient sounds
+	LocalSound		= 8,	-- chat messages, etc
+	Announcer		= 9,	-- announcer voices, etc
+	LessAttenuation	= 10,	-- attenuates similar to chan_voice, but uses empty channel auto-pick behaviour
+	Menu1			= 11,	-- menu stuff, etc
+	VoiceGlobal		= 12,	-- causes mouth animation and is broadcast, like announcer
+	Music			= 13	-- music played as a looping sound
 }
 
 SSF = {
@@ -293,20 +293,20 @@ SSF = {
 }
 
 Team = {
-	FREE		= 0,
-	RED			= 1,
-	BLUE		= 2,
-	SPECTATOR	= 3
+	Free		= 0,
+	Red			= 1,
+	Blue		= 2,
+	Spectator	= 3
 }
 
 TextStyle = {
-	NORMAL			= 0,
-	BLINK			= 1,
-	PULSE			= 2,
-	SHADOWED		= 3,
-	OUTLINED		= 4,
-	OUTLINESHADOWED	= 5,
-	SHADOWEDMORE	= 6
+	Normal			= 0,
+	Blink			= 1,
+	Pulse			= 2,
+	Shadowed		= 3,
+	Outlined		= 4,
+	OutlineShadowed	= 5,
+	ShadowedMore	= 6
 }
 
 Weapons = {
