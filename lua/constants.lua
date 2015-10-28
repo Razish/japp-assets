@@ -1,7 +1,7 @@
 screenWidth		= 640.0
 screenHeight	= 480.0
 
-ChatColours = {
+ChatColour = {
 	Black	= '^0',
 	Red		= '^1',
 	Green	= '^2',
@@ -11,7 +11,7 @@ ChatColours = {
 	Magenta	= '^6',
 	White	= '^7',
 	Orange	= '^8',
-	Grey	= '^9'
+	Grey	= '^9',
 }
 
 Contents = {
@@ -39,7 +39,7 @@ Contents = {
 	Item		= 0x00100000,	-- ""
 	NoShot		= 0x00200000,	-- shots pass through me
 	Detail		= 0x08000000,	-- brushes not used for the bsp
-	Translucent	= 0x80000000	-- don't consume surface fragments inside
+	Translucent	= 0x80000000,	-- don't consume surface fragments inside
 }
 
 CPD = {
@@ -61,7 +61,7 @@ CPD = {
 	NOKATA				= 0x00008000,	-- disable katas
 	NOBUTTERFLY			= 0x00010000,	-- diable dual/staff butterfly
 	NOSTAB				= 0x00020000,	-- disable roll/back stab
-	NODFA				= 0x00040000	-- disable dfa
+	NODFA				= 0x00040000,	-- disable dfa
 }
 
 CSF = {
@@ -69,7 +69,7 @@ CSF = {
 	SCOREBOARD_LARGE	= 0x0002,	-- can correctly parse scoreboard messages with information for 32 clients
 	SCOREBOARD_KD		= 0x0004,	-- can correctly parse scoreboard messages with extra K/D information
 	CHAT_FILTERS		= 0x0008,	-- can correctly parse chat messages with proper delimiters
-	FIXED_WEAPON_ANIMS	= 0x0010	-- fixes the missing concussion rifle animations
+	FIXED_WEAPON_ANIMS	= 0x0010,	-- fixes the missing concussion rifle animations
 }
 
 CvarFlags = {
@@ -86,7 +86,7 @@ CvarFlags = {
 	Cheat			= 0x0200,	-- can not be changed if cheats are disabled
 	NoRestart		= 0x0400,	-- do not clear when a cvar_restart is issued
 	Internal		= 0x0800,	-- cvar won't be displayed, ever (for passwords and such)
-	Parental		= 0x1000	-- lets cvar system know that parental stuff needs to be updated
+	Parental		= 0x1000,	-- lets cvar system know that parental stuff needs to be updated
 }
 
 EFlags = {
@@ -121,7 +121,7 @@ EFlags = {
 	CLIENTSMOOTH	= 0x10000000,	-- standard lerporigin smooth override on client
 	JETPACK			= 0x20000000,	-- wearing a jetpack
 	JETPACK_FLAMING	= 0x40000000,	-- jetpack fire effect
-	NOT_USED_4		= 0x80000000
+	NOT_USED_4		= 0x80000000,
 }
 
 EFlags2 = {
@@ -137,7 +137,15 @@ EFlags2 = {
 	BRACKET_ENTITY		= 0x0040,	-- draw as bracketed
 	SHIP_DEATH			= 0x0080,	-- "died in ship" mode
 	NOT_USED_1			= 0x0100,	-- grapple hook is out
-	GRAPPLE_OUT			= 0x0200
+	GRAPPLE_OUT			= 0x0200,
+}
+
+FlagStatus = {
+	AtBase		= 0,
+	Taken		= 1,
+	TakenRed	= 2,
+	TakenBlue	= 3,
+	Dropped		= 4,
 }
 
 Flags = {
@@ -160,10 +168,10 @@ Flags = {
 	VEH_BOARDING			= 0x00010000,
 	DMG_BY_SABER_ONLY		= 0x00020000,	-- only take damage from saber
 	DMG_BY_HEAVY_WEAP_ONLY	= 0x00040000,	-- only take damage from explosives
-	BBRUSH					= 0x00080000	-- breakable brush
+	BBRUSH					= 0x00080000,	-- breakable brush
 }
 
-Fonts = {
+Font = {
 	NONE		= 0,
 	SMALL		= 1,
 	MEDIUM		= 2,
@@ -171,17 +179,17 @@ Fonts = {
 	SMALL2		= 4,
 	JAPPLARGE	= 5,
 	JAPPSMALL	= 6,
-	JAPPMONO	= 7
+	JAPPMONO	= 7,
 }
 
 FSMode = {
 	Read		= 0,
 	Write		= 1,
 	Append		= 2,
-	AppendSync	= 3
+	AppendSync	= 3,
 }
 
-Gametypes = {
+Gametype = {
 	FFA				= 0,	-- deathmatch
 	HOLOCRON		= 1,	-- holocron deathmatch
 	JEDIMASTER		= 2,	-- jedi master
@@ -192,13 +200,20 @@ Gametypes = {
 	TEAM			= 6,	-- team deathmatch
 	SIEGE			= 7,	-- siege/objectives
 	CTF				= 8,	-- capture the flag
-	CTY				= 9		-- capture the ysalimiri
+	CTY				= 9,		-- capture the ysalimiri
 }
 
 Gender = {
 	Male	= 0,
 	Female	= 1,
-	Neuter	= 2
+	Neuter	= 2,
+}
+
+HudEvent = {
+	Stats	= 0x01,
+	Flags	= 0x02,
+	Scores	= 0x04,
+	All		= 0x07,
 }
 
 KeyCatcher = {
@@ -251,7 +266,7 @@ MOD = {
 	SUICIDE 				= 39,
 	TARGET_LASER 			= 40,
 	TRIGGER_HURT 			= 41,
-	TEAM_CHANGE 			= 42
+	TEAM_CHANGE 			= 42,
 }
 
 SaberStyle = {
@@ -262,7 +277,7 @@ SaberStyle = {
 	Desann	= 4,
 	Tavion	= 5,
 	Dual	= 6,
-	Staff	= 7
+	Staff	= 7,
 }
 
 SoundChannel = {
@@ -279,7 +294,7 @@ SoundChannel = {
 	LessAttenuation	= 10,	-- attenuates similar to chan_voice, but uses empty channel auto-pick behaviour
 	Menu1			= 11,	-- menu stuff, etc
 	VoiceGlobal		= 12,	-- causes mouth animation and is broadcast, like announcer
-	Music			= 13	-- music played as a looping sound
+	Music			= 13,	-- music played as a looping sound
 }
 
 SSF = {
@@ -289,14 +304,14 @@ SSF = {
 	CHAT_FILTERS		= 0x0008,	-- will send correct delimiters for tabbed chatbox
 	FIXED_WEAP_ANIMS	= 0x0010,	-- fixed bryar/concussion firing animations
 	MERC_FLAMETHROWER	= 0x0020,
-	SPECTINFO			= 0x0040
+	SPECTINFO			= 0x0040,
 }
 
 Team = {
 	Free		= 0,
 	Red			= 1,
 	Blue		= 2,
-	Spectator	= 3
+	Spectator	= 3,
 }
 
 TextStyle = {
@@ -309,7 +324,7 @@ TextStyle = {
 	ShadowedMore	= 6
 }
 
-Weapons = {
+Weapon = {
 	NONE			= 0,
 	STUN_BATON		= 1,
 	MELEE			= 2,
@@ -329,5 +344,5 @@ Weapons = {
 	BRYAR_OLD		= 16,
 	EMPLACED_GUN	= 17,
 	TURRET			= 18,
-	NUM_WEAPONS		= 19
+	NUM_WEAPONS		= 19,
 }

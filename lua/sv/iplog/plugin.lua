@@ -5,7 +5,7 @@ local iplist = {}
 local logname = 'ips.json'
 
 local function Load()
-	local sr = GetSerialiser( logname, FSMode.READ )
+	local sr = GetSerialiser( logname, FSMode.Read )
 	iplist = sr:ReadTable( 'iplist' )
 	sr:Close()
 	sr = nil
@@ -14,7 +14,7 @@ Load()
 
 local function Save()
 	print( 'Saving IP log...' )
-	local sr = GetSerialiser( logname, FSMode.WRITE )
+	local sr = GetSerialiser( logname, FSMode.Write )
 	local t = iplist
 	sr:AddTable( 'iplist', iplist )
 	sr:Close()

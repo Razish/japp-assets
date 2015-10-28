@@ -27,7 +27,7 @@ JPUtil = setmetatable( {}, {
 
 		-- Return a string with the Q3 colours codes (^0 <-> ^7) stripped out
 		StripColours = function( message )
-			return string.gsub( message, "%^[0-9]", "" )
+			return message and string.gsub( message, "%^[0-9]", "" ) or nil
 		end,
 
 		FadeColour = function( colour, startMsec, totalMsec )
@@ -61,6 +61,22 @@ JPUtil = setmetatable( {}, {
 			else
 				return nil, nil
 			end
+		end,
+
+		deepcopy = function( obj, seen )
+			if type( obj ) ~= 'table' then
+				return obj
+			end
+			if seen and seen[obj] then
+				return seen[obj]
+			end
+			local s = seen or {}
+			local res = setmetatable( {}, getmetatable( obj ) )
+			s[obj] = res
+			for k, v in pairs( obj ) do
+				res[JPUtil.deepcopy( k, s )] = JPUtil.deepcopy( v, s )
+			end
+			return res
 		end
 	},
 
