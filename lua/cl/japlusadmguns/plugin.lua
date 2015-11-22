@@ -2,12 +2,12 @@ local japlusadmguns = RegisterPlugin( 'JA+ Admin Guns', '1.0.0', '13.0.0' )
 
 local function GetTarget()
 	local self = GetPlayer(nil)
-	local pos = self:GetPosition()
+	local pos = self.position
 	pos.z = pos.z + 36.0 -- move to eye-position
-	local angles = JPMath.AngleVectors( self:GetAngles(), true, false, false )
-	local endPos = JPMath.Vector3MA( pos, 16384.0, angles )
+	local angles = JPMath.AngleVectors( self.angles, true, false, false )
+	local endPos = pos:MA( 16384.0, angles )
 	local mask = 1184515 -- MASK_OPAQUE|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE
-	local tr = RayTrace( pos, 1.0, endPos, self:GetID(), mask )
+	local tr = RayTrace( pos, 1.0, endPos, self.id, mask )
 	if tr.entityNum >= 0 and tr.entityNum < 32 then
 		return tr.entityNum, GetPlayer( tr.entityNum )
 	else
