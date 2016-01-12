@@ -1,9 +1,9 @@
-local razhud = RegisterPlugin( 'Razhud', '1.6.0', '13.1.0' )
+local razhud = RegisterPlugin( 'Razhud', '1.7.0', '13.2.1' )
 razhud.shaders = {}
 
 razhud.text = TextBox()
-	razhud.text.scale = 1.0
-	razhud.text.font = RegisterFont( Font.SMALL )
+	razhud.text.scale = 0.5
+	razhud.text.font = RegisterFont( Font.JAPPSMALL )
 	razhud.text.colour = { 1.0, 0.0, 0.0, 1.0 }
 	razhud.text.style = TextStyle.Shadowed
 	razhud.text.centered = true
@@ -66,6 +66,7 @@ local weaponNames = {
 local white = { 1.0, 1.0, 1.0, 1.0 }
 local yellow = { 1.0, 1.0, 0.0, 0.5 }
 local red = { 1.0, 0.0, 0.0, 0.5 }
+local ratioRed = { 1.0, 0.0, 0.0, 1.0 }
 local green = { 0.0, 0.66666, 0.0, 0.5 }
 local lightblue = { 0.33333, 0.33333, 1.0, 0.5 }
 local orange = { 1.0, 0.5, 0.0, 0.5 }
@@ -126,7 +127,7 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 	local team = self.team
 
 	if ( bit32.band( style, HudEvent.Stats ) == HudEvent.Stats ) then
-		local barWidth = (screenWidth / 4.0)
+		local barWidth = 213.33333
 		local barHeight = 24.0
 		local background = { 0.0, 0.0, 0.0, 0.175 }
 		local hpColour = JPUtil.deepcopy( red )
@@ -165,7 +166,6 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 			hpColour, background,
 			true
 		)
-		razhud.text.scale = 1.0
 		razhud.text.centered = true
 		razhud.text.colour = white
 		razhud.text.text = tostring( hp )
@@ -240,6 +240,7 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 				screenHeight - barHeight
 			)
 		end
+
 		::fail::
 		events = bit32.bor( events, HudEvent.Stats )
 	end
@@ -263,7 +264,7 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 		local defer = { 1.0, 1.0, 1.0, 0.8 }
 		local ourFlag = (team == Team.Red) and razhud.shaders.redFlag or razhud.shaders.blueFlag
 		local theirFlag = (team == Team.Red) and razhud.shaders.blueFlag or razhud.shaders.redFlag
-		
+
 		local otherTeamHasFlag = false
 		local otherTeamDroppedFlag = false
 		local ourTeamHasFlag = false
@@ -274,7 +275,7 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 		if self.isAlive == false or gametype < Gametype.CTF then
 			goto fail
 		end
-		
+
 		redFlagStatus, blueFlagStatus = GetFlagStatus()
 		if team == Team.Red then
 			otherTeamHasFlag = redFlagStatus == FlagStatus.Taken
@@ -300,9 +301,9 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 		else
 			DrawPic( leftX, y, iconSize * widthRatioCoef, iconSize, otherTeamDroppedFlag and faded or nil, ourFlag )
 		end
-		razhud.text.text = tostring( (team == Team.Red) and scores1 or scores2 );
+		razhud.text.text = tostring( (team == Team.Red) and scores1 or scores2 )
 		razhud.text.colour = (team == Team.Red) and redScore or cyanScore
-		razhud.text:Draw( leftX + ((iconSize * widthRatioCoef) / 2.0), y - razhud.text.height );
+		razhud.text:Draw( leftX + ((iconSize * widthRatioCoef) / 2.0), y - razhud.text.height )
 
 		-- right side
 		if ( ourTeamHasFlag ) then
@@ -311,12 +312,68 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 		else
 			DrawPic( rightX, y, iconSize * widthRatioCoef, iconSize, ourTeamDroppedFlag and faded or nil, theirFlag )
 		end
-		razhud.text.text = tostring( (team == Team.Red) and scores2 or scores1 );
+		razhud.text.text = tostring( (team == Team.Red) and scores2 or scores1 )
 		razhud.text.colour = (team == Team.Red) and cyanScore or redScore
-		razhud.text:Draw( rightX + ((iconSize * widthRatioCoef) / 2.0), y - razhud.text.height );
+		razhud.text:Draw( rightX + ((iconSize * widthRatioCoef) / 2.0), y - razhud.text.height )
 
 		::fail::
 		events = bit32.bor( events, HudEvent.Flags )
+	end
+
+	if ( bit32.band( style, HudEvent.Scores ) == HudEvent.Scores ) then
+		local list = {}
+		local barWidth = 213.33333
+		local barHeight = 24.0
+		local kills = self.score
+		local deaths = self.deaths
+		local net = kills - deaths
+		local ratio = (self.deaths ~= 0) and (self.score / self.deaths) or self.score
+		local sign = (net >= 0) and '+' or '-'
+
+		if self.isAlive == false then
+			goto fail
+		end
+
+		if gametype >= Gametype.TEAM then
+			-- ...
+		else
+			local list = {}
+			table.insert( list, 'Net: ' .. sign .. math.abs( net ) )
+
+			local ratioColour
+			if ratio < 0.25 then
+				ratioColour = ChatColour.Red
+			elseif ratio < 0.5 then
+				ratioColour = ChatColour.Orange
+			elseif ratio < 0.75 then
+				ratioColour = ChatColour.Yellow
+			elseif ratio < 1.0 then
+				ratioColour = ChatColour.White
+			else
+				ratioColour = ChatColour.Green
+			end
+			table.insert( list, 'KDR: ' .. ratioColour .. string.format( "%0.02f", ratio ) )
+
+			local maxlen = 0
+			for i,v in ipairs(list) do
+				razhud.text.text = v
+				if razhud.text.width > maxlen then
+					maxlen = razhud.text.width
+				end
+			end
+
+			for i,v in next, list do
+				razhud.text.text = v
+				razhud.text.centered = false
+				razhud.text:Draw(
+					((screenWidth / 2.0) - barWidth * widthRatioCoef) - maxlen,
+					(screenHeight - ( barHeight * 2.0)) + (barHeight * (i-1))
+				)
+			end
+		end
+
+		::fail::
+		events = bit32.bor( events, HudEvent.Scores )
 	end
 
 	return events

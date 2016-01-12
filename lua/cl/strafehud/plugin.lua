@@ -8,7 +8,7 @@ strafehud.text = TextBox()
 	strafehud.text.centered = true
 
 local cvars = {
-	cg_strafeHUD			= CreateCvar( 'cg_strafeHUD', 3, CvarFlags.ARCHIVE ),
+	['cg_strafeHUD']		= CreateCvar( 'cg_strafeHUD', 3, CvarFlags.ARCHIVE ),
 }
 --[[
 	1	Current UPS
@@ -36,7 +36,7 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 		return events
 	end
 
-	local x = screenWidth / 1.5
+	local x = 48.0
 	local y = 400
 	local currTime = GetTime()
 
@@ -44,7 +44,7 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 	if bestSpeed.lastTime < currTime - 2000 then
 		bestSpeed.speed = 0
 	end
-	
+
 	if groundSpeed.lastTime < currTime - 2000 then
 		groundSpeed.speed = 0
 	end
@@ -64,7 +64,7 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 		groundSpeed.speed = speed
 		groundSpeed.lastTime = currTime
 	end
-	
+
 	-- jump measure
 	if self.isInAir and wasInAir == false then
 		-- start jump
