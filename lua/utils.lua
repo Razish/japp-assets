@@ -1,3 +1,4 @@
+require 'parser.lua'
 JPUtil = setmetatable( {}, {
 	__index = {
 		-- List all global variables
@@ -23,6 +24,41 @@ JPUtil = setmetatable( {}, {
 
 			table.insert( arr, string.sub( str, pos ) ) -- Attach chars right of last divider
 			return arr
+		end,
+
+		-- credit: http://lua-users.org/wiki/StringTrim
+		trim6 = function( s )
+			return s:match'^()%s*$' and '' or s:match'^%s*(.*%S)'
+		end,
+
+		-- credit: http://lua-users.org/wiki/CommonFunctions
+		px = function( s )
+			local n = 1
+			while true do
+				while true do -- removes spaces
+					local _, ne, np = s:find("^[^%s%%]*()%s*", n)
+					n = np
+					if np - 1 ~= ne then
+						s = s:sub(1, np - 1) .. s:sub(ne + 1)
+					else
+						break
+					end
+				end
+				local m = s:match("%%(.?)", n) -- skip magic chars
+				if m == "b" then
+					n = n + 4
+				elseif m then
+					n = n + 2
+				else
+					break
+				end
+			end
+			return s
+		end,
+
+
+		trimWhitespace = function( str )
+			return str:gsub( "%s+", " " )
 		end,
 
 		-- Return a string with the Q3 colours codes (^0 <-> ^7) stripped out
