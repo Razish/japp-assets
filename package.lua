@@ -18,6 +18,7 @@ local paks = {
 			'lua/events.lua',
 			'lua/init.lua',
 			'lua/math.lua',
+			'lua/parser.lua',
 			'lua/utils.lua',
 		},
 		['animations'] = {
