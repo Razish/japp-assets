@@ -59,6 +59,24 @@ AddClientCommand( 'ammotd', function( client, args )
 	SendCommand( clientNum, levelTime )
 end )
 
+AddClientCommand( 'amshowmotd', function( client, args )
+	if not client.isAdmin then
+		SendReliableCommand(client.id, string.format("You're not allowed to execute this command!\n"))
+		return
+	end
+	if not args[1] then
+		SendReliableCommand(client.id, string.format("Usage: /amshowmotd client\n"))
+		return
+	end
+	local clientNum = tonumber(args[1])
+	local levelTime = GetTime()
+	joinTimes[clientNum] = levelTime
+	msgTimes[clientNum] = levelTime
+	firstMsgTime[clientNum] = levelTime
+	SendCommand( clientNum, levelTime )
+end )
+
+
 AddListener( 'JPLUA_EVENT_CLIENTSPAWN', function( client, firstSpawn )
 	local clientNum = client.id
 	if firstSpawn then
