@@ -113,6 +113,51 @@ JPUtil = setmetatable( {}, {
 				res[JPUtil.deepcopy( k, s )] = JPUtil.deepcopy( v, s )
 			end
 			return res
+		end,
+		
+		hexToColor = function(hex)
+			if type( hex ) ~= 'number' or type( hex ) ~= 'string' then
+				print("JPUtil.hexToColor: Wrong argument")
+				return
+			end
+			local color = {
+				r = 0,
+				g = 0,
+				b = 0,
+				a = 0,
+			}
+			if type( hex ) == 'number' then
+				color.r = (hex >> 16) & 0xFF
+				color.g = (hex >> 8) & 0xFF
+				color.b = hex & 0xFF
+			elseif type( hex ) == 'string' then -- by jasonbradley https://gist.github.com/jasonbradley/4357406
+				color.r = tonumber('0x' .. hex:sub(1,2))
+				color.g = tonumber('0x' .. hex:sub(3,4))
+				color.b = tonumber('0x' .. hex:sub(5,6))
+			end
+			return color
+		end,
+		
+		colorToHex = function(color, tostr)
+			if type( color ) ~= 'table' then
+				print("JPUtil.colorToHex: Wrong argument")
+				return
+			end
+			tostr = tostr or false
+			local hex
+			if tostr == true then --by marceloCodget https://gist.github.com/marceloCodget/3862929
+				for k,v in pairs(color) do 
+					while(value > 0)do
+						local index = math.fmod(value, 16) + 1
+						value = math.floor(value / 16)
+						hex = string.sub('0123456789ABCDEF', index, index) .. hex
+					end
+				end
+				hex = '#' .. hex
+			else
+				hex = ((color.r & 0xFF) << 16) + ((color.g & 0xFF) << 8) + (color.r & 0xFF)
+			end
+			return hex
 		end
 	},
 
