@@ -1,131 +1,161 @@
-local chatstyle = RegisterPlugin( 'ChatStyle', '1.2.0', '13.0.0' )
-local chatstyles = {}
-local chatstyle['current'] = 'none'
-local filename = 'chatstyles.json'
-
-local function saveChatStyles()
-		print( 'Saving ChatStyles...' )
-	local sr = GetSerialiser( filename , FSMode.Write )
-	local t = chatstyles
-	sr:AddTable( 'chatstyles', chatstyles )
-	sr:Close()
-	sr = nil
-end
-
-local function loadChatStyles()
-	local sr = GetSerialiser(filename , FSMode.Read )
-	if not sr then
-		saveChatStyles()
-		return
-	end
-	iplist = sr:ReadTable( 'chatstyles' )
-	sr:Close()
-	sr = nil
-end
-
-local function listChatStyles()
-	print('ChatStyles list: \n')
-	for k,v in pairs(chatstyle)
-		if k ~= 'current' then --skip
-			print(string.format("Name: '%s' Prefix: %s Suffix: %s\n"), k, v['prefix'], v['suffix'])
-		end
-	end
-	print('\n')
-end
-
-local function createChatStyle(name, prefix, suffix)
-	if chatstyles[name] ~= nil then
-		print("ChatStyle '" .. name .. "' already exist!\n")
-		return
-	end
-	chatstyles[name] = {}
-	chatstyles[name]['prefix'] = prefix
-	chatstyles[name]['suffix'] = suffix
-	saveChatStyles()
-end
-
-local function removeChatStyle(name))
-	if chatstyles[name] == nil then
-		print("ChatStyle '" .. name .. "' not exist!\n")
-		return
-	end
-	chatstyles[name]['prefix'] = prefix
-	chatstyles[name]['suffix'] = suffix
-end
-
-local function setChatStyle(name)
-	if chatstyles[name] == nil then
-		print("ChatStyle '" .. name .. "' not exist!\n")
-		return
-	end
-	chatstyles['current'] = name
-	return 1
-end
+local chatstyle = RegisterPlugin( 'ChatStyle', '1.3.0', '13.0.0' )
+local fileName = 'chatstyles.json'
 
 local cvars = {
-	['cg_chatPrefix']	= CreateCvar( 'cg_chatPrefix', '', CvarFlags.ARCHIVE ),
-	['cg_chatSuffix']	= CreateCvar( 'cg_chatSuffix', '', CvarFlags.ARCHIVE ),
 	['cg_chatStyle']	= CreateCvar( 'cg_chatStyle', '1', CvarFlags.ARCHIVE ),
-	['cg_chatAnnounce']	= CreateCvar( 'cg_chatAnnounce', '0', CvarFlags.ARCHIVE ),
 }
 
+local function SaveChatStyles()
+	print( 'Saving ChatStyles...' )
+	local sr = GetSerialiser( fileName, FSMode.Write )
+	sr:AddTable( 'chatstyles', chatstyle.styles )
+	sr:Close()
+	sr = nil
+end
+
+local function LoadChatStyles()
+	local sr = GetSerialiser( fileName, FSMode.Read )
+	if not sr then
+		SaveChatStyles()
+		return
+	end
+	chatstyle.styles = sr:ReadTable( 'chatstyles' )
+	sr:Close()
+	sr = nil
+
+	-- sanity check
+	if chatstyle.styles['current'] == nil or chatstyle.styles[chatstyle.styles['current']] == nil then
+		print( 'oops, looks like ChatStyles got corrupt, attempting repair' )
+		chatstyle.styles['none'] = {
+			['prefix'] = '',
+			['suffix'] = ''
+		}
+		chatstyle.styles['current'] = 'none'
+	end
+
+end
+
+local function CreateChatStyle( name, prefix, suffix )
+	-- see if it already exists
+	if chatstyle.styles[name] ~= nil then
+		print( 'ChatStyle ' .. name .. ' already exists' )
+		return
+	end
+
+	-- insert and save to disk
+	chatstyle.styles[name] = {
+		['prefix'] = prefix,
+		['suffix'] = suffix
+	}
+	SaveChatStyles()
+end
+
+local function RemoveChatStyle( name )
+	if chatstyle.styles[name] == nil then
+		print( 'ChatStyle ' .. name .. ' doesn\'t exist' )
+		return
+	end
+
+	-- if we're removing the current style, retrieve the name
+	if name == 'current' then
+		name = chatstyle.styles[name]
+	end
+	if name ~= nil then
+		print( 'removing chatstyle ' .. name )
+		chatstyle.styles[name] = nil
+		if chatstyle.styles['current'] == name then
+			-- attempt to fall back to 'none' - may not exist, but if it does it's the cleanest thing we can do short of
+			--	re-adding it, which the user may not want
+			chatstyle.styles['current'] = 'none'
+		end
+	end
+end
+
+local function ListChatStyles( func )
+	func( 'ChatStyles list:' )
+	for k,v in next, chatstyle.styles do
+		if k ~= 'current' then -- skip
+			func( '  ' .. k .. ': ' .. v['prefix'] .. 'example text' .. v['suffix'] )
+		end
+	end
+end
+
+local function SetChatStyle( name )
+	if chatstyle.styles[name] == nil then
+		SendChatText( 'ChatStyle ' .. name .. ' doesn\'t exist' )
+		return nil
+	end
+	if name ~= 'current' then
+		chatstyle.styles['current'] = name
+	end
+	return chatstyle.styles[name]
+end
 
 AddListener( 'JPLUA_EVENT_CHATMSGSEND', function( msg, mode, target )
-	local pt = JPUtil.explode(' ', msg)
-	if pt[1] == '!chatstyle' then
-		if pt[2] == 'set' then
-			setChatStyle(pt[3])
-		elseif pt[2] == 'current' or pt[2] == nil then
-			local str = string.format("Current ChatStyle: %s%s%s", chatstyles[chatstyles['current']]['prefix'],
-																			  chatstyles['current'],
-																			  chatstyles[chatstyles['current']]['suffix']))
-			if cvars['cg_chatAnnounce']:GetInteger() then
-				SendConsoleCommand("say " .. str)
-			else
-				SendConsoleCommand(string.format("lua SendChatText('%s')", str)) -- lol, should be inserted after message below
-			end
-		end
-		if cvars['cg_chatAnnounce']:GetInteger() then
-			return msg
-		else
-			SendChatText(msg)
-		end
-	end
 	local enabled = cvars['cg_chatStyle']:GetInteger()
-	if string.len( msg ) == 0 or bit32.band( enabled, bit32.lshift( 1, mode ) ) ~= enabled then
+	if #msg == 0 or bit32.band( enabled, bit32.lshift( 1, mode ) ) ~= enabled then
 		return msg
 	end
-	return chatstyles[chatstyles['current']]['prefix'] .. msg .. chatstyles[chatstyles['current']]['suffix']
+
+	local currentStyle = chatstyle.styles[chatstyle.styles['current']]
+
+	local pt = JPUtil.explode( ' ', msg )
+	if pt[1] == '!chatstyle' then
+		if #pt == 2 then
+			if pt[2] == 'list' then
+				ListChatStyles( SendChatText )
+				return nil
+			else
+				currentStyle = SetChatStyle( pt[2] )
+			end
+		end
+		if currentStyle ~= nil then
+			SendChatText( 'Current ChatStyle: ' .. currentStyle['prefix'] .. chatstyle.styles['current']
+				.. currentStyle['suffix']
+			)
+		else
+			SendChatText( 'no ChatStyle selected' )
+		end
+		return nil
+	end
+
+	if currentStyle ~= nil then
+		return chatstyle.styles[chatstyle.styles['current']]['prefix'] .. msg
+			.. chatstyle.styles[chatstyle.styles['current']]['suffix']
+	else
+		return msg
+	end
 end )
 
-AddConsoleCommand('cg_newChatStyle', function(args) --- /cg_newChatStyle name prefix suffix
-	if not args[1] then
-		print("Usage: /cg_newChatStyle name prefix/suffix [suffix]\n")
+-- chatstyle_create name prefix suffix
+AddConsoleCommand( 'chatstyle_create', function( cmd, args )
+	if #args < 2 or #args > 3 then
+		print( 'Usage: /cg_newChatStyle name prefix [suffix]' )
+		return
 	end
-	 local name = args[1]
-	 if args[2] ~= "''" or args[2] ~= '""' then
-	 	local prefix = args[2]
-	 else
-	 	local prefix = ''
-	 end
-	 if args[3] ~= "''" or args[3] ~= '""' then
-	 	local prefix = args[2]
-	 else
-	 	local prefix = ''
-	 end
-	 createChatStyle(name, prefix, suffix
-end)
 
-AddConsoleCommand('cg_removeChatStyle', function(args)
-	if not args[1] then
-		print("Usage: /cg_removeChatStyle name \n")
+	local name = args[1]
+ 	local prefix = args[2]
+ 	local suffix = ''
+	 if #args == 3 then
+	 	suffix = args[3]
+	 end
+	 CreateChatStyle( name, prefix, suffix )
+end )
+
+-- chatstyle_remove name
+AddConsoleCommand('chatstyle_remove', function( cmd, args )
+	if #args ~= 1 then
+		print( 'Usage: /chatstyle_remove <name>' )
+		return
 	end
-	removeChatStyle(args[1])
+
+	RemoveChatStyle( args[1] )
 end)
 
-AddConsoleCommand('cg_listChatStyles', function(args)
-	listChatStyles()
+AddConsoleCommand('chatstyle_list', function( cmd, args )
+	ListChatStyles( print )
 end)
 
-AddListener( 'JPLUA_EVENT_UNLOAD', saveChatStyles() )
-loadChatStyles()
+AddListener( 'JPLUA_EVENT_UNLOAD', SaveChatStyles )
+LoadChatStyles()
