@@ -6,11 +6,7 @@ local cvars = {
 	['japp_motdTime']	= CreateCvar( 'japp_motdTime', '5', CvarFlags.ARCHIVE ),
 }
 
-local joinTimes = {}
-local firstMsgTime = {}
-local msgTimes = {}
-
-function SendCommand( clientNum, levelTime )
+function SendCommand( clientNum, countdown )
 	local type = cvars['japp_motdType']:GetInteger()
 	local message = cvars['japp_motd']:GetString()
 
@@ -39,24 +35,24 @@ function SendCommand( clientNum, levelTime )
 
 	-- center print
 	elseif type == 3 then
-		message = string.gsub( message, '\\n', '\n' )
-		local out = 'cp "' .. message .. '\n'
-		if firstMsgTime[clientNum] ~= nil then
-			out = out .. 'Time left: ' .. math.ceil( (firstMsgTime[clientNum]-levelTime + (cvars['japp_motdTime']:GetInteger()*1000))/1000 ) .. '"'
-		else
-			out = out .. '"'
-		end
-		SendReliableCommand( clientNum, out )
+        message = string.gsub( message, '\\n', '\n' )
+        local i = cvars['japp_motdTime']:GetInteger()
+        if countdown then
+            while i > 0 do ---add messages to queue :>
+               local out = string.format('cp "%s\n TimeLeft: %i" 1000', message, i)
+               SendReliableCommand( clientNum , out )
+               i = i - 1
+            end
+        else
+            local out = string.format('cp "%s" 1000', message)
+            SendReliableCommand( clientNum, out)
+        end
 	end
 end
 
 AddClientCommand( 'ammotd', function( client, args )
 	local clientNum = client.id
-	local levelTime = GetTime()
-	joinTimes[clientNum] = levelTime
-	msgTimes[clientNum] = levelTime
-	firstMsgTime[clientNum] = levelTime
-	SendCommand( clientNum, levelTime )
+	SendCommand( clientNum, false  )
 end )
 
 AddClientCommand( 'amshowmotd', function( client, args )
@@ -65,62 +61,18 @@ AddClientCommand( 'amshowmotd', function( client, args )
 		return
 	end
 	if not args[1] then
-		SendReliableCommand(client.id, string.format("Usage: /amshowmotd client\n"))
+		SendReliableCommand(client.id, string.format("Usage: /amshowmotd client [countdown]\n"))
 		return
 	end
 	local clientNum = tonumber(args[1])
-	local levelTime = GetTime()
-	joinTimes[clientNum] = levelTime
-	msgTimes[clientNum] = levelTime
-	firstMsgTime[clientNum] = levelTime
-	SendCommand( clientNum, levelTime )
+    local countdown = tonumber(args[2]) or false
+	SendCommand( clientNum, countdown )
 end )
 
 
 AddListener( 'JPLUA_EVENT_CLIENTSPAWN', function( client, firstSpawn )
 	local clientNum = client.id
 	if firstSpawn then
-		if cvars['japp_motdType']:GetInteger() == 3 then
-			local levelTime = GetTime()
-			joinTimes[clientNum] = levelTime
-			msgTimes[clientNum] = levelTime
-			firstMsgTime[clientNum] = nil
-		else
-			SendCommand( clientNum, nil )
-		end
-	end
-end )
-
-AddListener( 'JPLUA_EVENT_RUNFRAME', function()
-	if cvars['japp_motdType']:GetInteger() ~= 3 then
-		return
-	end
-
-	local msg = nil
-	local levelTime = GetTime()
-	local msgTime = cvars['japp_motdTime']:GetInteger() * 1000
-	for _,ply in ipairs(GetPlayers()) do
-		if ply.isBot then
-			-- ignore
-		else
-			local i = ply.id
-			if joinTimes[i] ~= nil and joinTimes[i] > levelTime-msgTime then
-				if msgTimes[i] ~= nil and msgTimes[i] < levelTime-1000 then
-					if firstMsgTime[i] == nil then
-						firstMsgTime[i] = levelTime
-					end
-					msgTimes[i] = levelTime
-					SendCommand( i, levelTime )
-				end
-			elseif joinTimes[i] ~= nil and joinTimes[i] > levelTime-msgTime-1000 then
-				if msgTimes[i] ~= nil and msgTimes[i] < levelTime-1000 then
-					if firstMsgTime[i] == nil then
-						firstMsgTime[i] = levelTime
-					end
-					msgTimes[i] = levelTime
-					SendReliableCommand( i, 'cp ""' )
-				end
-			end
-		end
+		SendCommand( clientNum, true )
 	end
 end )
