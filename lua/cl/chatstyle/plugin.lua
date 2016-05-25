@@ -1,4 +1,4 @@
-local chatstyle = RegisterPlugin( 'ChatStyle', '1.3.0', '13.0.0' )
+local chatstyle = RegisterPlugin( 'ChatStyle', '1.3.1', '13.0.0' )
 local fileName = 'chatstyles.json'
 
 local cvars = {
@@ -93,7 +93,7 @@ end
 
 AddListener( 'JPLUA_EVENT_CHATMSGSEND', function( msg, mode, target )
 	local enabled = cvars['cg_chatStyle']:GetInteger()
-	if #msg == 0 or bit32.band( enabled, bit32.lshift( 1, mode ) ) ~= enabled then
+	if #msg == 0 or bit32.band( enabled, bit32.lshift( 1, mode ) ) == 0 then
 		return msg
 	end
 
@@ -130,7 +130,7 @@ end )
 -- chatstyle_create name prefix suffix
 AddConsoleCommand( 'chatstyle_create', function( cmd, args )
 	if #args < 2 or #args > 3 then
-		print( 'Usage: /cg_newChatStyle name prefix [suffix]' )
+		print( 'Usage: /chatstyle_create name prefix [suffix]' )
 		return
 	end
 
