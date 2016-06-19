@@ -31,6 +31,7 @@ JPUtil = setmetatable( {}, {
 			return s:match'^()%s*$' and '' or s:match'^%s*(.*%S)'
 		end,
 
+		-- remove whitespace from pattern
 		-- credit: http://lua-users.org/wiki/CommonFunctions
 		px = function( s )
 			local n = 1

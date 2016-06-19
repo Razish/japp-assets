@@ -13,17 +13,7 @@ function COM_Compress( str )
 	end
 
 	-- remove /* */ comments
-	local pos = 0
-	while pos ~= nil do
-		pos = str:find( '/*', pos, true )
-		if pos then
-			local commentEnd = str:find( '*/', pos, true )
-			if commentEnd then
-				local newStr = str:sub( 1, pos - 1 ) .. str:sub( commentEnd + 1 )
-				str = newStr
-			end
-		end
-	end
+	str = str:gsub( "/%*.-%*/", "" )
 
 	--str = JPUtil.px( str )
 	str = JPUtil.trim6( str )
