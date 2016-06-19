@@ -1,4 +1,4 @@
-local kt = RegisterPlugin( 'Kill Tracker', '1.1.0', '13.2.0' )
+local kt = RegisterPlugin( 'Kill Tracker', '1.1.1', '13.2.0' )
 
 local function sum( t )
 	local s = t[1] - t[1]
@@ -102,20 +102,23 @@ AddListener( 'JPLUA_EVENT_PLAYERDEATH', function( victim, methodOfDeath, inflict
 					ChatColour.Green .. '+1 duel won against ' .. ChatColour.White .. self.duelPartner.name,
 					ChatColour.Green .. math.floor( kt.db.duelsWon ) .. ChatColour.White .. '/' .. math.floor( kt.db.duelsLost )
 				)
-			elseif victim.isBot then
-				kt.db.botKills = kt.db.botKills + 1
-			else
-				local victimName = JPUtil.StripColours( victim.name )
-				if kt.db.killed[victimName] then
-					kt.db.killed[victimName] = kt.db.killed[victimName] + 1
+			--FIXME: powerduel etc?
+			elseif GetGametype() < Gametype.TEAM or victim.team ~= self.team then
+				if victim.isBot then
+					kt.db.botKills = kt.db.botKills + 1
 				else
-					kt.db.killed[victimName] = 1
+					local victimName = JPUtil.StripColours( victim.name )
+					if kt.db.killed[victimName] then
+						kt.db.killed[victimName] = kt.db.killed[victimName] + 1
+					else
+						kt.db.killed[victimName] = 1
+					end
+					kt.db.kills = kt.db.kills + 1
+					Alert(
+						ChatColour.Green .. '+1 kill',
+						ChatColour.Green .. math.floor( kt.db.kills ) .. ChatColour.White .. '/' .. math.floor( kt.db.deaths )
+					)
 				end
-				kt.db.kills = kt.db.kills + 1
-				Alert(
-					ChatColour.Green .. '+1 kill',
-					ChatColour.Green .. math.floor( kt.db.kills ) .. ChatColour.White .. '/' .. math.floor( kt.db.deaths )
-				)
 			end
 		elseif victim == self then
 			-- inflictor.name killed us
