@@ -95,6 +95,9 @@ local paks = {
 		["lua_japluscompat"] = {
 			'lua/cl/japluscompat/plugin.lua',
 		},
+		["lua_killtracker"] = {
+			'lua/cl/killtracker/plugin.lua',
+		},
 		["lua_razhud"] = {
 			'lua/cl/razhud/plugin.lua',
 		},
@@ -115,6 +118,10 @@ local paks = {
 		},
 		["lua_japluscompat"] = {
 			'lua/sv/japluscompat/plugin.lua',
+		},
+		["lua_modelscale"] = {
+			'lua/sv/modelscale/plugin.lua',
+			'modelscale.cfg'
 		},
 		["lua_motd"] = {
 			'lua/sv/motd/plugin.lua',
