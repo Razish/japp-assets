@@ -80,7 +80,7 @@ AddConsoleCommand( 'gunannounce', function( args )
 end )
 AddConsoleCommand( 'gunsay', function( args )
 	_, target = GetTarget()
-	if target ~= nil then SendChatText( string.format( '^7Client ID of \"%s^7\" is: ^5%02i', target.GetName(), target.GetID() ) ) end
+	if target ~= nil then SendChatText( string.format( '^7Client ID of \"%s^7\" is: ^5%02i', target.name, target.id ) ) end
 end )
 AddConsoleCommand( 'gunslay', function( args )
 	target = GetTarget()
@@ -89,16 +89,16 @@ end )
 
 AddConsoleCommand( 'clguntele', function( args )
 	local self = GetPlayer(nil)
-	local pos = self:GetPosition()
+	local pos = self.position
 	pos.z = pos.z + 36.0 -- move to eye-position
-	local angles = JPMath.AngleVectors( self:GetAngles(), true, false, false )
+	local angles = JPMath.AngleVectors( self.angles, true, false, false )
 	local endPos = JPMath.Vector3MA( pos, 16384.0, angles )
 	local mask = 1184515 -- MASK_OPAQUE|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE
-	local tr = RayTrace( pos, 1.0, endPos, self:GetID(), mask )
-	local tr2 = RayTrace( tr.endpos, 1.0, JPMath.Vector3MA( tr.endpos, 24.0, tr.plane.normal ), self:GetID(), mask )
+	local tr = RayTrace( pos, 1.0, endPos, self.id, mask )
+	local tr2 = RayTrace( tr.endpos, 1.0, JPMath.Vector3MA( tr.endpos, 24.0, tr.plane.normal ), self.id, mask )
 	if tr2.allsolid or tr2.startsolid then
 		print( 'Refusing to teleport: would end up inside a wall\n' )
 	else
-		SendServerCommand( string.format( 'amtele %i %.2f %.2f %.2f %i', self:GetID(), tr2.endpos.x, tr2.endpos.y, tr2.endpos.z, self:GetAngles().y ) )
+		SendServerCommand( string.format( 'amtele %i %.2f %.2f %.2f %i', self.id, tr2.endpos.x, tr2.endpos.y, tr2.endpos.z, self.angles.y ) )
 	end
 end )
