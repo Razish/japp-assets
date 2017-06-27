@@ -1,4 +1,4 @@
-local razhud = RegisterPlugin( 'Razhud', '1.7.0', '13.2.1' )
+local razhud = RegisterPlugin( 'Razhud', '1.7.1', '13.2.1' )
 razhud.shaders = {}
 
 razhud.text = TextBox()
@@ -41,6 +41,7 @@ local saberStyleInfo = {
 	[SaberStyle.Staff]	= { name = 'Staff',		colour = { 1.0, 1.0, 0.0, 0.5 } }
 }
 
+--[[
 local weaponNames = {
 	[Weapon.NONE] = '',
 	[Weapon.STUN_BATON] = 'Stun Baton',
@@ -62,11 +63,12 @@ local weaponNames = {
 	[Weapon.EMPLACED_GUN] = 'Emplaced Gun',
 	[Weapon.TURRET] = 'Turret Gun'
 }
+--]]
 
 local white = { 1.0, 1.0, 1.0, 1.0 }
 local yellow = { 1.0, 1.0, 0.0, 0.5 }
 local red = { 1.0, 0.0, 0.0, 0.5 }
-local ratioRed = { 1.0, 0.0, 0.0, 1.0 }
+--local ratioRed = { 1.0, 0.0, 0.0, 1.0 }
 local green = { 0.0, 0.66666, 0.0, 0.5 }
 local lightblue = { 0.33333, 0.33333, 1.0, 0.5 }
 local orange = { 1.0, 0.5, 0.0, 0.5 }
@@ -261,7 +263,7 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 			y = y - 48.0
 		end
 		local faded = { 0.25, 0.25, 0.25, 0.75 }
-		local defer = { 1.0, 1.0, 1.0, 0.8 }
+		--local defer = { 1.0, 1.0, 1.0, 0.8 }
 		local ourFlag = (team == Team.Red) and razhud.shaders.redFlag or razhud.shaders.blueFlag
 		local theirFlag = (team == Team.Red) and razhud.shaders.blueFlag or razhud.shaders.redFlag
 
@@ -321,7 +323,6 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 	end
 
 	if ( bit32.band( style, HudEvent.Scores ) == HudEvent.Scores ) then
-		local list = {}
 		local barWidth = 213.33333
 		local barHeight = 24.0
 		local kills = self.score
@@ -335,7 +336,7 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 		end
 
 		if gametype >= Gametype.TEAM then
-			-- ...
+			-- TODO: team HUD
 		else
 			local list = {}
 			table.insert( list, 'Net: ' .. sign .. math.abs( net ) )
@@ -355,7 +356,7 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 			table.insert( list, 'KDR: ' .. ratioColour .. string.format( "%0.02f", ratio ) )
 
 			local maxlen = 0
-			for i,v in ipairs(list) do
+			for _,v in ipairs(list) do
 				razhud.text.text = v
 				if razhud.text.width > maxlen then
 					maxlen = razhud.text.width

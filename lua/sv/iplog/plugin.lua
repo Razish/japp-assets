@@ -1,5 +1,5 @@
 -- Authors: EpicLoyd, Raz0r
-local plugin = RegisterPlugin( 'iplog', '0.2.0', '13.0.0' )
+local plugin = RegisterPlugin( 'iplog', '0.2.1', '13.0.0' )
 
 local iplist = {}
 local logname = 'ips.json'
@@ -7,10 +7,8 @@ local logname = 'ips.json'
 local function Save()
 	print( 'Saving IP log...' )
 	local sr = GetSerialiser( logname, FSMode.Write )
-	local t = iplist
 	sr:AddTable( 'iplist', iplist )
 	sr:Close()
-	sr = nil
 end
 
 
@@ -22,7 +20,6 @@ local function Load()
 	end
 	iplist = sr:ReadTable( 'iplist' )
 	sr:Close()
-	sr = nil
 end
 Load()
 
@@ -57,8 +54,7 @@ AddListener( 'JPLUA_EVENT_CLIENTCONNECT', function( id, info, ip, firsttime )
 	elseif iplist[ip] ~= nil and iplist[ip] == name then
 		return nil
 	else
-		local old = iplist[ip]
-		local msg = 'Player ' .. name .. ' connected...^1Player with same IP ' .. iplist[ip]
+		local msg = 'Player ' .. (name and name or 'Padawan') .. ' connected...' .. ChatColour.Red .. 'Player with same IP ' .. iplist[ip]
 		print( msg )
 		SendReliableCommand( -1, 'print "' .. msg .. '\n"' )
 	end

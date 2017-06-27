@@ -1,7 +1,8 @@
-require "utils.lua"
-require "math.lua"
-require "events.lua"
-require "constants.lua"
+require 'utils.lua'
+require 'math.lua'
+require 'events.lua'
+require 'constants.lua'
+require 'functional.lua'
 
 print(
 	ChatColour.Cyan .. 'Loaded JPLua ('

@@ -8,7 +8,7 @@ local cvars = {
 
 local msgTime = 0
 
-function SendMessage( clientNum )
+local function SendMessage( clientNum )
 	local type = cvars['japp_autoMsgType']:GetInteger()
 	local message = cvars['japp_autoMsgText']:GetString()
 
@@ -20,7 +20,7 @@ function SendMessage( clientNum )
 	-- chat (sent in multiple commands for line-feeds)
 	elseif type == 2 then
 		local start = 0
-		local slash = nil
+		local slash
 		while true do
 			slash = string.find( message, '\\n', start )
 			if slash == nil then

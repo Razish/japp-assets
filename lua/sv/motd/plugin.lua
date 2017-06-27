@@ -18,7 +18,7 @@ function SendCommand( clientNum, countdown )
 	-- chat (sent in multiple commands for line-feeds)
 	elseif type == 2 then
 		local start = 0
-		local slash = nil
+		local slash
 		while true do
 			slash = string.find( message, '\\n', start )
 			if slash == nil then

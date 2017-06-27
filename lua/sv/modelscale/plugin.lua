@@ -1,4 +1,4 @@
-local mscale = RegisterPlugin( 'ModelScale', '1.1.0', '13.5.0' )
+local mscale = RegisterPlugin( 'ModelScale', '1.1.1', '13.5.0' )
 
 -- key: player id
 -- value: scale amount
@@ -8,7 +8,6 @@ mscale.list = {}
 -- value: scale amount
 -- loaded from modelscale.cfg
 mscale.predefined = {}
-
 
 local cvars = {
 	['japp_modelScaleCmd'] = CreateCvar( 'japp_modelScaleCmd', '0', CvarFlags.ARCHIVE ),
@@ -45,6 +44,9 @@ end
 LoadCFG()
 
 AddListener( 'JPLUA_EVENT_CLIENTDISCONNECT', function( ply )
+	if not ply then
+		return
+	end
 	mscale.list[ply.id] = nil
 end )
 
@@ -93,21 +95,18 @@ AddClientCommand( 'modelscale', function( ply, args )
 			ply:ConsolePrint( ChatColour.Cyan .. 'setting model scale to ' .. ChatColour.Yellow .. scale .. '\n' )
 		end
 	else
-		local scale = 1.0
+		local scale = 100
 		if mscale.list[ply.id] then
 			scale = mscale.list[ply.id]
 		elseif mscale.predefined[ply.model] then
 			scale = mscale.predefined[ply.model]
 		end
-			ply:ConsolePrint(
-				ChatColour.Cyan .. 'your model scale is: ' .. ChatColour.Yellow
-				.. (mscale.list[ply.id] and tostring(mscale.list[ply.id]) or '100') .. '\n'
-			)
+		ply:ConsolePrint( ChatColour.Cyan .. 'your model scale is: ' .. ChatColour.Yellow .. scale .. '\n' )
 	end
 end )
 
 AddServerCommand( 'modelscales', function( args )
-		for k,v in next, mscale.predefined do
-			print( k .. ': ' .. v )
-		end
+	for k,v in next, mscale.predefined do
+		print( k .. ': ' .. v )
+	end
 end )

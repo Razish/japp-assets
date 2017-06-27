@@ -21,8 +21,8 @@ end
 -- Cancel JPLUA_EVENT_CHATMSGRECV if the message was from a bot.
 -- Uses an unreliable name-match, will NOT cancel the event if multiple clients are found to have that name
 AddListener( 'JPLUA_EVENT_CHATMSGRECV', function( msg )
-	sender, message = SplitChatMessage( msg )
-	ply = GetPlayer( sender )
+	local sender, message = SplitChatMessage( msg )
+	local ply = GetPlayer( sender )
 	if ply and ply.isBot then
 		return nil
 	else

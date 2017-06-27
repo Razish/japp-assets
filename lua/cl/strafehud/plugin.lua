@@ -21,8 +21,8 @@ local cvars = {
 
 local bestSpeed = { lastTime = GetTime(), speed = 0 }
 local groundSpeed = { lastTime = GetTime(), speed = 0 }
-local lastVelocity = { x=0, y=0, z=0 }
-local lastSpeed = 0.0
+--local lastVelocity = { x=0, y=0, z=0 }
+--local lastSpeed = 0.0
 local wasInAir = false
 local trackJump = false
 local jumpStartTime = 0
@@ -143,7 +143,7 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 		strafehud.text.text = string.format( '%06.3f', position.z )
 		strafehud.text.colour = { 0.6, 0.6, 0.6, 1.0 }
 		strafehud.text:Draw( x, y )
-		y = y + strafehud.text.height
+		--y = y + strafehud.text.height
 	end
 
 	return events

@@ -5,6 +5,7 @@
 	Requires lua 5.1, lua-filesystem, 7zip
 --]]
 
+-- luacheck: globals lfs
 require "lfs" -- lua filesystem
 
 if lfs == nil then
@@ -16,6 +17,7 @@ local paks = {
 		['lua'] = {
 			'lua/constants.lua',
 			'lua/events.lua',
+			'lua/functional.lua',
 			'lua/init.lua',
 			'lua/math.lua',
 			'lua/parser.lua',
@@ -64,15 +66,6 @@ local paks = {
 			'shaders/sabers.shader',
 			'shaders/sbRGB.shader',
 			'shaders/SFX_Sabers.shader',
-			'shaders/post/bloom.glsl',
-			'shaders/post/brightpass.glsl',
-			'shaders/post/downscaleLuminance.glsl',
-			'shaders/post/final.glsl',
-			'shaders/post/gaussianBlur3x3_horizontal.glsl',
-			'shaders/post/gaussianBlur3x3_vertical.glsl',
-			'shaders/post/gaussianBlur6x6_horizontal.glsl',
-			'shaders/post/gaussianBlur6x6_vertical.glsl',
-			'shaders/post/luminance.glsl',
 			'ui/jamp/demo.menu',
 			'ui/jamp/ingame.menu',
 			'ui/jamp/ingame_controls.menu',
@@ -80,8 +73,10 @@ local paks = {
 			'ui/jamp/ingame_saber.menu',
 			'ui/jamp/ingame_setup.menu',
 			'ui/jamp/joinserver.menu',
+			'ui/jamp/modsay.menu',
 			'ui/jamp/player.menu',
-			'ui/jamp/saber.menu'
+			'ui/jamp/saber.menu',
+			'ui/jampingame.txt'
 		},
 		["lua_chatstyle"] = {
 			'lua/cl/chatstyle/plugin.lua',
@@ -139,7 +134,7 @@ for prefix,pak in pairs( paks ) do
 		local filelist = ''
 		for _,file in pairs( files ) do
 			if lfs.touch( file ) == nil then
-				error( 'Missing file ' .. file )
+				print( 'Missing file: ' .. file )
 			else
 				filelist = filelist .. ' ' .. file -- append file name
 			end
@@ -154,11 +149,13 @@ for prefix,pak in pairs( paks ) do
 			os.remove( outname )
 		end
 
-		print( 'creating "' .. outname .. '"' )
-		if linux ~= false then
-			os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >/dev/null 2>&1' )
-		else
-			os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >nul 2>&1' )
+		if #filelist ~= 0 then
+			print( 'creating "' .. outname .. '"' )
+			if linux ~= false then
+				os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >/dev/null 2>&1' )
+			else
+				os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >nul 2>&1' )
+			end
 		end
 	end
 end

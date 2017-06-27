@@ -2,8 +2,8 @@ local dwi = RegisterPlugin( 'DuelWhois', '1.0.0', '13.0.0' )
 
 AddClientCommand( 'duelwhois', function( ply, args )
 	local partners = {}
-	local p2 = nil
-	local partner = nil
+	local p2
+	local partner
 	local count = 0
 	local msg = ''
 

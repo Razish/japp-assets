@@ -115,7 +115,7 @@ JPUtil = setmetatable( {}, {
 			end
 			return res
 		end,
-		
+
 		hexToColor = function(hex)
 			if type( hex ) ~= 'number' or type( hex ) ~= 'string' then
 				print("JPUtil.hexToColor: Wrong argument")
@@ -138,7 +138,7 @@ JPUtil = setmetatable( {}, {
 			end
 			return color
 		end,
-		
+
 		colorToHex = function(color, tostr)
 			if type( color ) ~= 'table' then
 				print("JPUtil.colorToHex: Wrong argument")
@@ -147,11 +147,11 @@ JPUtil = setmetatable( {}, {
 			tostr = tostr or false
 			local hex
 			if tostr == true then --by marceloCodget https://gist.github.com/marceloCodget/3862929
-				for k,v in pairs(color) do 
-					while(value > 0)do
-						local index = math.fmod(value, 16) + 1
-						value = math.floor(value / 16)
-						hex = string.sub('0123456789ABCDEF', index, index) .. hex
+				for _,v in pairs( color ) do
+					while v > 0 do
+						local index = math.fmod( v, 16 ) + 1
+						v = math.floor( v / 16 )
+						hex = string.sub( '0123456789ABCDEF', index, index ) .. hex
 					end
 				end
 				hex = '#' .. hex

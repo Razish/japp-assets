@@ -2,7 +2,7 @@ local kt = RegisterPlugin( 'Kill Tracker', '1.1.1', '13.2.0' )
 
 local function sum( t )
 	local s = t[1] - t[1]
-	for i,v in next, t do
+	for _,v in next, t do
 		s = s + v
 	end
 	return s
@@ -272,25 +272,25 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 	if kt.power then
 		local currTime = GetTime()
 		--for i,v in next, kt.alerts do
-		i = 1
-		v = kt.alerts[1]
-		if v then
-			local sDuration = sum( v.duration )
-			if v.time == 0 then
-				v.time = currTime
-			elseif v.time < currTime - sDuration then
+		local i = 1
+		local alert = kt.alerts[1]
+		if alert then
+			local sDuration = sum( alert.duration )
+			if alert.time == 0 then
+				alert.time = currTime
+			elseif alert.time < currTime - sDuration then
 				table.remove( kt.alerts, i )
 			else
-				local msec = currTime - v.time
-				local totalF = msec / sDuration
+				local msec = currTime - alert.time
+				--local totalF = msec / sDuration
 				local f = {
-					math.min( msec / v.duration[1], 1.0 ),
-					math.min( math.max( 0.0, (msec - v.duration[1]) / v.duration[2] ), 1.0 ),
-					math.max( 0.0, (msec - v.duration[1] - v.duration[2]) / v.duration[3] )
+					math.min( msec / alert.duration[1], 1.0 ),
+					math.min( math.max( 0.0, (msec - alert.duration[1]) / alert.duration[2] ), 1.0 ),
+					math.max( 0.0, (msec - alert.duration[1] - alert.duration[2]) / alert.duration[3] )
 				}
-				kt.textbox.text = ((sum(f)/3.0) < 0.5) and v.textBegin or v.textEnd
+				kt.textbox.text = ((sum(f)/3.0) < 0.5) and alert.textBegin or alert.textEnd
 				kt.textbox:Draw(
-					screenWidth - (v.padding * 2.0) - (kt.textbox.width * f[1]),
+					screenWidth - (alert.padding * 2.0) - (kt.textbox.width * f[1]),
 					screenHeight / 2.0
 				)
 			end
@@ -319,8 +319,8 @@ AddListener( 'JPLUA_EVENT_HUD', function( events )
 			table.insert( lines, ChatColour.Yellow .. '   suicides: ' .. ChatColour.White .. math.floor(kt.db.suicides) )
 
 			local lineOffset = 0
-			for i,v in next, lines do
-				kt.textbox.text = v
+			for _,line in next, lines do
+				kt.textbox.text = line
 				kt.textbox:Draw(
 					0.0,
 					(screenHeight / 4.0) + lineOffset

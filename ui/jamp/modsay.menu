@@ -1,0 +1,155 @@
+#define COMMON( n, t, r ) \
+name n \
+type t \
+rect r \
+mouseEnter { setitemrect highlight r } \
+mouseExit { setitemrect highlight 0 0 0 0 }
+
+#define NOHIGHLIGHT \
+mouseEnter { setitemrect highlight 0 0 0 0 } \
+mouseExit { setitemrect highlight 0 0 0 0 }
+
+
+#define TEXT_DEFAULTS \
+font 7 \
+textscale .375 \
+forecolor .615 .615 .956 1 \
+backcolor 1 1 1 1 \
+textstyle ITEM_TEXTSTYLE_SHADOWED
+
+#define MISC_DEFAULTS \
+border 0 \
+visible 1
+
+#define BORDER_DEFAULTS \
+border 1 \
+bordercolor .5 .5 .75 1.0 \
+bordersize 0.25
+
+#define BUTTON_DEFAULTS \
+action { play "sound/interface/button1" }
+
+{
+	//TODO: limit the clickable dimensions of the "modsay type" button
+
+	menuDef {
+		name				"modsay"
+		visible				1
+		fullscreen			0
+		rect				0 0 640 480
+		focusColor			1 1 1 1
+		style				1
+		border				0
+		descX				320
+		descY				390
+		descScale			1
+		descColor			1 .5 .2 1
+		descAlignment		ITEM_ALIGN_CENTER
+		outOfBoundsClick
+
+		onOpen {
+			// clear the input field
+			exec	"reset ui_modSayText"
+		}
+
+		// background
+		itemDef {
+			COMMON( background, ITEM_TYPE_MULTI, 64 48 512 384 )
+			MISC_DEFAULTS
+			style		WINDOW_STYLE_SHADER
+			background	"gfx/menus/datapad"
+			NOHIGHLIGHT
+			decoration
+		}
+
+		// window title
+		itemDef {
+			COMMON( title, ITEM_TYPE_TEXT, 320 50 192 20 )
+			TEXT_DEFAULTS MISC_DEFAULTS
+			text		"Say Mod"
+			textalign	ITEM_ALIGN_CENTER
+			textscale	0.5
+			NOHIGHLIGHT
+		}
+
+		// button highlight
+		itemDef {
+			name				highlight
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 0 0
+			background			"powerups/rezout"
+			visible				1
+			decoration
+		}
+
+		// type of mod say (ui_modSay)
+		itemDef {
+			COMMON( sayType, ITEM_TYPE_MULTI, 108 80 192 20 )
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+			text		"Type:"
+			descText	"Select the type of modsay"
+			cvar		"ui_modSay"
+			cvarFloatList {
+				"Clan"			0 // clansay
+				"Whisper"		1 // tell
+				"Admin"			2 // amsay
+				"Centerprint"	3 // ampsay
+			}
+		}
+
+		// ampsay: all players
+		itemDef {
+			COMMON( ampsayAllPlayers, ITEM_TYPE_MULTI, 108 100 192 20 )
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+			text		"Target player:"
+			descText	"Send message to all players?"
+			cvarTest	"ui_modSay"
+			showCvar	{ "3" }
+			cvar		"ui_modsayAllPlayer"
+			cvarFloatList {
+				"Selected"	0
+				"All"		1
+			}
+		}
+
+		// player list
+		itemDef {
+			COMMON( playerList, ITEM_TYPE_LISTBOX, 108 130 256 140 )
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS BORDER_DEFAULTS
+			text			"Select player"
+			descText		"Select which player to send a message to"
+			style			WINDOW_STYLE_FILLED
+			background		"gfx/menus/scanlines"
+			feeder			FEEDER_PLAYER_LIST
+			textaligny		8
+			elementheight	10
+			outlinecolor	0.75 0.5 0.0 0.5
+			cvarTest		"ui_modSay"
+			showCvar		{ "1"; "3" }
+		}
+
+		// text input
+		itemDef {
+			COMMON( messageInput, ITEM_TYPE_EDITFIELD, 108 320 192 20 )
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+			text				"Message:"
+			cvar				"ui_modSayText"
+			descText			"Message to send"
+			maxchars			150
+			maxPaintChars		150
+		}
+
+		// send button
+		itemDef {
+			COMMON( sendButton, ITEM_TYPE_BUTTON, 108 350 64 20 )
+			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
+			text		"SEND"
+			descText	"Send message"
+			action {
+				uiScript	sendModSayMsg;
+				uiScript	closeingame
+			}
+		}
+
+	}
+}

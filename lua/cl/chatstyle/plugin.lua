@@ -10,7 +10,6 @@ local function SaveChatStyles()
 	local sr = GetSerialiser( fileName, FSMode.Write )
 	sr:AddTable( 'chatstyles', chatstyle.styles )
 	sr:Close()
-	sr = nil
 end
 
 local function LoadChatStyles()
@@ -21,7 +20,6 @@ local function LoadChatStyles()
 	end
 	chatstyle.styles = sr:ReadTable( 'chatstyles' )
 	sr:Close()
-	sr = nil
 
 	-- sanity check
 	if chatstyle.styles['current'] == nil or chatstyle.styles[chatstyle.styles['current']] == nil then
@@ -135,12 +133,12 @@ AddConsoleCommand( 'chatstyle_create', function( cmd, args )
 	end
 
 	local name = args[1]
- 	local prefix = args[2]
- 	local suffix = ''
-	 if #args == 3 then
-	 	suffix = args[3]
-	 end
-	 CreateChatStyle( name, prefix, suffix )
+	local prefix = args[2]
+	local suffix = ''
+	if #args == 3 then
+		suffix = args[3]
+	end
+	CreateChatStyle( name, prefix, suffix )
 end )
 
 -- chatstyle_remove name
