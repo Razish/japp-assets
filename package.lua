@@ -59,6 +59,7 @@ local paks = {
 			'gfx/menus/saber_icon_black.jpg',
 			'gfx/menus/saber_icon_rgb.jpg',
 			'gfx/menus/scoreboard.tga',
+			'gfx/menus/missing_skin.jpg',
 			'gfx/sfx_sabers/saber_blade.jpg',
 			'gfx/sfx_sabers/saber_end.jpg',
 			'menu/new/sliderthumbdefault.tga',
@@ -92,6 +93,9 @@ local paks = {
 		},
 		["lua_killtracker"] = {
 			'lua/cl/killtracker/plugin.lua',
+		},
+		["lua_notify"] = {
+			'lua/cl/notify/plugin.lua',
 		},
 		["lua_razhud"] = {
 			'lua/cl/razhud/plugin.lua',

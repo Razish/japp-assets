@@ -79,7 +79,8 @@ CvarFlags = {
 	ServerInfo		= 0x0004,	-- sent in response to front end requests
 	SystemInfo		= 0x0008,	-- these cvars will be duplicated on all clients
 	Init			= 0x0010,	-- don't allow change from console at all, but can be set from the command line
-	Latch			= 0x0020,	-- will only change when C code next does a Cvar_Get(), so it can't be changed without proper initialization. modified will be set, even though the value hasn't changed yet
+	Latch			= 0x0020,	-- will only change when C code next does a Cvar_Get(), so it can't be changed without proper initialization. modified will be
+								--	set, even though the value hasn't changed yet
 	ReadOnly		= 0x0040,	-- display only, cannot be set by user at all (can be set by code)
 	UserCreated		= 0x0080,	-- created by a set command
 	Temp			= 0x0100,	-- can be set even when cheats are disabled, but is not archived
@@ -126,14 +127,12 @@ EFlags = {
 
 EFlags2 = {
 	HELD_BY_MONSTER		= 0x0001,	-- being held by something, like a rancor or a wampa
-	USE_ALT_ANIM		= 0x0002,	-- for certain special runs/stands for creatures like the rancor and wampa whose
-									--	runs/stands are conditional
-	ALERTED				= 0x0004,	-- for certain special anims. for rancor: means you've had an enemy, so use the
-									--	more alert stand
+	USE_ALT_ANIM		= 0x0002,	-- for certain special runs/stands for creatures like the rancor and wampa whose runs/stands are conditional
+	ALERTED				= 0x0004,	-- for certain special anims. for rancor: means you've had an enemy, so use the more alert stand
 	GENERIC_NPC_FLAG	= 0x0008,	-- so far, used for rancor
 	FLYING				= 0x0010,	-- flying
-	HYPERSPACE			= 0x0020,	-- used to both start the hyperspace effect on the predicted client and to let the
-									--	vehicle know it can now jump into hyperspace (after turning to face the proper angle)
+	HYPERSPACE			= 0x0020,	-- used to both start the hyperspace effect on the predicted client and to let the vehicle know it can now jump into
+									--	hyperspace (after turning to face the proper angle)
 	BRACKET_ENTITY		= 0x0040,	-- draw as bracketed
 	SHIP_DEATH			= 0x0080,	-- "died in ship" mode
 	NOT_USED_1			= 0x0100,	-- grapple hook is out
