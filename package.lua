@@ -79,6 +79,9 @@ local paks = {
 			'ui/jamp/saber.menu',
 			'ui/jampingame.txt'
 		},
+		["lua_channels"] = {
+			'lua/cl/channels/plugin.lua',
+		},
 		["lua_chatstyle"] = {
 			'lua/cl/chatstyle/plugin.lua',
 		},
@@ -111,6 +114,10 @@ local paks = {
 		},
 		["lua_duelwhois"] = {
 			'lua/sv/duelwhois/plugin.lua',
+		},
+		["lua_channels"] = {
+			'lua/sv/channels/Channel.lua',
+			'lua/sv/channels/plugin.lua',
 		},
 		["lua_iplog"] = {
 			'lua/sv/iplog/plugin.lua',
