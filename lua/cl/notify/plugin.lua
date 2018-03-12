@@ -1,26 +1,10 @@
-local notify = RegisterPlugin( 'Notifications', '1.0.0', '13.6.0' )
+local notify = RegisterPlugin( 'Notifications', '1.0.1', '13.6.0' )
 
-local cvars = {
-	['cg_notifyTriggers']	= CreateCvar( 'cg_notifyTriggers', "", CvarFlags.ARCHIVE ),
-	['cg_notifyConnect']	= CreateCvar( 'cg_notifyConnect', "1", CvarFlags.ARCHIVE ),
-}
-
---[[
-AddConsoleCommand( 'notify', function( cmd, args )
-	-- TODO: test function
-end )
-
-AddListener( 'JPLUA_EVENT_CHATMSGSEND', function( msg )
-	if #msg == 0 then
-		return nil
-	end
-	--TODO: warn for msg overflow
-	return msg
-end )
---]]
+local cg_notifyTriggers = CreateCvar( 'cg_notifyTriggers', "", CvarFlags.ARCHIVE )
+local cg_notifyConnect = CreateCvar( 'cg_notifyConnect', "1", CvarFlags.ARCHIVE )
 
 AddListener( 'JPLUA_EVENT_CLIENTCONNECT', function( player )
-	if cvars['cg_notifyConnect']:GetBoolean() then
+	if cg_notifyConnect:GetBoolean() then
 		--TODO: check if we were the only other player in the server, now we have friends :3
 		SendNotification( 'connect', '* ' .. JPUtil.StripColours( player.name ) .. ' connected', 3000, 'call-start' )
 	end
@@ -32,13 +16,14 @@ AddListener( 'JPLUA_EVENT_CHATMSGRECV', function( msg )
 		return msg
 	end
 	local ply = GetPlayer( sender )
-	if ply ~= nil then
-		local ourName = JPUtil.StripColours( GetPlayer(nil).name )
+	local us = GetPlayer( nil )
+	if ply ~= nil and ply ~= us then
+		local ourName = JPUtil.StripColours( us.name )
 		if string.find( text:lower(), ourName:lower(), 1, true ) then
 			SendNotification( 'mentioned by ' .. JPUtil.StripColours( ply.name ), JPUtil.StripColours( text ), 5000, 'appointment-new' )
-		else
+		elseif #cg_notifyTriggers:GetString() ~= 0 then
 			local toks = JPUtil.explode( ' ', text )
-			local triggers = JPUtil.explode( ' ', cvars['cg_notifyTriggers']:GetString() )
+			local triggers = JPUtil.explode( ' ', cg_notifyTriggers:GetString() )
 			for k1,tok in next,toks do
 				for k2,trigger in next,triggers do
 					if tok == trigger then

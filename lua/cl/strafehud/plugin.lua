@@ -1,4 +1,4 @@
-local strafehud = RegisterPlugin( 'Strafe HUD', '1.3.1', '13.1.0' )
+local strafehud = RegisterPlugin( 'Strafe HUD', '1.3.2', '13.1.0' )
 
 strafehud.text = TextBox()
 	strafehud.text.scale = 0.66666
@@ -7,9 +7,7 @@ strafehud.text = TextBox()
 	strafehud.text.style = TextStyle.Shadowed
 	strafehud.text.centered = true
 
-local cvars = {
-	['cg_strafeHUD']		= CreateCvar( 'cg_strafeHUD', 3, CvarFlags.ARCHIVE ),
-}
+local cg_strafeHUD = CreateCvar( 'cg_strafeHUD', 3, CvarFlags.ARCHIVE )
 --[[
 	1	Current UPS
 	2	Highest UPS in last 2000ms
@@ -31,7 +29,7 @@ local jumpLow = 0.0
 local jumpHigh = 0.0
 
 AddListener( 'JPLUA_EVENT_HUD', function( events )
-	local strafeHUD = cvars['cg_strafeHUD']:GetInteger()
+	local strafeHUD = cg_strafeHUD:GetInteger()
 	if strafeHUD == 0 then
 		return events
 	end

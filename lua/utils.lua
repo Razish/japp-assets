@@ -57,7 +57,6 @@ JPUtil = setmetatable( {}, {
 			return s
 		end,
 
-
 		trimWhitespace = function( str )
 			return str:gsub( "%s+", " " )
 		end,

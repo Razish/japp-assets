@@ -1,4 +1,4 @@
-local razhud = RegisterPlugin( 'Razhud', '1.7.1', '13.2.1' )
+local razhud = RegisterPlugin( 'Razhud', '1.7.2', '13.2.1' )
 razhud.shaders = {}
 
 razhud.text = TextBox()
@@ -25,10 +25,8 @@ AddListener( 'JPLUA_EVENT_UNLOAD', function()
 	RemapShader( 'console', 'console', '0' )
 end )
 
-local cvars = {
-	['cg_razhud']			= CreateCvar( 'cg_razhud', 1, CvarFlags.ARCHIVE ),
-	['japp_ratioFix']		= GetCvar( 'japp_ratioFix' ),
-}
+local cg_razhud = CreateCvar( 'cg_razhud', 1, CvarFlags.ARCHIVE )
+local japp_ratioFix = GetCvar( 'japp_ratioFix' )
 
 local saberStyleInfo = {
 	[SaberStyle.None]	= { name = 'None',		colour = { 1.0, 1.0, 1.0, 0.5 } },
@@ -108,10 +106,10 @@ local function RenderMeterHorz( x, y, w, h, minValue, maxValue, colour, backgrou
 end
 
 AddListener( 'JPLUA_EVENT_HUD', function( events )
-	local style = cvars['cg_razhud']:GetInteger()
+	local style = cg_razhud:GetInteger()
 
 	-- aspect-ratio fix
-	local ratioFix = cvars['japp_ratioFix']:GetBoolean()
+	local ratioFix = japp_ratioFix:GetBoolean()
 	local widthRatioCoef = 1.0
 	if ratioFix then
 		local glConfig = GetGLConfig()

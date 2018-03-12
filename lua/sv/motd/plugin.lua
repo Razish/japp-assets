@@ -1,14 +1,12 @@
-local motd = RegisterPlugin( 'MotD', '1.3.1', '13.0.0' )
+local motd = RegisterPlugin( 'MotD', '1.3.2', '13.0.0' )
 
-local cvars = {
-	['japp_motd']		= CreateCvar( 'japp_motd', 'Hello!\\nThis server is running JA++\\n\\nEnjoy your stay!', CvarFlags.ARCHIVE ),
-	['japp_motdType']	= CreateCvar( 'japp_motdType', '3', CvarFlags.ARCHIVE ),
-	['japp_motdTime']	= CreateCvar( 'japp_motdTime', '5', CvarFlags.ARCHIVE ),
-}
+local japp_motd = CreateCvar( 'japp_motd', 'Hello!\\nThis server is running JA++\\n\\nEnjoy your stay!', CvarFlags.ARCHIVE )
+local japp_motdType = CreateCvar( 'japp_motdType', '3', CvarFlags.ARCHIVE )
+local japp_motdTime = CreateCvar( 'japp_motdTime', '5', CvarFlags.ARCHIVE )
 
 function SendCommand( clientNum, countdown )
-	local type = cvars['japp_motdType']:GetInteger()
-	local message = cvars['japp_motd']:GetString()
+	local type = japp_motdType:GetInteger()
+	local message = japp_motd:GetString()
 
 	-- console
 	if type == 1 then
@@ -35,18 +33,18 @@ function SendCommand( clientNum, countdown )
 
 	-- center print
 	elseif type == 3 then
-        message = string.gsub( message, '\\n', '\n' )
-        local i = cvars['japp_motdTime']:GetInteger()
-        if countdown then
-            while i > 0 do ---add messages to queue :>
-               local out = string.format('cp "%s\n TimeLeft: %i" 1000', message, i)
-               SendReliableCommand( clientNum , out )
-               i = i - 1
-            end
-        else
-            local out = string.format('cp "%s" 1000', message)
-            SendReliableCommand( clientNum, out)
-        end
+		message = string.gsub( message, '\\n', '\n' )
+		local i = japp_motdTime:GetInteger()
+		if countdown then
+			while i > 0 do ---add messages to queue :>
+				local out = string.format( 'cp "%s\n TimeLeft: %i"', message, i )
+				SendReliableCommand( clientNum , out )
+				i = i - 1
+			end
+		else
+			local out = string.format( 'cp "%s"', message )
+			SendReliableCommand( clientNum, out )
+		end
 	end
 end
 

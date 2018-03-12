@@ -1,4 +1,4 @@
-local mscale = RegisterPlugin( 'ModelScale', '1.1.1', '13.5.0' )
+local mscale = RegisterPlugin( 'ModelScale', '1.1.2', '13.5.0' )
 
 -- key: player id
 -- value: scale amount
@@ -9,10 +9,8 @@ mscale.list = {}
 -- loaded from modelscale.cfg
 mscale.predefined = {}
 
-local cvars = {
-	['japp_modelScaleCmd'] = CreateCvar( 'japp_modelScaleCmd', '0', CvarFlags.ARCHIVE ),
-	['japp_modelScaleRange'] = CreateCvar( 'japp_modelScaleRange', '80 120', CvarFlags.ARCHIVE )
-}
+local japp_modelScaleCmd = CreateCvar( 'japp_modelScaleCmd', '0', CvarFlags.ARCHIVE )
+local japp_modelScaleRange = CreateCvar( 'japp_modelScaleRange', '80 120', CvarFlags.ARCHIVE )
 
 local function ParseToken( str, idx )
 	return JPUtil.explode( ' ', str )[idx]
@@ -78,7 +76,7 @@ AddListener( 'JPLUA_EVENT_CLIENTUSERINFOCHANGED', function( clientNum, userinfo 
 end )
 
 AddClientCommand( 'modelscale', function( ply, args )
-	if not cvars['japp_modelScaleCmd']:GetBoolean() then
+	if not japp_modelScaleCmd:GetBoolean() then
 		return
 	end
 
@@ -86,7 +84,7 @@ AddClientCommand( 'modelscale', function( ply, args )
 		local scale = tonumber( args[1] )
 		if scale then
 			-- make sure it's in valid range
-			local str = cvars['japp_modelScaleRange']:GetString()
+			local str = japp_modelScaleRange:GetString()
 			local range = { min = tonumber(ParseToken( str, 1 )), max = tonumber(ParseToken( str, 2 )) }
 			scale = math.min( scale, range.max )
 			scale = math.max( range.min, scale )

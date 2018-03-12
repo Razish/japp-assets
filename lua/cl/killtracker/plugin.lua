@@ -1,4 +1,4 @@
-local kt = RegisterPlugin( 'Kill Tracker', '1.1.1', '13.2.0' )
+local kt = RegisterPlugin( 'Kill Tracker', '1.1.2', '13.2.0' )
 
 local function sum( t )
 	local s = t[1] - t[1]
@@ -13,9 +13,7 @@ local function flrand( lo, hi )
 	return lo + (hi - lo) * math.random()
 end
 
-local cvars = {
-	['kt_spam']			= CreateCvar( 'kt_spam', 1, CvarFlags.ARCHIVE ),
-}
+local kt_spam = CreateCvar( 'kt_spam', 1, CvarFlags.ARCHIVE )
 
 kt.textbox = TextBox()
 	kt.textbox.scale = 0.5
@@ -227,7 +225,7 @@ AddConsoleCommand( 'kt_stats', function( cmd, args )
 		local duelNetSign = (duelNet >= 0) and '+' or '-'
 		duelNet = math.floor( math.abs( duelNet ) )
 
-		if cvars['kt_spam']:GetBoolean() then
+		if kt_spam:GetBoolean() then
 			SendServerCommand(
 				'say '
 					.. ChatColour.White .. 'K/D: ' .. ChatColour.Green .. math.floor(kt.db.kills) .. ChatColour.White

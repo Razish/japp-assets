@@ -4,22 +4,22 @@
 	2005/05/18
 --]]
 
--- map( function, table )
+-- map( function(val, idx, tbl), table )
 -- e.g: map( double, {1, 2, 3} ) -> {2, 4, 6}
 function map( func, tbl )
 	local newtbl = {}
 	for i, v in pairs( tbl ) do
-		newtbl[i] = func( v )
+		newtbl[i] = func( v, i, tbl )
 	end
 	return newtbl
 end
 
--- filter( function, table )
+-- filter( function(val, idx, tbl), table )
 -- e.g: filter( is_even, {1, 2, 3, 4} ) -> {2, 4}
 function filter( func, tbl )
 	local newtbl = {}
 	for i, v in pairs( tbl ) do
-		if func( v ) then
+		if func( v, i, tbl ) then
 			newtbl[i] = v
 		end
 	end
@@ -35,7 +35,7 @@ end
 -- tail( table )
 -- e.g: tail( {1, 2, 3} ) -> {2, 3}
 -- XXX This is a BAD and ugly implementation.
--- should return the address to next porinter, like in C (arr+1)
+-- should return the address to next pointer, like in C (arr+1)
 function tail( tbl )
 	if table.getn( tbl ) < 1 then
 		return nil

@@ -1,9 +1,7 @@
-local chatstyle = RegisterPlugin( 'ChatStyle', '1.3.1', '13.0.0' )
+local chatstyle = RegisterPlugin( 'ChatStyle', '1.3.2', '13.0.0' )
 local fileName = 'chatstyles.json'
 
-local cvars = {
-	['cg_chatStyle']	= CreateCvar( 'cg_chatStyle', '1', CvarFlags.ARCHIVE ),
-}
+local cg_chatStyle = CreateCvar( 'cg_chatStyle', '1', CvarFlags.ARCHIVE )
 
 local function SaveChatStyles()
 	print( 'Saving ChatStyles...' )
@@ -90,7 +88,7 @@ local function SetChatStyle( name )
 end
 
 AddListener( 'JPLUA_EVENT_CHATMSGSEND', function( msg, mode, target )
-	local enabled = cvars['cg_chatStyle']:GetInteger()
+	local enabled = cg_chatStyle:GetInteger()
 	if #msg == 0 or bit32.band( enabled, bit32.lshift( 1, mode ) ) == 0 then
 		return msg
 	end

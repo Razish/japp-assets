@@ -1,16 +1,14 @@
-local automsg = RegisterPlugin( 'AutoMsg', '1.2.0', '13.0.0' )
+local automsg = RegisterPlugin( 'AutoMsg', '1.2.1', '13.0.0' )
 
-local cvars = {
-	['japp_autoMsgText']	= CreateCvar( 'japp_autoMsgText', '^7Have a nice day :-)\nRemember to have fun!', CvarFlags.ARCHIVE ),
-	['japp_autoMsgType']	= CreateCvar( 'japp_autoMsgType', '2', CvarFlags.ARCHIVE ),
-	['japp_autoMsgDelay']	= CreateCvar( 'japp_autoMsgDelay', '900', CvarFlags.ARCHIVE ),
-}
+local japp_autoMsgText = CreateCvar( 'japp_autoMsgText', '^7Have a nice day :-)\nRemember to have fun!', CvarFlags.ARCHIVE )
+local japp_autoMsgType = CreateCvar( 'japp_autoMsgType', '2', CvarFlags.ARCHIVE )
+local japp_autoMsgDelay = CreateCvar( 'japp_autoMsgDelay', '900', CvarFlags.ARCHIVE )
 
 local msgTime = 0
 
 local function SendMessage( clientNum )
-	local type = cvars['japp_autoMsgType']:GetInteger()
-	local message = cvars['japp_autoMsgText']:GetString()
+	local type = japp_autoMsgType:GetInteger()
+	local message = japp_autoMsgText:GetString()
 
 	-- console
 	if type == 1 then
@@ -53,7 +51,7 @@ AddListener( 'JPLUA_EVENT_CLIENTSPAWN', function( client, firstSpawn )
 end )
 
 AddListener( 'JPLUA_EVENT_RUNFRAME', function()
-	local msgDelay = cvars['japp_autoMsgDelay']:GetInteger() * 1000
+	local msgDelay = japp_autoMsgDelay:GetInteger() * 1000
 	if msgTime < GetTime() - msgDelay then
 		for _,ply in ipairs(GetPlayers()) do
 			SendMessage( ply.id )
