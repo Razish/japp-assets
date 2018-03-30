@@ -1,0 +1,170 @@
+{
+	menuDef {
+		name				"serverinfo_popmenu"
+		visible				0
+		fullscreen			0
+		outOfBoundsClick							// this closes the window if it gets a click out of the rectangle
+		rect				0 0 640 480
+		focusColor			1 1 1 1					// Focus color for text and items
+		style				1
+		border				1
+		descX				320
+		descY				420
+		descScale			1
+		descColor			1 .682 0 .8
+		descAlignment		ITEM_ALIGN_CENTER
+		popup
+		onOpen {
+			uiScript	ServerStatus
+		}
+		onESC {
+			play	"sound/interface/esc.wav" ;
+			close	serverinfo_popmenu
+		}
+
+		// menu backgrounds
+		#define BACKGROUND( _name, _rect, _shader ) \
+		itemDef { \
+			name		_name \
+			style		WINDOW_STYLE_SHADER \
+			rect		_rect \
+			background	_shader \
+			forecolor	1 1 1 .8 \
+			visible		1 \
+			decoration \
+		}
+		#define BACKGROUND_B( _name, _rect ) \
+		itemDef { \
+			name		_name \
+			rect		_rect \
+			style		WINDOW_STYLE_FILLED \
+			forecolor	1 1 1 1 \
+			backcolor	0 0 .6 .5 \
+			border		1 \
+			bordersize	0.5 \
+			bordercolor	0 0 .6 1 \
+			visible		1 \
+			decoration \
+		}
+		BACKGROUND( really_background, 0 0 640 480, "gfx/menus/main_centerblue" )
+		//BACKGROUND( background, 0 0 640 480, "gfx/menus/main_background" )
+		BACKGROUND_B( nav_background, 5 440 630 20 )
+
+		// serverinfo title
+		itemDef {
+			name		screenTitle
+			group		none
+			style		WINDOW_STYLE_SHADER
+			background	"gfx/menus/menu_blendbox"
+			text		@MENUS_SERVER_INFORMATION
+			rect		50 4 540 16
+			font		6
+			textscale	0.75
+			textalign	ITEM_ALIGN_CENTER
+			textalignx	270
+			textaligny	-1
+			forecolor	.549 .854 1 1
+			visible		1
+			decoration
+		}
+
+		// server info
+		itemDef {
+			name			serverinfoList
+			rect			10 46 620 368
+			type			ITEM_TYPE_LISTBOX
+			style			WINDOW_STYLE_FILLED
+			feeder			FEEDER_SERVERSTATUS
+			elementtype		LISTBOX_TEXT
+			elementwidth	120
+			elementheight	14
+			font			7
+			textscale		0.4
+		//	backcolor		.25 .25 .5 .75
+			backcolor		0.25098 0.36078 0.50196 .75
+		//	backcolor		0 0 0 0.5
+			border			1
+			bordersize		0.5
+			bordercolor		.5 .5 .5 1
+			notselectable
+			visible			1
+			columns			4 0 0 0
+							24 0 0
+							54 0 0
+							124 0 464
+		}
+
+		itemDef {
+			name		button_glow
+			rect		0 0 0 0
+
+			///*
+			style		WINDOW_STYLE_SHADER
+			background	"gfx/menus/menu_buttonback"
+		//	background	"gfx/menus/menu_blendbox_extended"
+		//	forecolor	1 1 1 1
+			forecolor	1 .682 0 1
+			//*/
+
+			/*
+			style		WINDOW_STYLE_FILLED
+			backcolor	1 1 1 .15
+			border		0
+			*/
+
+			visible		1
+			decoration
+		}
+
+		#define BUTTON_COMMON \
+			type		ITEM_TYPE_BUTTON \
+			font		4 \
+			textscale	1.5 \
+			textstyle	0 \
+			style		WINDOW_STYLE_FILLED \
+			textalign	ITEM_ALIGN_CENTER \
+			textaligny	-3 \
+			visible		1 \
+			forecolor	1 .682 0 1
+
+		// refresh button
+		itemDef {
+			name		refresh
+			text		@MENUS_REFRESH_LIST
+			descText	@MENUS_REFRESH_SERVER_LIST
+			rect		5 440 210 24
+			textalignx	109
+			BUTTON_COMMON
+			action {
+				play "sound/interface/button1.wav"
+				uiScript ServerStatus
+			}
+			mouseEnter {
+				setitemrect button_glow	5 440 210 24
+			}
+			mouseExit {
+				setitemrect button_glow 0 0 0 0
+			}
+		}
+
+		// done button
+		itemDef {
+			name		doneText
+			text		@MENUS_DONE_CAPS
+			descText	@MENUS_DONE_DESC
+			rect		425 440 210 24
+			textalignx	109
+			BUTTON_COMMON
+			action {
+				play "sound/interface/button1.wav"
+				close serverinfo_popmenu
+			}
+			mouseEnter {
+				setitemrect button_glow	425 440 210 24
+			}
+			mouseExit {
+				setitemrect button_glow 0 0 0 0
+			}
+		}
+	}
+}

@@ -1,0 +1,155 @@
+{
+	map			"yavin1b"
+	longname	"yavin1b"
+	type		"coop"
+}
+
+{
+	map			"yavin2"
+	longname	"yavin2"
+	type		"coop"
+}
+
+{
+	map			"t1_danger"
+	longname	"Merchant Rescue"
+	type		"coop"
+}
+
+{
+	map			"t1_fatal"
+	longname	"t1_fatal"
+	type		"coop"
+}
+
+{
+	map			"t1_rail"
+	longname	"Cult Investigation"
+	type		"coop"
+}
+
+{
+	map			"t1_sour"
+	longname	"Mercenary Activity"
+	type		"coop"
+}
+
+{
+	map			"t1_surprise"
+	longname	"Droid Recovery"
+	type		"coop"
+}
+
+{
+	map			"hoth2"
+	longname	"Hoth - Intro"
+	type		"coop"
+}
+
+{
+	map			"hoth3"
+	longname	"Hoth - Echo Base"
+	type		"coop"
+}
+
+{
+	map			"t2_dpred"
+	longname	"Cult Investigation"
+	type		"coop"
+}
+
+{
+	map			"t2_rancor"
+	longname	"t2_rancor"
+	type		"coop"
+}
+
+{
+	map			"t2_rogue"
+	longname	"Capture Crime Lord"
+	type		"coop"
+}
+
+{
+	map			"t2_trip"
+	longname	"Meet Contact"
+	type		"coop"
+}
+
+{
+	map			"t2_wedge"
+	longname	"Covert Operation"
+	type		"coop"
+}
+
+{
+	map			"vjun1"
+	longname	"Vjun Castle - Outside"
+	type		"coop"
+}
+
+{
+	map			"vjun2"
+	longname	"Vjun Castle - Inside"
+	type		"coop"
+}
+
+{
+	map			"vjun3"
+	longname	"Vjun Castle - Final"
+	type		"coop"
+}
+
+{
+	map			"t3_bounty"
+	longname	"Weapon Destruction"
+	type		"coop"
+}
+
+{
+	map			"t3_byss"
+	longname	"Force Theft Investigation"
+	type		"coop"
+}
+
+{
+	map			"t3_hevil"
+	longname	"Dismantle Device"
+	type		"coop"
+}
+
+{
+	map			"t3_rift"
+	longname	"Cult Sighting"
+	type		"coop"
+}
+
+{
+	map			"t3_stamp"
+	longname	"Cult Investigation"
+	type		"coop"
+}
+
+{
+	map			"taspir1"
+	longname	"Taspir - 1"
+	type		"coop"
+}
+
+{
+	map			"taspir2"
+	longname	"Taspir - 2"
+	type		"coop"
+}
+
+{
+	map			"kor1"
+	longname	"Korriban - Tombs"
+	type		"coop"
+}
+
+{
+	map			"kor2"
+	longname	"Korriban - Final"
+	type		"coop"
+}

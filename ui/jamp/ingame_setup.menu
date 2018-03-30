@@ -1,3034 +1,1506 @@
-//--------------------------------------------------------------
-//
-// SETUP MENU
-//
-//--------------------------------------------------------------
+// setup menu
 
-#define EDITFIELD_BACKGROUND "clear"
-//#define EDITFIELD_BACKGROUND "gfx/2d/select"
+//NOTE: overrides mouseEnter{} mouseExit{}
+#define DOHIGHLIGHT( _r ) \
+	mouseEnter { \
+		transition2 highlight _r 1 1.375 \
+	} \
+	mouseExit { \
+		setitemrect highlight _r \
+	}
 
-#define COMMON( n, g, t, r ) \
-name n \
-group g \
-type t \
-rect r \
-mouseEnter { setitemrect highlight r } \
-mouseExit { setitemrect highlight 0 0 0 0 }
-
-#define DISABLED( n, g, t, r ) \
-name n \
-group g \
-type t \
-rect r \
-decoration \
-mouseEnter { setitemrect darklight r } \
-mouseExit { setitemrect darklight 0 0 0 0 }
+#define COMMON( _n, _g, _t, _r ) \
+	name _n \
+	group _g \
+	type _t \
+	rect _r \
+	DOHIGHLIGHT( _r )
 
 #define TEXT_DEFAULTS \
-font 7 \
-textscale .375 \
-forecolor .615 .615 .956 1 \
-backcolor 1 1 1 1 \
-textstyle ITEM_TEXTSTYLE_SHADOWED
+	font 7 \
+	textscale .375 \
+	forecolor .615 .615 .956 1 \
+	backcolor 1 1 1 1 \
+	textstyle ITEM_TEXTSTYLE_SHADOWED
 
-#define TEXT_APPLY \
-font 7 \
-textscale .5 \
-forecolor 1 0 0 1
+#define BORDER_NO \
+	border 0
+#define BORDER_1PX \
+	border		1 \
+	bordersize	0.5 \
+	bordercolor	0 0 .6 1
+#define BORDER_DEFAULT \
+	BORDER_NO
 
 #define MISC_DEFAULTS \
-border 0 \
-visible 0
+	BORDER_DEFAULT \
+	visible 0
 
-#define BORDER_DEFAULTS \
-border 1 \
-bordercolor .5 .5 .75 1.0 \
-bordersize 0.25
+#define BUTTON_DEFAULTS \
+	action { play "sound/interface/button1" }
 
-#define SLIDER_DEFAULTS \
-slider 92.0 20.0 8.0 20.0
+#define TEXT_APPLY \
+	font 7 \
+	textscale .5 \
+	forecolor 1 0 0 1
 
+// item types
+#define BACKGROUND_COMMON( _n, _r ) \
+	name		_n \
+	rect		_r \
+	style		WINDOW_STYLE_FILLED \
+	forecolor	1 1 1 1 \
+	visible		1 \
+	backcolor	0 0 .6 .333333 \
+	decoration
 
-#define BUTTON_DEFAULTS action { play "sound/interface/button1" }
-#define BUTTON_CHANGEPP action { show applyPPChanges; play "sound/interface/button1" }
-#define BUTTON_CHANGESOUND action { show applySoundChanges; play "sound/interface/button1" }
+#define BACKGROUND_TITLE( _n, _r ) \
+	itemDef { \
+		BACKGROUND_COMMON( _n, _r ) \
+		backcolor	0 .5 1 .25 \
+	}
+#define BACKGROUND_B( _n, _r ) \
+	itemDef { \
+		BACKGROUND_COMMON( _n, _r ) \
+		BORDER_1PX \
+	}
+
+#define TITLE_SMALL( _n, _g, _r, _text ) \
+	itemDef { \
+		TEXT_DEFAULTS \
+		name		_n \
+		group		_g \
+		rect		_r \
+		text		_text \
+		textscale	0.3333 \
+		textalign	ITEM_ALIGN_CENTER \
+		forecolor	0.5 0.75 1.0 1.0 \
+		visible		1 \
+		decoration \
+	}
+
+#define HIGHLIGHT( _name, _group, _bg ) \
+	itemDef { \
+		name		_name \
+		group		_group \
+		background	_bg \
+		forecolor	1 1 1 1 \
+		rect		0 0 0 0 \
+		style		WINDOW_STYLE_SHADER \
+		visible		1 \
+		decoration \
+	}
+
+#define HIDETABS \
+	hide tabWindow1 \
+	hide tabWindow2 \
+	hide tabWindow3 \
+	hide tabWindow4 \
+	hide tabWindow5 \
+	hide tabWindow6
+
+#define TABDEF( _rect, _name, _group, _window, _text, _alignx, _desc ) \
+	itemDef { \
+		COMMON( _name, _group, ITEM_TYPE_BUTTON, _rect ) \
+		TEXT_DEFAULTS BORDER_DEFAULT \
+		text		_text \
+		textalignx	_alignx \
+		descText	_desc \
+		action { \
+			play "sound/interface/button1" \
+			defer VideoSetup videowarningMenu \
+			HIDETABS \
+			show _window \
+			hide applySoundChanges \
+			setitemcolor setup_submenu forecolor .682 .682 1 1 \
+			setitemcolor _name forecolor 1 0.2 0 1 \
+		} \
+		style		WINDOW_STYLE_EMPTY \
+		textalign	ITEM_ALIGN_CENTER \
+		textalignx	38 \
+		textscale	0.46875 \
+		forecolor	.682 .682 1 1 \
+		visible		1 \
+	}
+
+// option types
+#define YESNO( _cvar, _text, _desc, _alignx ) \
+	TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS \
+	cvar		_cvar \
+	descText	_desc \
+	text		_text \
+	textalignx	_alignx
+
+#define MULTI_STR( _cv, _strs, _desc, _text, _alignx ) \
+	TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS \
+	cvar		_cv \
+	cvarStrList	_strs \
+	descText	_desc \
+	text		_text \
+	textalignx	_alignx
+
+#define MULTI_FL( _cv, _strs, _desc, _text, _alignx ) \
+	TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS \
+	cvar			_cv \
+	cvarFloatList	_strs \
+	descText		_desc \
+	text			_text \
+	textalignx		_alignx
+
+#define EDITFIELD( _cv, _desc, _maxChars, _maxPaintChars, _text, _alignx ) \
+	TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS \
+	cvar			_cv \
+	descText		_desc \
+	maxchars		_maxChars \
+	maxpaintchars	_maxPaintChars \
+	text			_text \
+	textalignx		_alignx
+
+#define SLIDER( _cv, _desc, _text, _alignx, _sliderVals ) \
+	TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS \
+	cvarfloat	_cv \
+	descText	_desc \
+	text		_text \
+	textalignx	_alignx \
+	slider		_sliderVals
+
+#define NUMERIC( _cv, _desc, _maxChars, _maxPaintChars, _text, _alignx ) \
+	TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS \
+	cvar			_cv \
+	descText		_desc \
+	maxchars		_maxChars \
+	maxpaintchars	_maxPaintChars \
+	text			_text \
+	textalignx		_alignx
+
+#define OWNERDRAW( _od, _desc, _text, _alignx ) \
+	TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS \
+	ownerdraw	_od \
+	descText	_text \
+	text		_desc \
+	textalignx	_alignx
+
+#define BUTTON( _desc, _text, _alignx ) \
+	TEXT_APPLY MISC_DEFAULTS \
+	descText	_desc \
+	text		_text \
+	textalignx	_alignx \
+	style		WINDOW_STYLE_EMPTY
+
+// "gfx/2d/droid_view"
+// "gfx/menus/main_background"
+// "gfx/menus/main_centerblue"
+// "gfx/menus/menu_blendbox_extended"
+// "gfx/menus/menu_blendbox"
+// "gfx/menus/menu_blendbox3"
+// "gfx/menus/menu_box_ingame"
+// "gfx/menus/menu_buttonback"
+// "powerups/rezout"
 
 {
-	menuDef 
-	{
-		name					"ingame_setup"
-		visible					0
-		fullscreen				0
-		outOfBoundsClick									// this closes the window if it gets a click out of the rectangle
-		rect					0 32 640 480
-		focusColor				1 1 1 1								// Focus color for text and items
-		style					1
-		border					0
-		descX					368
-		descY					440
-		descScale				1
-		descColor				1 .5 .2 1					// Focus color for text and items
-		descAlignment			ITEM_ALIGN_CENTER		
+	menuDef {
+		name			"ingame_setup"
+		visible			0
+		fullscreen		0
+		rect			0 32 640 480 //448
+		focusColor		1 1 1 1				// Focus color for text and items
+		style			1
+		border			0
+		descX			355
+		descY			460
+		descScale		1
+		descColor		1 .5 .2 1			// color for description text
+		descAlignment	ITEM_ALIGN_CENTER
+		outOfBoundsClick	// this closes the window if it gets a click out of the rectangle
+		onOpen {
+			show			tabWindowYesNo
 
-		onOpen 
-		{
-			uiScript		getvideosetup		// Get video settings
-
-			show			tabWindowGameplay
-			hide			tabWindowVisuals
-			hide			tabWindowViewCamera
-			hide			tabWindowHUD2D
-			hide			tabWindowEffects
-			hide			tabWindowRenderer
-			hide			tabWindowPostprocess
-			hide			tabWindowNetPerf
-			hide			tabWindowSound
-			hide			applyChanges
-			hide			applyPPChanges
-			hide			applySoundChanges
-			hide			vidrestart
+			HIDETABS
 
 			setitemcolor	setup_submenu forecolor .682 .682 1 1
-			setitemcolor	tabButtonGameplay forecolor 1 0.2 0 1
+			setitemcolor	tabButtonYesNo forecolor 1 0.2 0 1
 		}
-			
-		onESC 
-		{ 
+		onESC {
 			play				"sound/interface/button1"
-			defer				VideoSetup	videowarningMenu
-
 			close				ingame_setup
 		}
-		onClose
-		{
+		onClose {
 			setitemrect			highlight 0 0 0 0
 		}
 
-		itemDef 
-		{// Background
-			name				background
-			group				none
-			style				WINDOW_STYLE_SHADER
-			rect				0 0 640 448
-			background			"gfx/menus/menu_box_ingame"
-			visible				1
-			decoration
+		/* layout: ~23 items per tab, 16px rows, 14px titles, 1px inner border, 1px padding
+		total pos	0 32 640 448
+		tabs col	80px
+		tabs row	24px
+		pane col	560 (280+280, 1px inner border, 1px padding)
+		pane row	16px, 14px titles
+			/-----------------------------\
+			|xxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+			|xxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+			|-----------------------------|
+			|	| /---------\ /---------\ |
+			| T	| |			| |			| |
+			|	| |	P A N E	| |	P A N E	| |
+			| A	| |			| |			| |
+			|	| |			| |			| |
+			| B	| |			| |			| |
+			|	| |			| |			| |
+			| S	| |			| |			| |
+			|	| |			| |			| |
+			|	| |			| |			| |
+			|	| |			| |			| |
+			|	| \---------/ \---------/ |
+			\-----------------------------/
+		*/
+
+		// overall background
+		BACKGROUND_B( background, 0 0 639 447 )
+
+		// reusable selection "highlight"
+		HIGHLIGHT( highlight, highlights, "powerups/rezout" )
+
+		// side tabs
+		BACKGROUND_B( tabBackground,	2 2 79 146 )
+		//NOTE: you must update HIDETABS when adding/removing/renaming tabs
+		//		rect			name		group			window,		text			alignx	desc
+		TABDEF( 4 4 76 24,		tabButton1,	setup_submenu,	tabWindow1,	"GAME",			0,		"Page 1: Misc" )
+		TABDEF( 4 28 76 24,		tabButton2,	setup_submenu,	tabWindow2,	"GAME / HUD",	0,		"Page 2: Misc / HUD" )
+		TABDEF( 4 52 76 24,		tabButton3,	setup_submenu,	tabWindow3,	"HUD / CAM",	0,		"Page 3: HUD / Camera" )
+		TABDEF( 4 76 76 24,		tabButton4,	setup_submenu,	tabWindow4,	"CAM / ADV",	0,		"Page 4: Camera / Advanced" )
+		TABDEF( 4 100 76 24,	tabButton5,	setup_submenu,	tabWindow5,	"GFX / IN",		0,		"Page 5: Graphics / Input" )
+		TABDEF( 4 124 76 24,	tabButton6,	setup_submenu,	tabWindow6,	"SND / MP",			0,		"Page 6: Sound" )
+
+		// layout: options panes
+		BACKGROUND_B( optsLeft,			82 2 277 425 )
+		BACKGROUND_B( optsRight,		360 2 277 425 )
+
+		// players
+		BACKGROUND_B( tabWindow1, 84 4 273 257 )
+		BACKGROUND_TITLE( tabWindow1, 131 6 180 14 )
+		TITLE_SMALL( text_w1_players, tabWindow1, 218 6 135 14, "Players" )
+		itemDef {
+			COMMON( broadsword, tabWindow1, ITEM_TYPE_MULTI, 86 20 270 16 )
+			MULTI_STR( "broadsword", { "Off (default)"; "0"; "On"; "1"; "Excessive"; "2" }, "Ragdoll physics", "Ragdoll:", 82 )
 		}
-		itemDef 
-		{// Overlay
-			name				background
-			group				none
-			style				WINDOW_STYLE_SHADER
-			rect				0 0 640 448
-			background			"gfx/2d/droid_view"
-			visible				1
-			decoration
+		itemDef {
+			COMMON( cg_altDimA, tabWindow1, ITEM_TYPE_SLIDER, 86 36 270 16 )
+			SLIDER( "cg_altDimA" 96 0 255, "Transparency for players in the 'alternate dimension'", "Alt-Dim Transparency:", 19, 141 16 8 16 )
+		}
+		itemDef { // 0 255 0 100
+			COMMON( cg_bubbleColour, tabWindow1, ITEM_TYPE_EDITFIELD, 86 52 270 16 )
+			EDITFIELD( "cg_bubbleColour", "Protection bubble colour", 19, 19, "Protection Bubble Colour:", 0 )
+		}
+		itemDef {
+			COMMON( cg_dismember, tabWindow1, ITEM_TYPE_MULTI, 86 68 270 16 )
+			MULTI_STR( "cg_dismember", { "Off (default)"; "0"; "On (limbs)"; "1"; "On (everything)"; "2" }, "Limb dismemberment (gore)", "Dismemberment:", 54 )
+		}
+		itemDef { // 1
+			COMMON( cg_drawEnemyInfo, tabWindow1, ITEM_TYPE_YESNO, 86 84 270 16 )
+			YESNO( "cg_drawEnemyInfo", "Show NME Info:", "Show leader in the top-right corner", 54 )
+		}
+		itemDef { // 1
+			COMMON( cg_drawFriend, tabWindow1, ITEM_TYPE_YESNO, 86 100 270 16 )
+			YESNO( "cg_drawFriend", "Show Friend Icons:", "Show icon above teammates", 34 )
+		}
+		itemDef { // 0
+			COMMON( cg_jumpSounds, tabWindow1, ITEM_TYPE_YESNO, 86 116 270 16 )
+			YESNO( "cg_jumpSounds", "Jump Sounds:", "Put some grunt in your jump", 64 )
+		}
+		itemDef {
+			COMMON( cg_noBodies, tabWindow1, ITEM_TYPE_MULTI, 86 132 270 16 )
+			MULTI_STR( "cg_noBodies", { "No"; "0"; "Instant fade"; "1"; "Instant fade, silent"; "2" }, "Show or hide bodies", "Hide Bodies:", 64 )
+		}
+		itemDef { // 0
+			COMMON( cg_noPlayerAnims, tabWindow1, ITEM_TYPE_YESNO, 86 148 270 16 )
+			YESNO( "cg_noPlayerAnims", "Animate Players:", "Disable player animations", 44 )
+		}
+		itemDef { // 0
+			COMMON( cg_noTaunt, tabWindow1, ITEM_TYPE_YESNO, 86 164 270 16 )
+			YESNO( "cg_noTaunt", "No Taunts:", "Disable taunt sounds", 74 )
+		}
+		itemDef { // 1
+			COMMON( cg_showDuelSabers, tabWindow1, ITEM_TYPE_YESNO, 86 180 270 16 )
+			YESNO( "cg_showDuelSabers", "Show Duel Sabers:", "Show sabers of duelists", 40 )
+		}
+		itemDef { // 1
+			COMMON( cg_smartEntities, tabWindow1, ITEM_TYPE_YESNO, 86 196 270 16 )
+			YESNO( "cg_smartEntities", "Smart Entities:", "Skip rendering of players and objects behind solids", 50 )
+		}
+		itemDef { // 1
+			COMMON( cg_smoothClients, tabWindow1, ITEM_TYPE_MULTI, 86 212 270 16 )
+			MULTI_STR( "cg_smoothClients", { "Off"; "0"; "On (default)"; "1"; "On + PMove"; "2" }, "Player smoothing technique", "Smooth Clients:", 50 )
+		}
+		itemDef {
+			COMMON( cg_teamSabersRGB, tabWindow1, ITEM_TYPE_MULTI, 86 228 270 16 )
+			MULTI_STR( "cg_teamSabersRGB", { "Disallowed"; "0"; "Team Only"; "1"; "Allowed"; "2" }, "Allow team-mates (or everyone) to use RGB sabers in team gametypes", "TFFA RGB Sabers:", 45 )
+		}
+		itemDef {
+			COMMON( cg_footsteps, tabWindow1, ITEM_TYPE_MULTI, 86 244 270 16 )
+			MULTI_STR( "cg_footsteps", { "Off"; "0"; "SND"; "1"; "SND,EFX"; "2"; "SND,EFX,GFX"; "3"; "SND,EFX,GFX (always)"; "4" }, "Footstep effects", "Footsteps:", 74 )
 		}
 
-		itemDef 
-		{// darken the contents
-			name				tabBackground
-			group				none
-			style				WINDOW_STYLE_FILLED
-			rect				96 0 544 448
-			backcolor			0 0 0 0.25
-			forecolor			1 0 0 1
-			border				0
-			bordercolor			0 0 .6 1
-			visible				1
-			decoration
+		// sabers
+		BACKGROUND_B( tabWindow1, 84 262 273 96 )
+		BACKGROUND_TITLE( tabWindow1, 131 264 180 14 )
+		TITLE_SMALL( text_w1_sabers, tabWindow1, 218 264 135 14, "Sabers" )
+		itemDef {
+			COMMON( cg_saberBladeCoreMulti, tabWindow1, ITEM_TYPE_SLIDER, 86 278 270 16 )
+			SLIDER( "cg_saberBladeCoreMulti" 1.0 0.1 3.0, "Saber core width", "Saber Core Width:", 8, 172 16 8 16 )
 		}
-		itemDef 
-		{//border
-			name				tabBackground
-			group				none
-			style				WINDOW_STYLE_FILLED
-			rect				96 0 1 448
-			backcolor			.375 .375 1 .5
-			forecolor			1 1 1 1
-			border				0
-			visible				1
-			decoration
+		itemDef {
+			COMMON( cg_saberBladeGlowMulti, tabWindow1, ITEM_TYPE_SLIDER, 86 294 270 16 )
+			SLIDER( "cg_saberBladeGlowMulti" 1.25 0.1 3.0, "Saber glow width", "Saber Glow Width:", 8, 172 16 8 16 )
 		}
-
-		itemDef
-		{//button highlight
-			name				highlight
-			group				highlights
-			style				WINDOW_STYLE_SHADER
-			rect				0 0 0 0
-			background			"powerups/rezout"
-		//	background			"gfx/menus/menu_box_ingame"
-		//	background			"gfx/menus/menu_blendbox"
-			forecolor			1 1 1 1
-			visible				1
-			decoration
+		itemDef {
+			COMMON( cg_saberTrail, tabWindow1, ITEM_TYPE_MULTI, 86 310 270 16 )
+			MULTI_STR( "cg_saberTrail", { "None"; "0"; "Normal"; "1"; "Mirror"; "2"; "???"; "3" }, "Saber trail type", "Saber Trails:", 28 )
+		}
+		itemDef {
+			COMMON( cg_saberTrailLength, tabWindow1, ITEM_TYPE_SLIDER, 86 326 270 16 )
+			SLIDER( "cg_saberTrailLength" 0.7 0.1 3.0, "Saber trail length", "Saber Trail Length:", 0, 170 16 8 16 )
+		}
+		itemDef {
+			COMMON( cg_saberWidth, tabWindow1, ITEM_TYPE_SLIDER, 86 342 270 16 )
+			SLIDER( "cg_saberWidth" 0.8 0.1 3.0, "Saber width", "Saber Width:", 34, 170 16 8 16 )
 		}
 
-		itemDef
-		{//button highlight
-			name				darklight
-			group				highlights
-			style				WINDOW_STYLE_SHADER
-			rect				0 0 0 0
-		//	background			"powerups/rezout"
-			background			"gfx/menus/menu_box_ingame"
-		//	background			"gfx/menus/menu_blendbox"
-			forecolor			1 1 1 1
-			visible				1
-			decoration
+		// duel shaders
+		BACKGROUND_B( tabWindow1, 84 359 273 65 )
+		BACKGROUND_TITLE( tabWindow1, 131 361 180 14 )
+		TITLE_SMALL( text_w1_duelshaders, tabWindow1, 218 361 135 14, "Duel Shaders" )
+		itemDef { // 72 72 224 128 0
+			COMMON( cg_duelColour, tabWindow1, ITEM_TYPE_EDITFIELD, 86 375 270 16 )
+			EDITFIELD( "cg_duelColour", "Colour of duelists", 19, 19, "Duel Colour:", 24 )
+		}
+		itemDef {
+			COMMON( cg_duelShaderStyle, tabWindow1, ITEM_TYPE_MULTI, 86 391 270 16 )
+			MULTI_STR( "cg_duelShaderStyle", { "Bubble (default)"; "-1"; "Protect"; "1"; "Seeing 1"; "2"; "Jedi Master"; "3"; "Seeing 2"; "4"; "Flat Bubble"; "5"; "Cloak"; "6"; "Bubble (default)"; "7" }, "Visual effect for duelists", "Duel Shader:", 24 )
+		}
+		itemDef { // 0
+			COMMON( cg_duelShaderTest, tabWindow1, ITEM_TYPE_YESNO, 86 407 270 16 )
+			YESNO( "cg_duelShaderTest", "Duel Shader Test:", "Pretend everyone is in a duel", 0 )
 		}
 
+		// force models
+		BACKGROUND_B( tabWindow1, 362 4 273 128 )
+		BACKGROUND_TITLE( tabWindow1, 409 6 180 14 )
+		TITLE_SMALL( text_w1_forcemodels, tabWindow1, 495 6 135 14, "Force Models" )
+		itemDef { // ""
+			COMMON( cg_forceEnemySaber, tabWindow1, ITEM_TYPE_EDITFIELD, 364 20 270 16 )
+			EDITFIELD( "cg_forceEnemySaber", "Force enemies to use a certain hilt", 19, 19, "Force NME Saber:", 5 )
+		}
+		itemDef { // ""
+			COMMON( cg_forceOwnSaber, tabWindow1, ITEM_TYPE_EDITFIELD, 364 36 270 16 )
+			EDITFIELD( "cg_forceOwnSaber", "Visually override your selected hilt", 19, 19, "Force Own Saber:", 5 )
+		}
+		itemDef { // 0
+			COMMON( cg_forceModel, tabWindow1, ITEM_TYPE_YESNO, 364 52 270 16 )
+			YESNO( "cg_forceModel", "Force Models:", "Force everyone to use the same model", 20 )
+		}
+		itemDef { // 64 192 255
+			COMMON( cg_forceAllyColour, tabWindow1, ITEM_TYPE_EDITFIELD, 364 68 270 16 )
+			EDITFIELD( "cg_forceAllyColour", "RGB tint for allies", 19, 19, "Force Ally RGB:", 10 )
+			cvarTest	"cg_forceModel"
+			hideCvar	{ "0" }
+		}
+		itemDef { // rebel/default
+			COMMON( cg_forceAllyModel, tabWindow1, ITEM_TYPE_EDITFIELD, 364 84 270 16 )
+			EDITFIELD( "cg_forceAllyModel", "Force allies to use the same model", 19, 19, "Force Ally Model:", 0 )
+			cvarTest	"cg_forceModel"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 0 255 0
+			COMMON( cg_forceEnemyColour, tabWindow1, ITEM_TYPE_EDITFIELD, 364 100 270 16 )
+			EDITFIELD( "cg_forceEnemyColour", "RGB tint for enemies", 19, 19, "Force NME RGB:", 15 )
+			cvarTest	"cg_forceModel"
+			hideCvar	{ "0" }
+		}
+		itemDef { // stormtrooper/default
+			COMMON( cg_forceEnemyModel, tabWindow1, ITEM_TYPE_EDITFIELD, 364 116 270 16 )
+			EDITFIELD( "cg_forceEnemyModel", "Force enemies to use the same model", 19, 19, "Force NME Model:", 6 )
+			cvarTest	"cg_forceModel"
+			hideCvar	{ "0" }
+		}
 
-		//	================================
-		//	TAB BUTTONS
-		//	================================
+		// shield effects
+		BACKGROUND_B( tabWindow1, 362 133 273 81 )
+		BACKGROUND_TITLE( tabWindow1, 409 135 180 14 )
+		TITLE_SMALL( text_w1_shieldeffects, tabWindow1, 495 135 135 14, "Shield Effects" )
+		itemDef { // 72 128 224 255 0
+			COMMON( cg_shieldColour, tabWindow1, ITEM_TYPE_EDITFIELD, 364 149 270 16 )
+			EDITFIELD( "cg_shieldColour", "RGB colour of shield effects", 19, 19, "Shield RGB:", 14 )
+		}
+		itemDef { // 1
+			COMMON( cg_shieldLayers, tabWindow1, ITEM_TYPE_NUMERICFIELD, 364 165 270 16 )
+			NUMERIC( "cg_shieldLayers", "Intensity of the shield effect", 5, 5, "Shield Layers:", 0 )
+		}
+		itemDef {
+			COMMON( cg_shieldStyle, tabWindow1, ITEM_TYPE_MULTI, 364 181 270 16 )
+			MULTI_STR( "cg_shieldStyle", { "Bubble (default)"; "-1"; "Protect"; "1"; "Seeing 1"; "2"; "Jedi Master"; "3"; "Seeing 2"; "4"; "Flat Bubble"; "5"; "Cloak"; "6"; "Bubble (default)"; "7" }, "Visual effect for shields", "Shield Style:", 5 )
+		}
+		itemDef { // 0
+			COMMON( cg_shieldTest, tabWindow1, ITEM_TYPE_YESNO, 364 197 270 16 )
+			YESNO( "cg_shieldTest", "Shield Test:", "Pretend everyone is losing shield", 10 )
+		}
 
-		itemDef
-		{//Gameplay
-			name				tabButtonGameplay
-			group				setup_submenu
-			text				"Gameplay"
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			rect				8 8 88 16
-			font				7
-			textscale			0.5
-			textalignx			28
-			textaligny			-4
-			textstyle			3
-			forecolor			.682 .682 1 1
-			border				0
-			bordercolor			1 1 1 1
-			visible				1
-			descText			"Configure gameplay settings"
-			mouseEnter			{ setitemrect highlight 0 8 96 16 }
-			mouseExit			{ setitemrect highlight 0 8 0 0 }
-			action 
-			{ 
-				play			"sound/interface/button1"
-				defer			VideoSetup	videowarningMenu
+		// world
+		BACKGROUND_B( tabWindow1, 362 215 273 160 )
+		BACKGROUND_TITLE( tabWindow1, 409 217 180 14 )
+		TITLE_SMALL( text_w1_world, tabWindow1, 495 217 135 14, "World" )
+		itemDef { // 1
+			COMMON( cg_drawScreenTints, tabWindow1, ITEM_TYPE_YESNO, 364 231 270 16 )
+			YESNO( "cg_drawScreenTints", "Screen Tints:", "Draw 2D overlays (e.g. force sight)", 38 )
+		}
+		//cg_newFX "0" bitfield
+		itemDef { // 0
+			COMMON( cg_noPredict, tabWindow1, ITEM_TYPE_YESNO, 364 247 270 16 )
+			YESNO( "cg_noPredict", "No Prediction:", "Disable client movement prediction", 33 )
+		}
+		itemDef { // 1
+			COMMON( cg_predictGrapple, tabWindow1, ITEM_TYPE_YESNO, 364 263 270 16 )
+			YESNO( "cg_predictGrapple", "Predict Grapple:", "Disable grapple hook prediction", 24 )
+		}
+		itemDef { // 1
+			COMMON( cg_predictItems, tabWindow1, ITEM_TYPE_YESNO, 364 279 270 16 )
+			YESNO( "cg_predictItems", "Predict Items:", "Disable predicted item pickup", 34 )
+		}
+		itemDef { // 1
+			COMMON( cg_renderToTextureFX, tabWindow1, ITEM_TYPE_YESNO, 364 295 270 16 )
+			YESNO( "cg_renderToTextureFX", "Render To Texture FX:", "Enable refraction effects (e.g. force push blur, protection bubble)", 0 )
+		}
+		itemDef {
+			COMMON( cg_scorePlums, tabWindow1, ITEM_TYPE_MULTI, 364 311 270 16 )
+			MULTI_STR( "cg_scorePlums", { "Off"; "0"; "If enabled on server"; "1"; "Force enabled"; "2" }, "Enable feedback for scoring", "Score Plumes:", 44 )
+		}
+		itemDef {
+			COMMON( cg_shadows, tabWindow1, ITEM_TYPE_MULTI, 364 327 270 16 )
+			MULTI_STR( "cg_shadows", { "Off"; "0"; "Blob (default)"; "1"; "Stencil"; "2"; "Projection"; "3" }, "Type of shadows to use", "Shadows:", 64 )
+		}
+		itemDef { // 0
+			COMMON( cg_simpleItems, tabWindow1, ITEM_TYPE_YESNO, 364 343 270 16 )
+			YESNO( "cg_simpleItems", "Simple Items:", "2D or 3D item pickups", 40 )
+		}
+		itemDef {
+			COMMON( cg_simpleItems, tabWindow1, ITEM_TYPE_SLIDER, 364 359 270 16 )
+			SLIDER( "cg_simpleItems" 1.0 0.1 2.0, "Size of 2D items", "Simple Items Size:", 16, 159 16 8 16 )
+			cvarTest	"cg_simpleItems"
+			hideCvar	{ "0" }
+		}
 
-				show 			tabWindowGameplay
-				hide			tabWindowVisuals
-				hide			tabWindowViewCamera
-				hide			tabWindowHUD2D
-				hide			tabWindowEffects
-				hide			tabWindowRenderer
-				hide			tabWindowPostprocess
-				hide			tabWindowNetPerf
-				hide			tabWindowSound
-				hide			applyChanges
-				hide			applyPPChanges
-				hide			applySoundChanges
-				hide			vidrestart
+		// strafe trail
+		BACKGROUND_B( tabWindow1, 362 376 273 49 )
+		BACKGROUND_TITLE( tabWindow1, 409 378 180 14 )
+		TITLE_SMALL( text_w1_strafetrail, tabWindow1, 495 378 135 14, "Strafe Trail" )
+		itemDef { // 0
+			COMMON( cg_strafeTrail, tabWindow1, ITEM_TYPE_YESNO, 364 392 270 16 )
+			YESNO( "cg_strafeTrail", "Strafe Trail:", "Enable strafe jump trail effect", 4 )
+		}
+		itemDef { // 300 1500
+			COMMON( cg_strafeTrailWeights, tabWindow1, ITEM_TYPE_EDITFIELD, 364 408 270 16 )
+			EDITFIELD( "cg_strafeTrailWeights", "Threshold for displaying strafe jump trail", 19, 19, "Min/Max Speed:", 0 )
+			cvarTest	"cg_strafeTrail"
+			hideCvar	{ "0" }
+		}
 
-				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
-				setitemcolor	tabButtonGameplay	forecolor	1 0.2 0 1
+		// speed trail
+		BACKGROUND_B( tabWindow2, 84 4 273 33 )
+		BACKGROUND_TITLE( tabWindow2, 131 6 180 14 )
+		TITLE_SMALL( text_w2_speedtrail, tabWindow2, 218 6 135 14, "Speed Trail" )
+		itemDef {
+			COMMON( cg_speedTrail, tabWindow2, ITEM_TYPE_MULTI, 86 20 270 16 )
+			MULTI_STR( "cg_speedTrail", { "Off"; "0"; "On"; "1" }, "Force speed trail type", "Speed Trail:", 0 )
+		}
+
+		// HUD
+		BACKGROUND_B( tabWindow2, 84 38 273 385 )
+		BACKGROUND_TITLE( tabWindow2, 131 40 180 14 )
+		TITLE_SMALL( text_w2_hud, tabWindow2, 218 40 135 14, "HUD" )
+		itemDef { // 0
+			COMMON( cg_draw2D, tabWindow2, ITEM_TYPE_YESNO, 86 54 270 16 )
+			YESNO( "cg_draw2D", "Draw 2D Overlay:", "Disable entire HUD", 23 )
+		}
+		itemDef { // 1
+			COMMON( cg_draw3DIcons, tabWindow2, ITEM_TYPE_YESNO, 86 70 270 16 )
+			YESNO( "cg_draw3DIcons", "Show 3D Icons:", "Show 3D models for flags and siege icons", 33 )
+		}
+		itemDef {
+			COMMON( cg_drawFPS, tabWindow2, ITEM_TYPE_MULTI, 86 86 270 16 )
+			MULTI_STR( "cg_drawFPS", { "No (default)"; "0"; "Yes"; "1"; "Yes + Frametime"; "2" }, "Show framerate in the top-right corner", "Show FPS:", 57 )
+		}
+		itemDef { // 1
+			COMMON( cg_drawIcons, tabWindow2, ITEM_TYPE_YESNO, 86 102 270 16 )
+			YESNO( "cg_drawIcons", "Show 2D Icons:", "Disable 2D icons for flags and siege icons", 33 )
+		}
+		itemDef { // 1
+			COMMON( cg_drawRadar, tabWindow2, ITEM_TYPE_YESNO, 86 118 270 16 )
+			YESNO( "cg_drawRadar", "Show Radar:", "Show radar in the top-right corner", 48 )
+		}
+		itemDef { // 0
+			COMMON( cg_drawRewards, tabWindow2, ITEM_TYPE_YESNO, 86 134 270 16 )
+			YESNO( "cg_drawRewards", "Show Rewards:", "Show Quake 3 style rewards", 38 )
+		}
+		itemDef {
+			COMMON( cg_drawScores, tabWindow2, ITEM_TYPE_MULTI, 86 150 270 16 )
+			MULTI_STR( "cg_drawScores", { "No"; "0"; "Yes (default)"; "1"; "With Mini Scoreboard"; "2" }, "Style of the scoreboard in the top-right", "Show Scores:", 43 )
+		}
+		itemDef { // 0
+			COMMON( cg_drawScoresNet, tabWindow2, ITEM_TYPE_YESNO, 86 166 270 16 )
+			YESNO( "cg_drawScoresNet", "Show Net Scores:", "Show net score along kills/deaths on scoreboard", 24 )
+		}
+		itemDef { // 0
+			COMMON( cg_drawSpectatorNames, tabWindow2, ITEM_TYPE_YESNO, 86 182 270 16 )
+			YESNO( "cg_drawSpectatorNames", "Show Spectator Names:", "Show player names when spectating", 0 )
+		}
+		itemDef {
+			COMMON( cg_drawStatus, tabWindow2, ITEM_TYPE_MULTI, 86 198 270 16 )
+			MULTI_STR( "cg_drawStatus", { "Off"; "0"; "On (default)"; "1"; "With flags"; "2" }, "???", "Show HUD:", 15 )
+		}
+		itemDef { // 0
+			COMMON( cg_drawTeamOverlay, tabWindow2, ITEM_TYPE_YESNO, 86 214 270 16 )
+			YESNO( "cg_drawTeamOverlay", "Team Overlay:", "Show team overlay", 39 )
+		}
+		itemDef {
+			COMMON( cg_drawTimer, tabWindow2, ITEM_TYPE_MULTI, 86 230 270 16 )
+			MULTI_STR( "cg_drawTimer", { "Off (default)"; "0"; "On"; "1"; "Countdown"; "2"; "Colour"; "4"; "Countdown + Colour"; "6" }, "Style of match timer in the top-right corner", "Show Match Timer:", 19 )
+		}
+		itemDef { // ui/jahud.txt
+			COMMON( cg_hudFiles, tabWindow2, ITEM_TYPE_EDITFIELD, 86 246 270 16 )
+			EDITFIELD( "cg_hudFiles", "Which file to use for HUD definition", 19, 19, "HUD file:", 58 )
+		}
+		itemDef { // 2 240
+			COMMON( cg_hudStatsPos, tabWindow2, ITEM_TYPE_EDITFIELD, 86 262 270 16 )
+			EDITFIELD( "cg_hudStatsPos", "'X Y' position of the extra stats HUD", 19, 19, "Stats HUD Pos:", 34 )
+		}
+		itemDef { // 0.375
+			COMMON( cg_hudStatsScale, tabWindow2, ITEM_TYPE_EDITFIELD, 86 278 270 16 )
+			EDITFIELD( "cg_hudStatsScale", "Font size of the extra stats HUD", 19, 19, "Stats HUD Scale:", 24 )
+		}
+		itemDef { // 0
+			//FIXME: bit-field or multi
+			COMMON( cg_lagometer, tabWindow2, ITEM_TYPE_YESNO, 86 294 270 16 )
+			YESNO( "cg_lagometer", "Lagometer:", "Show latency and snapshot interpolation graphs", 53 )
+		}
+		itemDef { // 592 320
+			COMMON( cg_lagometerPos, tabWindow2, ITEM_TYPE_EDITFIELD, 86 310 270 16 )
+			EDITFIELD( "cg_lagometerPos", "'X Y' position of the lagometer", 19, 19, "Lagometer Pos:", 34 )
+			cvarTest	"cg_lagometer"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 0
+			COMMON( cg_queueCenterprint, tabWindow2, ITEM_TYPE_YESNO, 86 326 270 16 )
+			YESNO( "cg_queueCenterprint", "Queue Centerprint:", "Use a queue for announcements, or overwrite as new ones come in", 14 )
+		}
+		itemDef { // 0
+			COMMON( cg_statsHUD, tabWindow2, ITEM_TYPE_YESNO, 86 342 270 16 )
+			YESNO( "cg_statsHUD", "Stats HUD:", "Show extra stats on the HUD", 53 )
+		}
+		itemDef {
+			COMMON( cg_topRightFont, tabWindow2, ITEM_TYPE_MULTI, 86 358 270 16 )
+			MULTI_STR( "cg_topRightFont", { "Small (default)"; "1"; "Medium"; "2"; "Large"; "3"; "Small 2"; "4"; "JA++ large"; "5"; "JA++ small (default)"; "6"; "JA++ monospace"; "7" }, "Font for info in the top-right corner", "Top-Right Font:", 29 )
+		}
+		itemDef {
+			COMMON( cg_topRightSize, tabWindow2, ITEM_TYPE_SLIDER, 86 374 270 16 )
+			SLIDER( "cg_topRightSize" 1.0 0.1 2.0, "Font size for info in the top-right corner", "Top-Right Size:", 29, 160 16 8 16 )
+		}
+		itemDef { // 0
+			COMMON( japp_preciseFonts, tabWindow2, ITEM_TYPE_YESNO, 86 390 270 16 )
+			YESNO( "japp_preciseFonts", "Precise Fonts:", "Sub-pixel text positioning", 33 )
+		}
+		itemDef { // 0
+			COMMON( japp_ratioFix, tabWindow2, ITEM_TYPE_YESNO, 86 406 270 16 )
+			YESNO( "japp_ratioFix", "Ratio Fix:", "Fix non-4:3 (widescreen) resolutions stretching 2D elements", 52 )
+		}
+
+		// HUD: crosshair
+		BACKGROUND_B( tabWindow2, 362 4 273 176 )
+		BACKGROUND_TITLE( tabWindow2, 409 6 180 14 )
+		TITLE_SMALL( text_w2_crosshair, tabWindow2, 495 6 135 14, "HUD: Crosshair" )
+		itemDef { // 1
+			COMMON( cg_drawCrosshair, tabWindow2, ITEM_TYPE_YESNO, 364 20 270 16 )
+			YESNO( "cg_drawCrosshair", "Show Crosshair:", "Show the crosshair", 4 )
+		}
+		itemDef {
+			COMMON( ownerdraw_crosshair, tabWindow2, ITEM_TYPE_OWNERDRAW, 364 36 270 16 )
+			OWNERDRAW( UI_CROSSHAIR, "Crosshair:", "Choose which crosshair to use", 28 )
+			cvarTest	"cg_drawCrosshair"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 255 255 255 255
+			COMMON( cg_crosshairColour, tabWindow2, ITEM_TYPE_EDITFIELD, 364 52 270 16 )
+			EDITFIELD( "cg_crosshairColour", "'R G B A' colour of the crosshair'", 19, 19, "XHair RGBA:", 24 )
+			cvarTest	"cg_drawCrosshair"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 0
+			COMMON( cg_crosshairHealth, tabWindow2, ITEM_TYPE_YESNO, 364 68 270 16 )
+			YESNO( "cg_crosshairHealth", "XHair HP:", "Tint your crosshair based on your health", 34 )
+			cvarTest	"cg_drawCrosshair"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 0
+			COMMON( cg_crosshairLerp, tabWindow2, ITEM_TYPE_YESNO, 364 84 270 16 )
+			YESNO( "cg_crosshairLerp", "XHair Smoothing:", "Interpolate position of the crosshair", 0 )
+			cvarTest	"cg_drawCrosshair"
+			hideCvar	{ "0" }
+		}
+		itemDef {
+			COMMON( cg_crosshairSize, tabWindow2, ITEM_TYPE_SLIDER, 364 100 270 16 )
+			SLIDER( "cg_crosshairSize" 24 8 64, "Size of the crosshair", "XHair Size:", 24, 185 16 8 16 )
+			cvarTest	"cg_drawCrosshair"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 1
+			COMMON( cg_crosshairTint, tabWindow2, ITEM_TYPE_YESNO, 364 116 270 16 )
+			YESNO( "cg_crosshairTint", "XHair Tint:", "Tint your crosshair based on your team", 24 )
+			cvarTest	"cg_drawCrosshair"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 1
+			COMMON( cg_drawCrosshairNames, tabWindow2, ITEM_TYPE_YESNO, 364 132 270 16 )
+			YESNO( "cg_drawCrosshairNames", "XHair Names:", "Draw player names when targeting them", 19 )
+			cvarTest	"cg_drawCrosshair"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 1
+			COMMON( cg_dynamicCrosshair, tabWindow2, ITEM_TYPE_YESNO, 364 148 270 16 )
+			YESNO( "cg_dynamicCrosshair", "XHair Realism:", "Accurate crosshair that collides with objects", 10 )
+			cvarTest	"cg_drawCrosshair"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 1
+			COMMON( cg_dynamicCrosshairPrecision, tabWindow2, ITEM_TYPE_YESNO, 364 164 270 16 )
+			YESNO( "cg_dynamicCrosshairPrecision", "XHair Precision:", "Use Ghoul2 tracing for realistic crosshair", 0 )
+			cvarTest	"cg_drawCrosshair"
+			hideCvar	{ "0" }
+		}
+
+		// HUD: movement keys
+		BACKGROUND_B( tabWindow2, 362 181 273 64 )
+		BACKGROUND_TITLE( tabWindow2, 409 183 180 14 )
+		TITLE_SMALL( text_w2_movementkeys, tabWindow2, 495 183 135 14, "HUD: Movement Keys" )
+		itemDef { // 0
+			COMMON( cg_movementKeys, tabWindow2, ITEM_TYPE_YESNO, 364 197 270 16 )
+			YESNO( "cg_movementKeys", "Movement Keys:", "Show which movement keys are being pressed", 0 )
+		}
+		itemDef { // 320 240
+			COMMON( cg_movementKeysPos, tabWindow2, ITEM_TYPE_EDITFIELD, 364 213 270 16 )
+			EDITFIELD( "cg_movementKeysPos", "'X Y' position of the movement keys overlay'", 19, 19, "Position:", 25 )
+			cvarTest	"cg_movementKeys"
+			hideCvar	{ "0" }
+		}
+		itemDef {
+			COMMON( cg_movementKeysScale, tabWindow2, ITEM_TYPE_SLIDER, 364 229 270 16 )
+			SLIDER( "cg_movementKeysScale" 1.0 0.1 3.0, "Font size of the movement keys overlay", "Size:", 45, 193 16 8 16 )
+			cvarTest	"cg_movementKeys"
+			hideCvar	{ "0" }
+		}
+
+		// HUD: strafe helper
+		BACKGROUND_B( tabWindow2, 362 246 273 112 )
+		BACKGROUND_TITLE( tabWindow2, 409 248 180 14 )
+		TITLE_SMALL( text_w2_strafehelper, tabWindow2, 495 248 135 14, "HUD: Strafe Helper" )
+		itemDef { // 0
+			COMMON( cg_strafeHelper, tabWindow2, ITEM_TYPE_YESNO, 364 262 270 16 )
+			YESNO( "cg_strafeHelper", "Strafe Helper:", "Show strafe jump helper HUD (SMod style)", 0 )
+		}
+		itemDef {
+			COMMON( cg_strafeHelperAngle, tabWindow2, ITEM_TYPE_SLIDER, 364 278 270 16 )
+			SLIDER( "cg_strafeHelperAngle" 20 1 180, "Offset the desired angle of the strafe helper lines", "Angle:", 39, 185 16 8 16 )
+			cvarTest	"cg_strafeHelper"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 0 255 255 255
+			COMMON( cg_strafeHelperColor, tabWindow2, ITEM_TYPE_EDITFIELD, 364 294 270 16 )
+			EDITFIELD( "cg_strafeHelperColor", "'R G B A' colour of the strafe helper HUD", 19, 19, "Colour:", 34 )
+			cvarTest	"cg_strafeHelper"
+			hideCvar	{ "0" }
+		}
+		itemDef {
+			COMMON( cg_strafeHelperLength, tabWindow2, ITEM_TYPE_SLIDER, 364 310 270 16 )
+			SLIDER( "cg_strafeHelperLength" 100 10 300, "Length of the strafe helper lines", "Length:", 34, 185 16 8 16 )
+			cvarTest	"cg_strafeHelper"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 1
+			COMMON( cg_strafeHelperRadius, tabWindow2, ITEM_TYPE_YESNO, 364 326 270 16 )
+			YESNO( "cg_strafeHelperRadius", "Radius:", "Radius of the strafe helper lines", 34 )
+			cvarTest	"cg_strafeHelper"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 1
+			COMMON( cg_strafeHelperVelocity, tabWindow2, ITEM_TYPE_YESNO, 364 342 270 16 )
+			YESNO( "cg_strafeHelperVelocity", "Velocity:", "Show your velocity vector alongside the strafe helper lines", 24 )
+			cvarTest	"cg_strafeHelper"
+			hideCvar	{ "0" }
+		}
+
+		// HUD: accelerometer
+		BACKGROUND_B( tabWindow2, 362 359 273 64 )
+		BACKGROUND_TITLE( tabWindow2, 409 361 180 14 )
+		TITLE_SMALL( text_w2_accelerometer, tabWindow2, 495 361 135 14, "HUD: Accelerometer" )
+		itemDef { // 0
+			COMMON( cg_accelerometer, tabWindow2, ITEM_TYPE_YESNO, 364 375 270 16 )
+			YESNO( "cg_accelerometer", "Show Accelerometer:", "Show accelerometer", 0 )
+		}
+		itemDef { // 320 360
+			COMMON( cg_accelerometerPos, tabWindow2, ITEM_TYPE_EDITFIELD, 364 391 270 16 )
+			EDITFIELD( "cg_accelerometerPos", "'X Y' position of the accelerometer", 19, 19, "Position:", 49 )
+			cvarTest	"cg_accelerometer"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 128 20
+			COMMON( cg_accelerometerSize, tabWindow2, ITEM_TYPE_EDITFIELD, 364 407 270 16 )
+			EDITFIELD( "cg_accelerometerSize", "'WIDTH HEIGHT' size of the accelerometer", 19, 19, "Size:", 69 )
+			cvarTest	"cg_accelerometer"
+			hideCvar	{ "0" }
+		}
+
+		// HUD: chatbox
+		BACKGROUND_B( tabWindow3, 84 4 273 176 )
+		BACKGROUND_TITLE( tabWindow3, 131 6 180 14 )
+		TITLE_SMALL( text_w3_chatbox, tabWindow3, 218 6 135 14, "HUD: Chatbox" )
+		itemDef {
+			COMMON( cg_newChatbox, tabWindow3, ITEM_TYPE_MULTI, 86 20 270 16 )
+			MULTI_STR( "cg_newChatbox", { "Off"; "0"; "On (default)"; "1" }, "Use the new advanced chatbox", "New Chatbox:", 25 )
+		}
+		// old chatbox
+		itemDef { // 10000
+			COMMON( cg_chatbox, tabWindow3, ITEM_TYPE_NUMERICFIELD, 86 36 270 16 )
+			NUMERIC( "cg_chatbox", "How many milliseconds to show chat messages", 5, 5, "Chatbox:", 44 )
+			cvarTest	"cg_newChatbox"
+			hideCvar	{ "1" }
+		}
+		itemDef { // 350
+			COMMON( cg_chatboxHeight, tabWindow3, ITEM_TYPE_NUMERICFIELD, 86 52 270 16 )
+			NUMERIC( "cg_chatboxHeight", "Height of the chatbox", 5, 5, "Height:", 48 )
+			cvarTest	"cg_newChatbox"
+			hideCvar	{ "1" }
+		}
+		// new chatbox
+		itemDef { // 0.0 0.0 0.0 0.0
+			COMMON( cg_chatboxBackground, tabWindow3, ITEM_TYPE_EDITFIELD, 86 36 270 16 )
+			EDITFIELD( "cg_chatboxBackground", "'R G B A' background colour", 19, 19, "Background RGBA:", 5 )
+			cvarTest	"cg_newChatbox"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 1
+			COMMON( cg_chatboxCompletion, tabWindow3, ITEM_TYPE_YESNO, 86 52 270 16 )
+			YESNO( "cg_chatboxCompletion", "Tab completion:", "Enable tab-completion for player names", 9 )
+			cvarTest	"cg_newChatbox"
+			hideCvar	{ "0" }
+		}
+		itemDef {
+			COMMON( cg_chatboxFont, tabWindow3, ITEM_TYPE_MULTI, 86 68 270 16 )
+			MULTI_STR( "cg_chatboxFont", { "Small (default)"; "1"; "Medium"; "2"; "Large"; "3"; "Small 2"; "4"; "JA++ large"; "5"; "JA++ small"; "6"; "JA++ monospace"; "7" }, "Font to use for the chatbox", "Font:", 58 )
+			cvarTest	"cg_newChatbox"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 5
+			COMMON( cg_chatboxLineCount, tabWindow3, ITEM_TYPE_NUMERICFIELD, 86 84 270 16 )
+			NUMERIC( "cg_chatboxLineCount", "How many lines of chat to show", 5, 5, "Line Count:", 28 )
+			cvarTest	"cg_newChatbox"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 30 290
+			COMMON( cg_chatboxPos, tabWindow3, ITEM_TYPE_EDITFIELD, 86 100 270 16 )
+			EDITFIELD( "cg_chatboxPos", "'X Y' position of the chatbox'", 19, 19, "Position:", 38 )
+			cvarTest	"cg_newChatbox"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 0.65 350
+			COMMON( cg_chatboxSize, tabWindow3, ITEM_TYPE_EDITFIELD, 86 116 270 16 )
+			EDITFIELD( "cg_chatboxSize", "'FONT_SCALE WIDTH' size of the chatbox", 19, 19, "Size:", 57 )
+			cvarTest	"cg_newChatbox"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 0
+			COMMON( cg_chatboxTabs, tabWindow3, ITEM_TYPE_YESNO, 86 132 270 16 )
+			YESNO( "cg_chatboxTabs", "Use Tabs:", "Use tabbed chatbox (for PMs, teams, channels)", 38 )
+			cvarTest	"cg_newChatbox"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 1
+			COMMON( cg_chatboxTimeShow, tabWindow3, ITEM_TYPE_YESNO, 86 148 270 16 )
+			YESNO( "cg_chatboxTimeShow", "Timestamp:", "Timestamp messages in the chatbox", 34 )
+			cvarTest	"cg_newChatbox"
+			hideCvar	{ "0" }
+		}
+		itemDef {
+			COMMON( cg_chatboxTimeColour, tabWindow3, ITEM_TYPE_MULTI, 86 164 270 16 )
+			MULTI_STR( "cg_chatboxTimeColour", { "^0Black"; "0"; "^1Red"; "1"; "^2Green"; "2"; "^3Yellow"; "3"; "^4Blue"; "4"; "^5Cyan"; "5"; "^6Magenta"; "6"; "^7White"; "7"; "^8Orange"; "8"; "^9Grey"; "9" }, "Colour of the timestamp", "Timestamp Colour:", 0 )
+			cvarTest	"cg_newChatbox"
+			hideCvar	{ "0" }
+			cvarTest2	"cg_chatboxTimeShow"
+			hideCvar2	{ "0" }
+		}
+
+		// HUD: scoreboard
+		BACKGROUND_B( tabWindow3, 84 181 273 80 )
+		BACKGROUND_TITLE( tabWindow3, 131 183 180 14 )
+		TITLE_SMALL( text_w3_scoreboard, tabWindow3, 218 183 135 14, "HUD: Scoreboard" )
+		itemDef {
+			COMMON( cg_newScoreboard, tabWindow3, ITEM_TYPE_MULTI, 86 197 270 16 )
+			MULTI_STR( "cg_newScoreboard", { "Default"; "0"; "q3pro"; "1"; "JA++"; "2" }, "Scoreboard type", "Scoreboard Type:", 0 )
+		}
+		// new scoreboard
+		itemDef {
+			COMMON( cg_newScoreboardFont, tabWindow3, ITEM_TYPE_MULTI, 86 213 270 16 )
+			MULTI_STR( "cg_newScoreboardFont", { "Small (default)"; "1"; "Medium"; "2"; "Large"; "3"; "Small 2"; "4"; "JA++ large"; "5"; "JA++ small"; "6"; "JA++ monospace (default)"; "7" }, "Font to use for the new scoreboard", "Font:", 54 )
+			cvarTest	"cg_newScoreboard"
+			showCvar	{ "2" }
+		}
+		itemDef {
+			COMMON( cg_newScoreboardFontSize, tabWindow3, ITEM_TYPE_SLIDER, 86 229 270 16 )
+			SLIDER( "cg_newScoreboardFontSize" 0.33333 0.1 2.0, "Font size for the new scoreboard", "Font Size:", 29, 185 16 8 16 )
+			cvarTest	"cg_newScoreboard"
+			showCvar	{ "2" }
+		}
+		itemDef { // 1
+			COMMON( cg_newScoreboardShowKPM, tabWindow3, ITEM_TYPE_YESNO, 86 245 270 16 )
+			YESNO( "cg_newScoreboardShowKPM", "Show KPM:", "Show kills per minute on the scoreboard", 34 )
+			cvarTest	"cg_newScoreboard"
+			showCvar	{ "2" }
+		}
+		// old scoreboard
+		itemDef { // 0
+			COMMON( cg_oldScoreboardShowBots, tabWindow3, ITEM_TYPE_YESNO, 86 213 270 16 )
+			YESNO( "cg_oldScoreboardShowBots", "Show Bots:", "Show bot indicators on the scoreboard", 29 )
+			cvarTest	"cg_newScoreboard"
+			showCvar	{ "0" }
+		}
+		itemDef { // 0
+			COMMON( cg_oldScoreboardSkinIcons, tabWindow3, ITEM_TYPE_YESNO, 86 229 270 16 )
+			YESNO( "cg_oldScoreboardSkinIcons", "Skin Icons:", "Show player model/skin icons on the scoreboard", 24 )
+			cvarTest	"cg_newScoreboard"
+			showCvar	{ "0" }
+		}
+
+		// HUD: automap
+		BACKGROUND_B( tabWindow3, 84 262 273 160 )
+		BACKGROUND_TITLE( tabWindow3, 131 264 180 14 )
+		TITLE_SMALL( text_w3_automap, tabWindow3, 218 264 135 14, "HUD: Automap" )
+		itemDef { // 0
+			COMMON( r_autoMap, tabWindow3, ITEM_TYPE_YESNO, 86 278 270 16 )
+			YESNO( "r_autoMap", "Automap:", "Enable the world map", 30 )
+		}
+		itemDef { // 0
+			COMMON( r_autoMapAdjustHeight, tabWindow3, ITEM_TYPE_YESNO, 86 294 270 16 )
+			YESNO( "r_autoMapAdjustHeight", "Adjust Height:", "Height bias for the world map", 0 )
+			cvarTest	"r_autoMap"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 90.0 0.0 0.0
+			COMMON( r_autoMapAngle, tabWindow3, ITEM_TYPE_EDITFIELD, 86 310 270 16 )
+			EDITFIELD( "r_autoMapAngle", "Rotation of the world map", 19, 19, "Angle:", 39 )
+			cvarTest	"r_autoMap"
+			hideCvar	{ "0" }
+		}
+		itemDef {
+			COMMON( r_autoMapFov, tabWindow3, ITEM_TYPE_SLIDER, 86 326 270 16 )
+			SLIDER( "r_autoMapFov" 90 50 150, "Field of view for the world map", "FOV:", 49, 194 16 8 16 )
+			cvarTest	"r_autoMap"
+			hideCvar	{ "0" }
+		}
+		itemDef {
+			COMMON( r_autoMapH, tabWindow3, ITEM_TYPE_SLIDER, 86 342 270 16 )
+			SLIDER( "r_autoMapH" 128 -256 256, "Height of the world map", "Height:", 34, 194 16 8 16 )
+			cvarTest	"r_autoMap"
+			hideCvar	{ "0" }
+		}
+		itemDef {
+			COMMON( r_autoMapW, tabWindow3, ITEM_TYPE_SLIDER, 86 358 270 16 )
+			SLIDER( "r_autoMapW" 128 -256 256, "Width of the world map", "Width:", 39, 194 16 8 16 )
+			cvarTest	"r_autoMap"
+			hideCvar	{ "0" }
+		}
+		itemDef {
+			COMMON( r_autoMapX, tabWindow3, ITEM_TYPE_SLIDER, 86 374 270 16 )
+			SLIDER( "r_autoMapX" 496 -512 512, "X position of the world map", "X:", 59, 194 16 8 16 )
+			cvarTest	"r_autoMap"
+			hideCvar	{ "0" }
+		}
+		itemDef {
+			COMMON( r_autoMapY, tabWindow3, ITEM_TYPE_SLIDER, 86 390 270 16 )
+			SLIDER( "r_autoMapY" 32 -40 40, "Y position of the world map", "Y:", 59, 194 16 8 16 )
+			cvarTest	"r_autoMap"
+			hideCvar	{ "0" }
+		}
+		itemDef {
+			COMMON( r_autoMapZoom, tabWindow3, ITEM_TYPE_SLIDER, 86 406 270 16 )
+			SLIDER( "r_autoMapZoom" 768 256 1024, "Zoom factor of the world map", "Zoom:", 44, 194 16 8 16 )
+			cvarTest	"r_autoMap"
+			hideCvar	{ "0" }
+		}
+
+		// camera: view
+		BACKGROUND_B( tabWindow3, 362 4 273 96 )
+		BACKGROUND_TITLE( tabWindow3, 409 6 180 14 )
+		TITLE_SMALL( text_w3_view, tabWindow3, 495 6 135 14, "Camera: View" )
+		itemDef {
+			COMMON( cg_fakeGun, tabWindow3, ITEM_TYPE_MULTI, 364 20 270 16 )
+			MULTI_STR( "cg_fakeGun", { "Off (default)"; "0"; "Stun Baton"; "1"; "Lightsaber"; "3"; "DL-44 Pistol"; "4"; "E-11 Blaster"; "5"; "Disruptor"; "6"; "Bowcaster"; "7"; "Heavy Repeater"; "8"; "DEMP2"; "9"; "Flechette"; "10"; "Rocket Launcher"; "11"; "Thermal Detonator"; "12"; "Trip Mine"; "13"; "Det Pack"; "14"; "Concussion Rifle"; "15"; "Bryar Pistol"; "16"; "Emplaced Gun"; "17"; "Turret"; "18" }, "Pretend you're holding a gun in first-person camera", "Fake Gun:", 24 )
+		}
+		itemDef { // 0
+			COMMON( cg_instantDuck, tabWindow3, ITEM_TYPE_YESNO, 364 36 270 16 )
+			YESNO( "cg_instantDuck", "Instant Duck:", "Slide or Instantly move the camera when crouching", 4 )
+		}
+		itemDef { // 0
+			COMMON( cg_smoothCamera, tabWindow3, ITEM_TYPE_YESNO, 364 52 270 16 )
+			YESNO( "cg_smoothCamera", "Smooth Camera:", "Smoother camera motion", 0 )
+		}
+		itemDef { // 0.002 0.002 0.005 1
+			COMMON( cg_viewBob, tabWindow3, ITEM_TYPE_EDITFIELD, 364 68 270 16 )
+			EDITFIELD( "cg_viewBob", "Pitch / Yaw / Roll / Enabled", 19, 19, "View Bobbing:", 4 )
+		}
+		itemDef { // 1
+			COMMON( cg_viewShake, tabWindow3, ITEM_TYPE_YESNO, 364 84 270 16 )
+			YESNO( "cg_viewShake", "View Shake:", "Enable camera shaking effects", 14 )
+		}
+
+		// camera: field of view
+		BACKGROUND_B( tabWindow3, 362 101 273 80 )
+		BACKGROUND_TITLE( tabWindow3, 409 103 180 14 )
+		TITLE_SMALL( text_w3_fov, tabWindow3, 495 103 135 14, "Camera: Field Of View" )
+		itemDef {
+			COMMON( cg_fov, tabWindow3, ITEM_TYPE_SLIDER, 364 117 270 16 )
+			SLIDER( "cg_fov" 80 50 150, "Field of view", "FOV:", 82, 160 16 8 16 )
+		}
+		itemDef { // 0
+			COMMON( cg_fovViewmodel, tabWindow3, ITEM_TYPE_YESNO, 364 133 270 16 )
+			YESNO( "cg_fovViewmodel", "Viewmodel FOV Adjust:", "Enable first-person weapon field of view adjustment", 0 )
+		}
+		itemDef {
+			COMMON( cg_fovViewmodel, tabWindow3, ITEM_TYPE_SLIDER, 364 149 270 16 )
+			SLIDER( "cg_fovViewmodel" 1.0 1.0 180, "Field of view for first-person weapon", "Viewmodel FOV:", 34, 160 16 8 16 )
+			cvarTest	"cg_fovViewmodel"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 0
+			COMMON( cg_fovAspectAdjust, tabWindow3, ITEM_TYPE_YESNO, 364 165 270 16 )
+			YESNO( "cg_fovAspectAdjust", "Widescreen Fix:", "Fix non-4:3 (widescreen) resolutions field of view calculation", 30 )
+		}
+
+		// camera: viewmodel
+		BACKGROUND_B( tabWindow3, 362 182 273 144 )
+		BACKGROUND_TITLE( tabWindow3, 409 184 180 14 )
+		TITLE_SMALL( text_w3_viewmodel, tabWindow3, 495 184 135 14, "Camera: Viewmodel" )
+		itemDef {
+			COMMON( cg_drawGun, tabWindow3, ITEM_TYPE_MULTI, 364 198 270 16 )
+			YESNO( "cg_drawGun", "Draw Gun:", "Show the first-person weapon model", 23 )
+		}
+		itemDef { // 0 0 0
+			COMMON( cg_gunAlign, tabWindow3, ITEM_TYPE_EDITFIELD, 364 214 270 16 )
+			EDITFIELD( "cg_gunAlign", "X / Y / Z", 19, 19, "Alignment:", 18 )
+		}
+		itemDef { // 1
+			COMMON( cg_gunBobEnable, tabWindow3, ITEM_TYPE_YESNO, 364 230 270 16 )
+			YESNO( "cg_gunBobEnable", "Bobbing:", "Enable gun movement when running and jumping", 28 )
+		}
+		itemDef { // 1
+			COMMON( cg_gunIdleDriftEnable, tabWindow3, ITEM_TYPE_YESNO, 364 246 270 16 )
+			YESNO( "cg_gunIdleDriftEnable", "Idle Drift:", "Enable gun drifting", 14 )
+		}
+		itemDef { // 0
+			COMMON( cg_gunMomentumEnable, tabWindow3, ITEM_TYPE_YESNO, 364 262 270 16 )
+			YESNO( "cg_gunMomentumEnable", "Momentum Sway:", "Enable gun sway when looking around and moving", 0 )
+		}
+		itemDef {
+			COMMON( cg_gunMomentumDamp, tabWindow3, ITEM_TYPE_SLIDER, 364 278 270 16 )
+			SLIDER( "cg_gunMomentumDamp" 1.0 0.6 10.0, "Gun sway smoothing factor", "Damping:", 29, 194 16 8 16 )
+			cvarTest	"cg_gunMomentumEnable"
+			showCvar	{ "1" }
+		}
+		itemDef {
+			COMMON( cg_gunMomentumFall, tabWindow3, ITEM_TYPE_SLIDER, 364 294 270 16 )
+			SLIDER( "cg_gunMomentumFall" 0.5 0.0 1.0, "Gun sway factor when falling", "Fall:", 44, 194 16 8 16 )
+			cvarTest	"cg_gunMomentumEnable"
+			showCvar	{ "1" }
+		}
+		itemDef {
+			COMMON( cg_gunMomentumInterval, tabWindow3, ITEM_TYPE_SLIDER, 364 310 270 16 )
+			SLIDER( "cg_gunMomentumInterval" 2.5 0.0 5.0, "Gun sway fluidity", "Interval:", 25, 194 16 8 16 )
+			cvarTest	"cg_gunMomentumEnable"
+			showCvar	{ "1" }
+		}
+
+		// camera: third person
+		BACKGROUND_B( tabWindow4, 84 4 273 176 )
+		BACKGROUND_TITLE( tabWindow4, 131 6 180 14 )
+		TITLE_SMALL( text_w4_thirdperson, tabWindow4, 218 6 135 14, "Camera: Third Person" )
+		itemDef { // 0
+			COMMON( cg_thirdPerson, tabWindow4, ITEM_TYPE_YESNO, 86 20 270 16 )
+			YESNO( "cg_thirdPerson", "3rd Person:", "Enable third person camera", 34 )
+		}
+		itemDef {
+			COMMON( cg_thirdPersonAlpha, tabWindow4, ITEM_TYPE_SLIDER, 86 36 270 16 )
+			SLIDER( "cg_thirdPersonAlpha" 1.0 0.0 1.0, "Transparency of your character when in third person camera", "Alpha:", 58, 175 16 8 16 )
+			cvarTest	"cg_thirdPerson"
+			showCvar	{ "1" }
+		}
+		itemDef {
+			COMMON( cg_thirdPersonAngle, tabWindow4, ITEM_TYPE_SLIDER, 86 52 270 16 )
+			SLIDER( "cg_thirdPersonAngle" 0 -180 180, "Angle of the third person camera", "Angle:", 58, 175 16 8 16 )
+			cvarTest	"cg_thirdPerson"
+			showCvar	{ "1" }
+		}
+		itemDef {
+			COMMON( cg_thirdPersonCameraDamp, tabWindow4, ITEM_TYPE_SLIDER, 86 68 270 16 )
+			SLIDER( "cg_thirdPersonCameraDamp" 0.3 0.0 1.0, "Smoothing factor of the third person camera", "Camera Damping:", 14, 175 16 8 16 )
+			cvarTest	"cg_thirdPerson"
+			showCvar	{ "1" }
+		}
+		itemDef {
+			COMMON( cg_thirdPersonHorzOffset, tabWindow4, ITEM_TYPE_SLIDER, 86 84 270 16 )
+			SLIDER( "cg_thirdPersonHorzOffset" 0 -32 32, "Horizontal offset of the third person camera", "Horizontal Offset:", 0, 175 16 8 16 )
+			cvarTest	"cg_thirdPerson"
+			showCvar	{ "1" }
+		}
+		itemDef {
+			COMMON( cg_thirdPersonPitchOffset, tabWindow4, ITEM_TYPE_SLIDER, 86 100 270 16 )
+			SLIDER( "cg_thirdPersonPitchOffset" 0 -24 48, "Vertical offset (height) of the third person following camera", "Pitch Offset:", 24, 175 16 8 16 )
+			cvarTest	"cg_thirdPerson"
+			showCvar	{ "1" }
+		}
+		itemDef {
+			COMMON( cg_thirdPersonRange, tabWindow4, ITEM_TYPE_SLIDER, 86 116 270 16 )
+			SLIDER( "cg_thirdPersonRange" 80 40 120, "Range of the third person camera", "Range:", 58, 175 16 8 16 )
+			cvarTest	"cg_thirdPerson"
+			showCvar	{ "1" }
+		}
+		itemDef { // 0
+			COMMON( cg_thirdPersonSpecialCam, tabWindow4, ITEM_TYPE_YESNO, 86 132 270 16 )
+			YESNO( "cg_thirdPersonSpecialCam", "Special Cam:", "Use special third person camera for special events", 29 )
+			cvarTest	"cg_thirdPerson"
+			showCvar	{ "1" }
+		}
+		itemDef {
+			COMMON( cg_thirdPersonTargetDamp, tabWindow4, ITEM_TYPE_SLIDER, 86 148 270 16 )
+			SLIDER( "cg_thirdPersonTargetDamp" 0.5 0. 1.0, "Snappiness of the third person following camera", "Target Damping:", 14, 175 16 8 16 )
+			cvarTest	"cg_thirdPerson"
+			showCvar	{ "1" }
+		}
+		itemDef {
+			COMMON( cg_thirdPersonVertOffset, tabWindow4, ITEM_TYPE_SLIDER, 86 164 270 16 )
+			SLIDER( "cg_thirdPersonVertOffset" 16 -24 48, "Vertical offset (height) of the third person following camera", "Vertical Offset:", 9, 175 16 8 16 )
+			cvarTest	"cg_thirdPerson"
+			showCvar	{ "1" }
+		}
+
+		// advanced
+		BACKGROUND_B( tabWindow4, 84 181 273 176 )
+		BACKGROUND_TITLE( tabWindow4, 131 183 180 14 )
+		TITLE_SMALL( text_w4_misc, tabWindow4, 218 183 135 14, "Advanced" )
+		itemDef { // 0
+			COMMON( cg_autoRecordDemo, tabWindow4, ITEM_TYPE_YESNO, 86 197 270 16 )
+			YESNO( "cg_autoRecordDemo", "Autorecord Demos:", "Automatically record demos of matches", 10 )
+		}
+		itemDef { // 1
+			COMMON( cg_autoSwitch, tabWindow4, ITEM_TYPE_YESNO, 86 213 270 16 )
+			YESNO( "cg_autoSwitch", "Auto Switch Weapon:", "Automaticlly switch weapon on pickup", 0 )
+		}
+		itemDef { // 0
+			COMMON( cg_debugEvents, tabWindow4, ITEM_TYPE_YESNO, 86 229 270 16 )
+			YESNO( "cg_debugEvents", "Debug Events:", "Debug entity events", 30 )
+		}
+		itemDef { // 1
+			COMMON( cg_deferPlayers, tabWindow4, ITEM_TYPE_YESNO, 86 245 270 16 )
+			YESNO( "cg_deferPlayers", "Defer Players:", "Delay loading new player info (models) during combat. Press TAB to request updates.", 25 )
+		}
+		itemDef { // 1
+			COMMON( cg_jplua, tabWindow4, ITEM_TYPE_YESNO, 86 261 270 16 )
+			YESNO( "cg_jplua", "JPLua Plugins:", "Enable JA++ Lua scripting", 25 )
+		}
+		itemDef { // 1
+			COMMON( cg_jpluaAutoload, tabWindow4, ITEM_TYPE_EDITFIELD, 86 277 270 16 )
+			EDITFIELD( "cg_jpluaAutoload", "List of plugins to automatically load (0 or empty = disabled, 1 = all)", 36, 36, "JPLua Autoload:", 20 )
+		}
+		itemDef { // 1
+			COMMON( cg_logChat, tabWindow4, ITEM_TYPE_YESNO, 86 293 270 16 )
+			YESNO( "cg_logChat", "Chat Logging:", "Log chat to disk", 30 )
+		}
+//cp_pluginDisable	"0"		???
+		itemDef { // 0
+			COMMON( cg_teamChatsOnly, tabWindow4, ITEM_TYPE_YESNO, 86 309 270 16 )
+			YESNO( "cg_teamChatsOnly", "Team Chats Only:", "Only show chat messages from teammates", 15 )
+		}
+		itemDef { // 0
+			COMMON( developer, tabWindow4, ITEM_TYPE_YESNO, 86 325 270 16 )
+			YESNO( "developer", "Developer Mode:", "Enable developer/debug logging and features", 20 )
+		}
+
+		// feature: trueview
+		BACKGROUND_B( tabWindow4, 362 4 273 160 )
+		BACKGROUND_TITLE( tabWindow4, 409 6 180 14 )
+		TITLE_SMALL( text_w4_trueview, tabWindow4, 495 6 135 14, "Camera: True View" )
+		itemDef {
+			COMMON( cg_trueEyePosition, tabWindow4, ITEM_TYPE_SLIDER, 364 20 270 16 )
+			SLIDER( "cg_trueEyePosition" -2.0 -4.0 4.0, "Eye position for True View", "Eye Pos:", 24, 199 16 8 16 )
+		}
+		itemDef { // 0
+			COMMON( cg_trueFlip, tabWindow4, ITEM_TYPE_YESNO, 364 36 270 16 )
+			YESNO( "cg_trueFlip", "Flip:", "Enable eye-tracking for flipping animations", 39 )
+		}
+		itemDef {
+			COMMON( cg_trueFOV, tabWindow4, ITEM_TYPE_SLIDER, 364 52 270 16 )
+			SLIDER( "cg_trueFOV" 110 60 130, "Field of view for True View", "FOV:", 44, 199 16 8 16 )
+		}
+		itemDef { // 0
+			COMMON( cg_trueGuns, tabWindow4, ITEM_TYPE_YESNO, 364 68 270 16 )
+			YESNO( "cg_trueGuns", "Guns:", "Enable True View for weapons", 39 )
+		}
+		itemDef { // 1
+			COMMON( cg_trueInvertSaber, tabWindow4, ITEM_TYPE_YESNO, 364 84 270 16 )
+			YESNO( "cg_trueInvertSaber", "Invert Saber:", "Invert True View setting when using a lightsaber/melee", 0 )
+		}
+		itemDef { // 1
+			COMMON( cg_trueMoveRoll, tabWindow4, ITEM_TYPE_YESNO, 364 100 270 16 )
+			YESNO( "cg_trueMoveRoll", "Move Roll:", "Enable Z/Roll axis rotation for True View", 15 )
+		}
+		itemDef { // 1
+			COMMON( cg_trueRoll, tabWindow4, ITEM_TYPE_YESNO, 364 116 270 16 )
+			YESNO( "cg_trueRoll", "Roll:", "Enable eye-tracking for rolling animations", 39 )
+		}
+		itemDef { // 0
+			COMMON( cg_trueSaberOnly, tabWindow4, ITEM_TYPE_YESNO, 364 132 270 16 )
+			YESNO( "cg_trueSaberOnly", "Saber Only:", "Only use True View for lightsaber", 10 )
+		}
+		itemDef { // 1
+			COMMON( cg_trueSpin, tabWindow4, ITEM_TYPE_YESNO, 364 148 270 16 )
+			YESNO( "cg_trueSpin", "Spin:", "Enable eye-tracking for spinning animations", 40 )
+		}
+
+		// advanced: networking
+		BACKGROUND_B( tabWindow4, 362 165 273 80 )
+		BACKGROUND_TITLE( tabWindow4, 409 167 180 14 )
+		TITLE_SMALL( text_w4_trueview, tabWindow4, 495 167 135 14, "Advanced: Networking" )
+		itemDef { // 63
+			COMMON( cl_maxPackets, tabWindow4, ITEM_TYPE_NUMERICFIELD, 364 181 270 16 )
+			NUMERIC( "cl_maxPackets", "aka \"cl_maxpackets\"", 5, 5, "Outbound PPS:", 4 )
+		}
+		itemDef { // 25000
+			COMMON( rate, tabWindow4, ITEM_TYPE_NUMERICFIELD, 364 197 270 16 )
+			NUMERIC( "rate", "Rate limit overall networked bits per second", 5, 5, "Rate (bps):", 14 )
+		}
+		itemDef { // 40
+			COMMON( snaps, tabWindow4, ITEM_TYPE_NUMERICFIELD, 364 213 270 16 )
+			NUMERIC( "snaps", "How many snapshots per second to request from server (limited by server's framerate)", 5, 5, "Snapshots/sec:", 0 )
+		}
+		itemDef {
+			COMMON( cl_timeNudge, tabWindow4, ITEM_TYPE_SLIDER, 364 229 270 16 )
+			SLIDER( "cl_timeNudge" 0 -50 50, "Adjust interpolation/extrapolation of snapshot processing and prediction", "Time Nudge:", 15, 194 16 8 16 )
+		}
+
+		// video: performance
+		BACKGROUND_B( tabWindow4, 362 246 273 80 )
+		BACKGROUND_TITLE( tabWindow4, 409 248 180 14 )
+		TITLE_SMALL( text_w4_trueview, tabWindow4, 495 248 135 14, "Video: Performance" )
+		itemDef { // 0
+			COMMON( com_affinity, tabWindow4, ITEM_TYPE_NUMERICFIELD, 364 262 270 16 )
+			NUMERIC( "com_affinity", "Lock JA's process to a certain CPU/core", 5, 5, "CPU Affinity:", 33 )
+		}
+		itemDef { // 125
+			COMMON( com_maxFPS, tabWindow4, ITEM_TYPE_NUMERICFIELD, 364 278 270 16 )
+			NUMERIC( "com_maxFPS", "Maximum framerate", 5, 5, "Max FPS:", 58 )
+		}
+		itemDef { // 0
+			COMMON( com_maxFPSUnfocused, tabWindow4, ITEM_TYPE_NUMERICFIELD, 364 294 270 16 )
+			NUMERIC( "com_maxFPSUnfocused", "Maximum framerate when window is not focused", 5, 5, "Max FPS (unfocused):", 0 )
+		}
+		itemDef { // 50
+			COMMON( com_maxFPSMinimized, tabWindow4, ITEM_TYPE_NUMERICFIELD, 364 310 270 16 )
+			NUMERIC( "com_maxFPSMinimized", "Maximum framerate when window is minimized", 5, 5, "Max FPS (minimized):", 0 )
+		}
+
+		// video: window
+		BACKGROUND_B( tabWindow5, 84 4 273 112 )
+		BACKGROUND_TITLE( tabWindow5, 131 6 180 14 )
+		TITLE_SMALL( text_w5_window, tabWindow5, 218 6 135 14, "Video: Window" )
+		itemDef { // 0
+			COMMON( r_fullscreen, tabWindow5, ITEM_TYPE_YESNO, 86 20 270 16 )
+			YESNO( "r_fullscreen", "Fullscreen:", "Enable fullscreen", 14 )
+		}
+		itemDef {
+			COMMON( r_mode, tabWindow5, ITEM_TYPE_MULTI, 86 36 270 16 )
+			MULTI_STR( "r_mode", { "Native"; "-2"; "Custom"; "-1"; "320x240"; "0"; "400x300"; "1"; "512x384"; "2"; "640x480"; "3"; "800x600 (default)"; "4"; "960x720"; "5"; "1024x768"; "6"; "1152x864"; "7"; "1280x1024"; "8"; "1600x1200"; "9"; "2048x1536"; "10"; "856x480 (wide)"; "11"; "2400x600(surround)"; "12" }, "Window Resolution", "Preset:", 34 )
+		}
+		itemDef { // 1600
+			COMMON( r_customWidth, tabWindow5, ITEM_TYPE_NUMERICFIELD, 86 52 270 16 )
+			NUMERIC( "r_customWidth", "Custom resolution width", 5, 5, "Custom Width:", 5 )
+		}
+		itemDef { // 1024
+			COMMON( r_customHeight, tabWindow5, ITEM_TYPE_NUMERICFIELD, 86 68 270 16 )
+			NUMERIC( "r_customHeight", "Custom resolution height", 5, 5, "Custom Height:", 0 )
+		}
+		itemDef { // 0
+			COMMON( r_swapInterval, tabWindow5, ITEM_TYPE_YESNO, 86 84 270 16 )
+			YESNO( "r_swapInterval", "V/Sync:", "Enable vertical sync (lock framerate to monitor refresh rate and wait for vertical blank)", 34 )
+		}
+		itemDef { // 1
+			COMMON( r_centerWindow, tabWindow5, ITEM_TYPE_YESNO, 86 100 270 16 )
+			YESNO( "r_centerWindow", "Center Window:", "Position the window in the center of the monitor", 0 )
+		}
+
+		// video: graphics
+		BACKGROUND_B( tabWindow5, 84 117 273 160 )
+		BACKGROUND_TITLE( tabWindow5, 131 119 180 14 )
+		TITLE_SMALL( text_w5_graphics, tabWindow5, 218 119 135 14, "Video: Graphics" )
+		itemDef { // 0
+			COMMON( r_aspectCorrectFonts, tabWindow5, ITEM_TYPE_YESNO, 86 133 270 16 )
+			YESNO( "r_aspectCorrectFonts", "Aspect Correct Fonts:", "Fix non-4:3 (widescreen) resolutions font size/position calculation", 0 )
+		}
+		itemDef { // 1
+			COMMON( r_inGameVideo, tabWindow5, ITEM_TYPE_YESNO, 86 149 270 16 )
+			YESNO( "r_inGameVideo", "Ingame Video:", "Enable ROQ videos", 39 )
+		}
+		itemDef { // 0
+			COMMON( r_DynamicGlow, tabWindow5, ITEM_TYPE_YESNO, 86 165 270 16 )
+			YESNO( "r_DynamicGlow", "Dynamic Glow:", "Enable dynamic glow", 39 )
+		}
+		itemDef { // 4
+			COMMON( r_DynamicGlowPasses, tabWindow5, ITEM_TYPE_NUMERICFIELD, 86 181 270 16 )
+			NUMERIC( "r_DynamicGlowPasses", "How many times to apply dynamic glow", 5, 5, "Glow Passes:", 44 )
+			cvarTest	"r_DynamicGlow"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 0
+			COMMON( r_DynamicGlowSoft, tabWindow5, ITEM_TYPE_YESNO, 86 197 270 16 )
+			YESNO( "r_DynamicGlowSoft", "Glow Soft:", "Use a softer method of blurring", 54 )
+			cvarTest	"r_DynamicGlow"
+			hideCvar	{ "0" }
+		}
+		itemDef {
+			COMMON( r_DynamicGlowIntensity, tabWindow5, ITEM_TYPE_SLIDER, 86 213 270 16 )
+			SLIDER( "r_DynamicGlowIntensity" 1.13 0.1 3.0, "Intensity of dynamic glow", "Glow Intensity:", 30, 159 16 8 16 )
+			cvarTest	"r_DynamicGlow"
+			hideCvar	{ "0" }
+		}
+		itemDef {
+			COMMON( r_DynamicGlowDelta, tabWindow5, ITEM_TYPE_SLIDER, 86 229 270 16 )
+			SLIDER( "r_DynamicGlowDelta" 0.8 0.1 3.0, "Distance between dynamic glow passes", "Glow Delta:", 50, 159 16 8 16 )
+			cvarTest	"r_DynamicGlow"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 512
+			COMMON( r_DynamicGlowWidth, tabWindow5, ITEM_TYPE_NUMERICFIELD, 86 245 270 16 )
+			NUMERIC( "r_DynamicGlowWidth", "Width of the blur texture for dynamic glow", 5, 5, "Glow Width:", 50 )
+			cvarTest	"r_DynamicGlow"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 512
+			COMMON( r_DynamicGlowHeight, tabWindow5, ITEM_TYPE_NUMERICFIELD, 86 261 270 16 )
+			NUMERIC( "r_DynamicGlowHeight", "Height of the blur texture for dynamic glow", 5, 5, "Glow Height:", 45 )
+			cvarTest	"r_DynamicGlow"
+			hideCvar	{ "0" }
+		}
+
+		// video: advanced
+		BACKGROUND_B( tabWindow5, 84 278 273 96 )
+		BACKGROUND_TITLE( tabWindow5, 131 280 180 14 )
+		TITLE_SMALL( text_w5_vidadvanced, tabWindow5, 218 280 135 14, "Video: Advanced" )
+		itemDef { // 0
+			COMMON( r_gammaShaders, tabWindow5, ITEM_TYPE_YESNO, 86 294 270 16 )
+			YESNO( "r_gammaShaders", "Gamma Shaders:", "Adjust gamma by using ARB shaders or device gamma ramp", 23 )
+		}
+		itemDef { // 0
+			COMMON( r_ext_compress_textures, tabWindow5, ITEM_TYPE_YESNO, 86 310 270 16 )
+			YESNO( "r_ext_compress_textures", "Compress Textures:", "Compress textures on GPU", 4 )
+		}
+		itemDef { // 0
+			COMMON( r_ext_compress_lightmaps, tabWindow5, ITEM_TYPE_YESNO, 86 326 270 16 )
+			YESNO( "r_ext_compress_lightmaps", "Compress Lightmaps:", "Compress lightmaps on GPU", 0 )
+		}
+		itemDef { // 0
+			COMMON( r_lightmap, tabWindow5, ITEM_TYPE_YESNO, 86 342 270 16 )
+			YESNO( "r_lightmap", "Show Lightmap:", "Requires \"sv_cheats 1\"", 24 )
+		}
+		itemDef {
+			COMMON( r_znear, tabWindow5, ITEM_TYPE_SLIDER, 86 358 270 16 )
+			SLIDER( "r_znear" 4 1 20, "Distance of the near clipping plane", "Near Clip Plane:", 15, 169 16 8 16 )
+		}
+
+		// world
+		BACKGROUND_B( tabWindow5, 362 4 273 144 )
+		BACKGROUND_TITLE( tabWindow5, 409 6 180 14 )
+		TITLE_SMALL( text_w5_world, tabWindow5, 495 6 135 14, "Video: World" )
+		itemDef { // 0
+			COMMON( r_dynamicLight, tabWindow5, ITEM_TYPE_YESNO, 364 20 270 16 )
+			YESNO( "r_dynamicLight", "Dynamic Lighting:", "Enable dynamic lights", 25 )
+		}
+		itemDef {
+			COMMON( r_picmip, tabWindow5, ITEM_TYPE_MULTI, 364 36 270 16 )
+			MULTI_STR( "r_picmip", { "Highest"; "0"; "Toaster"; "2"; "Lego"; "4"; "Potato"; "9"; "Brick"; "15" }, "Scale texture resolution to save memory", "Texture Resolution:", 15 )
+		}
+		itemDef {
+			COMMON( r_textureMode, tabWindow5, ITEM_TYPE_MULTI, 364 52 270 16 )
+			MULTI_STR( "r_textureMode", { "Nearest"; "GL_NEAREST"; "Linear"; "GL_LINEAR"; "Nearest (mip1)"; "GL_NEAREST_MIPMAP_NEAREST"; "Bilinear"; "GL_LINEAR_MIPMAP_NEAREST"; "Nearest (mip2)"; "GL_NEAREST_MIPMAP_LINEAR"; "Trilinear"; "GL_LINEAR_MIPMAP_LINEAR"; }, "Texture filtering method", "Texture Filtering:", 20 )
+		}
+		itemDef { // 0
+			COMMON( r_ext_texture_filter_anisotropic, tabWindow5, ITEM_TYPE_YESNO, 364 68 270 16 )
+			YESNO( "r_ext_texture_filter_anisotropic", "Anisotropic Filtering:", "Enable anisotropic texture filtering", 0 )
+		}
+		itemDef {
+			COMMON( r_ext_texture_filter_anisotropic, tabWindow5, ITEM_TYPE_SLIDER, 364 84 270 16 )
+			SLIDER( "r_ext_texture_filter_anisotropic" 8 1.0 16.0, "Anisotropic filtering amount", "Amount:", 73, 155 16 8 16 )
+			cvarTest	"r_ext_texture_filter_anisotropic"
+			hideCvar	{ "0" }
+		}
+		itemDef { // 0
+			COMMON( r_environmentMapping, tabWindow5, ITEM_TYPE_YESNO, 364 100 270 16 )
+			YESNO( "r_environmentMapping", "Environment Mapping:", "Enable envmaps (pseudo reflection/shine)", 10 )
+		}
+		itemDef { // 1
+			COMMON( r_mapOverbrightBits, tabWindow5, ITEM_TYPE_NUMERICFIELD, 364 116 270 16 )
+			NUMERIC( "r_mapOverbrightBits", "Brightness of map textures", 5, 5, "Map Overbright Bits:", 10 )
+		}
+		itemDef { // 0
+			COMMON( r_vertexLight, tabWindow5, ITEM_TYPE_YESNO, 364 132 270 16 )
+			YESNO( "r_vertexLight", "Vertex Lighting:", "Enable vertex-based lighting (disables lightmaps)", 30 )
+		}
+
+		// video: performance
+		BACKGROUND_B( tabWindow5, 362 149 273 144 )
+		BACKGROUND_TITLE( tabWindow5, 409 151 180 14 )
+		TITLE_SMALL( text_w5_performance, tabWindow5, 495 151 135 14, "Video: Performance" )
+		itemDef {
+			COMMON( r_lodBias, tabWindow5, ITEM_TYPE_MULTI, 364 165 270 16 )
+			MULTI_STR( "r_lodBias", { "High"; "0"; "Medium"; "1"; "Low"; "2" }, "Level of detail in models", "Model Quality:", 10 )
+		}
+		itemDef {
+			COMMON( r_subdivisions, tabWindow5, ITEM_TYPE_MULTI, 364 181 270 16 )
+			MULTI_STR( "r_subdivisions", { "Highest"; "0"; "Very High"; "1"; "High"; "2"; "Medium"; "4"; "Low"; "10"; "Very Low"; "20"; "Potato"; "80" }, "Quality of smooth surfaces in the world", "World Quality:", 10 )
+		}
+		itemDef { // 1
+			COMMON( r_detailTextures, tabWindow5, ITEM_TYPE_YESNO, 364 197 270 16 )
+			YESNO( "r_detailTextures", "Detail Textures:", "Disable 'extra' cosmetic textures and effects", 0 )
+		}
+		itemDef { // 1
+			COMMON( r_flares, tabWindow5, ITEM_TYPE_YESNO, 364 213 270 16 )
+			YESNO( "r_flares", "Flares:", "Enable sprite-based flares on light sources", 44 )
+		}
+		itemDef { // 0
+			COMMON( r_fastSky, tabWindow5, ITEM_TYPE_YESNO, 364 229 270 16 )
+			YESNO( "r_fastSky", "Disable Skybox:", "Disable skybox", 5 )
+		}
+		itemDef { // 1
+			COMMON( r_surfaceSprites, tabWindow5, ITEM_TYPE_YESNO, 364 245 270 16 )
+			YESNO( "r_surfaceSprites", "Surface Sprites:", "Enable surface sprites for world effects (grass etc)", 0 )
+		}
+		itemDef { // 100
+			COMMON( r_markCount, tabWindow5, ITEM_TYPE_NUMERICFIELD, 364 261 270 16 )
+			NUMERIC( "r_markCount", "How many decals to draw on world surfaces", 5, 5, "Mark Count:", 24 )
+		}
+		itemDef { // 2
+			COMMON( r_drawFog, tabWindow5, ITEM_TYPE_YESNO, 364 277 270 16 )
+			YESNO( "r_drawFog", "Draw Fog:", "Requires \"sv_cheats 1\"", 34 )
+		}
+
+		// input: mouse
+		BACKGROUND_B( tabWindow5, 362 294 273 128 )
+		BACKGROUND_TITLE( tabWindow5, 409 296 180 14 )
+		TITLE_SMALL( text_w5_sound, tabWindow5, 495 296 135 14, "Input: Mouse" )
+		itemDef {
+			COMMON( in_mouse, tabWindow5, ITEM_TYPE_MULTI, 364 310 270 16 )
+			MULTI_STR( "in_mouse", { "Disabled"; "0"; "Raw Input"; "1"; "OS Fallback"; "2" }, "Mouse input method", "Mouse Input:", 34 )
+		}
+		itemDef { // 5
+			COMMON( sensitivity, tabWindow5, ITEM_TYPE_NUMERICFIELD, 364 326 270 16 )
+			NUMERIC( "sensitivity", "Sensitivity of mouse movement", 5, 5, "Mouse Sensitivity:", 5 )
+		}
+		itemDef { // 0.022
+			COMMON( m_pitch, tabWindow5, ITEM_TYPE_NUMERICFIELD, 364 342 270 16 )
+			NUMERIC( "m_pitch", "Vertical mouse sensitivity multiplier", 5, 5, "Mouse Y Multiplier:", 0 )
+		}
+		itemDef { // 0.022
+			COMMON( m_yaw, tabWindow5, ITEM_TYPE_NUMERICFIELD, 364 358 270 16 )
+			NUMERIC( "m_yaw", "Horizontal mouse sensitivity multiplier", 5, 5, "Mouse X Multiplier:", 0 )
+		}
+		itemDef { // 0
+			COMMON( m_filter, tabWindow5, ITEM_TYPE_YESNO, 364 374 270 16 )
+			YESNO( "m_filter", "Mouse Smoothing:", "Smooth mouse input across multiple frames", 15 )
+		}
+		itemDef { // 0
+			COMMON( cl_mouseAccel, tabWindow5, ITEM_TYPE_YESNO, 364 390 270 16 )
+			YESNO( "cl_mouseAccel", "Mouse Acceleration:", "Enable mouse acceleration", 0 )
+		}
+		itemDef {
+			COMMON( cl_mouseAccel, tabWindow5, ITEM_TYPE_SLIDER, 364 406 270 16 )
+			SLIDER( "cl_mouseAccel" 0.02 0.0001 0.25, "Mouse acceleration factor", "Acceleration Amount:", 0, 169 16 8 16 )
+		}
+		/*
+		itemDef {
+			COMMON( in_mouse, tabWindow5, ITEM_TYPE_MULTI, 364 422 270 16 )
+			MULTI_STR( "in_mouse", { "Default"; "0"; "QuakeLive"; "1" }, "Description", "Mouse Input:", 34 )
+		}
+		*/
+
+		// sound
+		BACKGROUND_B( tabWindow6, 84 4 273 144 )
+		BACKGROUND_TITLE( tabWindow6, 131 6 180 14 )
+		TITLE_SMALL( text_w6_sound, tabWindow6, 218 6 135 14, "Sound" )
+		itemDef {
+			COMMON( s_khz, tabWindow6, ITEM_TYPE_MULTI, 86 20 270 16 )
+			MULTI_STR( "s_khz", { "Low"; "11"; "Medium"; "22"; "High"; "44" }, "Sound quality in KHz", "Quality:", 24 )
+		}
+		itemDef {
+			COMMON( s_mixAhead, tabWindow6, ITEM_TYPE_SLIDER, 86 36 270 16 )
+			SLIDER( "s_mixAhead" 0.2 0.0001 0.9999, "Sound buffer size", "Mix Ahead:", 15, 199 16 8 16 )
+		}
+		itemDef {
+			COMMON( s_mixPreStep, tabWindow6, ITEM_TYPE_SLIDER, 86 52 270 16 )
+			SLIDER( "s_mixPreStep" 0.05 0.0001 0.5, "Sound buffer cursor", "Mix Pre Step:", 0, 199 16 8 16 )
+		}
+		itemDef {
+			COMMON( s_musicVolume, tabWindow6, ITEM_TYPE_SLIDER, 86 68 270 16 )
+			SLIDER( "s_musicVolume" 0.25 0.0 1.0, "Volume of background music", "Music Volume:", 0, 199 16 8 16 )
+		}
+		itemDef {
+			COMMON( s_volume, tabWindow6, ITEM_TYPE_SLIDER, 86 84 84 16 )
+			SLIDER( "s_volume" 0.5 0.0 1.0, "Master volume control", "Volume:", 29, 199 16 8 16 )
+		}
+		itemDef {
+			COMMON( s_volumeVoice, tabWindow6, ITEM_TYPE_SLIDER, 86 100 270 16 )
+			SLIDER( "s_volumeVoice" 1.0 0.0 1.0, "Volume of character voices", "Voice Volume:", 0, 199 16 8 16 )
+		}
+		itemDef { // 44100
+			COMMON( s_sdlSpeed, tabWindow6, ITEM_TYPE_NUMERICFIELD, 86 116 270 16 )
+			NUMERIC( "s_sdlSpeed", "Sound driver sample rate (in Hz)", 5, 5, "Sample Rate:", 5 )
+		}
+		itemDef {
+			COMMON( s_separation, tabWindow6, ITEM_TYPE_SLIDER, 86 132 270 16 )
+			SLIDER( "s_separation" 0.5 0.0 1.0, "Stereo sound separation", "Separation:", 10, 199 16 8 16 )
+		}
+
+		/*
+		// master server
+		BACKGROUND_B( tabWindow5, 362 4 273 144 )
+		TITLE_SMALL( text_w5_sound, tabWindow5, 495 6 135 14, "Video: World" )
+		itemDef { // masterjk3.ravensoft.com
+			COMMON( sv_master1, tabWindow4, ITEM_TYPE_EDITFIELD, 86 277 270 16 )
+			EDITFIELD( "sv_master1", "Description", 36, 36, "Master Server 1:", 0 )
+		}
+		itemDef { // master.jkhub.org
+			COMMON( sv_master2, tabWindow5, ITEM_TYPE_EDITFIELD, 86 277 270 16 )
+			EDITFIELD( "sv_master2", "Description", 36, 36, "Master Server 2:", 0 )
+		}
+		itemDef { // ""
+			COMMON( sv_master3, tabWindow5, ITEM_TYPE_EDITFIELD, 86 277 270 16 )
+			EDITFIELD( "sv_master3", "Description", 36, 36, "Master Server 3:", 0 )
+		}
+		*/
+
+		/* unused type templates
+		itemDef {
+			COMMON( cg_autoswitch, tabWindow1, ITEM_TYPE_MULTI, 358 8 270 16 )
+			MULTI_FL( "cg_autoswitch", { "Never" 0; "Safe weapons only" 1; "Always switch" 2 }, "Automatically switch weapons when you pick them up", "Auto switch:", 0 )
+		}
+		itemDef {
+			COMMON( button_sndRestart, tabWindow1, ITEM_TYPE_BUTTON, 86 8 270 16 )
+			BUTTON( "Reload the sound system to apply changes", @MENUS_APPLY_CHANGES, 0 )
+			action {
+				exec "snd_restart";
+				play "sound/interface/button1"
 			}
 		}
-
-		itemDef
-		{//Visuals
-			name				tabButtonVisuals
-			group				setup_submenu
-			text				"Visuals"
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			rect				8 32 88 16
-			font				7
-			textscale			0.5
-			textalignx			36
-			textaligny			-4
-			textstyle			3
-			forecolor			.682 .682 1 1
-			border				0
-			bordercolor			1 1 1 1
-			visible				1
-			descText			"Configure visual settings"
-			mouseEnter			{ setitemrect highlight 0 32 96 16 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{ 
-				play			"sound/interface/button1"
-				defer			VideoSetup	videowarningMenu
-
-				show 			tabWindowVisuals
-				hide			tabWindowGameplay
-				hide			tabWindowViewCamera
-				hide			tabWindowHUD2D
-				hide			tabWindowEffects
-				hide			tabWindowRenderer
-				hide			tabWindowPostprocess
-				hide			tabWindowNetPerf
-				hide			tabWindowSound
-				hide			applyChanges
-				hide			applyPPChanges
-				hide			applySoundChanges
-				hide			vidrestart
-
-				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
-				setitemcolor	tabButtonVisuals	forecolor	1 0.2 0 1
-			}
-		}
-
-		itemDef
-		{//View + Camera
-			name				tabButtonViewCamera
-			group				setup_submenu
-			text				"View/Camera"
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			rect				8 56 88 16
-			font				7
-			textscale			0.5
-			textalignx			7
-			textaligny			-4
-			textstyle			3
-			forecolor			.682 .682 1 1
-			border				0
-			bordercolor			1 1 1 1
-			visible				1
-			descText			"Configure camera settings"
-			mouseEnter			{ setitemrect highlight 0 56 96 16 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{ 
-				play			"sound/interface/button1"
-				defer			VideoSetup	videowarningMenu
-
-				show 			tabWindowViewCamera
-				hide			tabWindowGameplay
-				hide			tabWindowVisuals
-				hide			tabWindowHUD2D
-				hide			tabWindowEffects
-				hide			tabWindowRenderer
-				hide			tabWindowPostprocess
-				hide			tabWindowNetPerf
-				hide			tabWindowSound
-				hide			applyChanges
-				hide			applyPPChanges
-				hide			applySoundChanges
-				hide			vidrestart
-
-				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
-				setitemcolor	tabButtonViewCamera	forecolor	1 0.2 0 1
-			}
-		}
-
-		itemDef
-		{//HUD + 2D
-			name				tabButtonHUD2D
-			group				setup_submenu
-			text				"HUD/2D"
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			rect				8 80 88 16
-			font				7
-			textscale			0.5
-			textalignx			42
-			textaligny			-4
-			textstyle			3
-			forecolor			.682 .682 1 1
-			border				0
-			bordercolor			1 1 1 1
-			visible				1
-			descText			"Configure HUD settings"
-			mouseEnter			{ setitemrect highlight 0 80 96 16 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{ 
-				play			"sound/interface/button1"
-				defer			VideoSetup	videowarningMenu
-
-				show 			tabWindowHUD2D
-				hide			tabWindowGameplay
-				hide			tabWindowVisuals
-				hide			tabWindowViewCamera
-				hide			tabWindowEffects
-				hide			tabWindowRenderer
-				hide			tabWindowPostprocess
-				hide			tabWindowNetPerf
-				hide			tabWindowSound
-				hide			applyChanges
-				hide			applyPPChanges
-				hide			applySoundChanges
-				hide			vidrestart
-
-				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
-				setitemcolor	tabButtonHUD2D		forecolor	1 0.2 0 1
-			}
-		}
-
-		itemDef
-		{//Effects
-			name				tabButtonEffects
-			group				setup_submenu
-			text				"Effects"
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			rect				8 104 88 16
-			font				7
-			textscale			0.5
-			textalignx			36
-			textaligny			-4
-			textstyle			3
-			forecolor			.682 .682 1 1
-			border				0
-			bordercolor			1 1 1 1
-			visible				1
-			descText			"Configure special effects settings"
-			mouseEnter			{ setitemrect highlight 0 104 96 16 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{ 
-				play			"sound/interface/button1"
-				defer			VideoSetup	videowarningMenu
-
-				show 			tabWindowEffects
-				hide			tabWindowGameplay
-				hide			tabWindowVisuals
-				hide			tabWindowViewCamera
-				hide			tabWindowHUD2D
-				hide			tabWindowRenderer
-				hide			tabWindowPostprocess
-				hide			tabWindowNetPerf
-				hide			tabWindowSound
-				hide			applyChanges
-				hide			applyPPChanges
-				hide			applySoundChanges
-				hide			vidrestart
-
-
-				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
-				setitemcolor	tabButtonEffects	forecolor	1 0.2 0 1
-			}
-		}
-
-		itemDef
-		{//Renderer
-			name				tabButtonRenderer
-			group				setup_submenu
-			text				"Renderer"
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			rect				8 128 88 16
-			font				7
-			textscale			0.5
-			textalignx			28
-			textaligny			-4
-			textstyle			3
-			forecolor			.682 .682 1 1
-			border				0
-			bordercolor			1 1 1 1
-			visible				1
-			descText			"Configure renderer settings"
-			mouseEnter			{ setitemrect highlight 0 128 96 16 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{ 
-				play			"sound/interface/button1"
-				uiScript		getvideosetup // Get video settings
-
-				show 			tabWindowRenderer
-				hide			tabWindowGameplay
-				hide			tabWindowVisuals
-				hide			tabWindowViewCamera
-				hide			tabWindowHUD2D
-				hide			tabWindowEffects
-				hide			tabWindowPostprocess
-				hide			tabWindowNetPerf
-				hide			tabWindowSound
-				hide			applyChanges
-				hide			applyPPChanges
-				hide			applySoundChanges
-				hide			vidrestart
-
-
-				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
-				setitemcolor	tabButtonRenderer	forecolor	1 0.2 0 1
-			}
-		}
-
-		itemDef
-		{//Post processing
-			name				tabButtonPostprocess
-			group				setup_submenu
-			text				"Post-process"
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			rect				8 152 88 16
-			font				7
-			textscale			0.5
-			textalignx			0
-			textaligny			-4
-			textstyle			3
-			forecolor			.682 .682 1 1
-			border				0
-			bordercolor			1 1 1 1
-			visible				1
-			descText			"Configure post-process settings"
-			mouseEnter			{ setitemrect highlight 0 152 96 16 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{ 
-				play			"sound/interface/button1"
-				defer			VideoSetup	videowarningMenu
-
-				show 			tabWindowPostprocess
-				hide			tabWindowGameplay
-				hide			tabWindowVisuals
-				hide			tabWindowViewCamera
-				hide			tabWindowHUD2D
-				hide			tabWindowEffects
-				hide			tabWindowRenderer
-				hide			tabWindowNetPerf
-				hide			tabWindowSound
-				hide			applyChanges
-				hide			applyPPChanges
-				hide			applySoundChanges
-				hide			vidrestart
-
-
-				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
-				setitemcolor	tabButtonPostprocess	forecolor	1 0.2 0 1
-			}
-		}
-
-		itemDef
-		{//Network + Performance
-			name				tabButtonNetPerf
-			group				setup_submenu
-			text				"Net/Perf"
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			rect				8 176 88 16
-			font				7
-			textscale			0.5
-			textalignx			28
-			textaligny			-4
-			textstyle			3
-			forecolor			.682 .682 1 1
-			border				0
-			bordercolor			1 1 1 1
-			visible				1
-			descText			"Configure network and performance settings"
-			mouseEnter			{ setitemrect highlight 0 176 96 16 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{ 
-				play			"sound/interface/button1"
-				defer			VideoSetup	videowarningMenu
-
-				show 			tabWindowNetPerf
-				hide			tabWindowGameplay
-				hide			tabWindowVisuals
-				hide			tabWindowViewCamera
-				hide			tabWindowHUD2D
-				hide			tabWindowEffects
-				hide			tabWindowRenderer
-				hide			tabWindowPostprocess
-				hide			tabWindowSound
-				hide			applyChanges
-				hide			applyPPChanges
-				hide			applySoundChanges
-				hide			vidrestart
-
-
-				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
-				setitemcolor	tabButtonNetPerf	forecolor	1 0.2 0 1
-			}
-		}
-
-		itemDef
-		{//Sound
-			name				tabButtonSound
-			group				setup_submenu
-			text				"Sound"
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			rect				8 200 88 16
-			font				7
-			textscale			0.5
-			textalignx			48
-			textaligny			-4
-			textstyle			3
-			forecolor			.682 .682 1 1
-			border				0
-			bordercolor			1 1 1 1
-			visible				1
-			descText			"Configure sound settings"
-			mouseEnter			{ setitemrect highlight 0 200 96 16 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{ 
-				play			"sound/interface/button1"
-				defer			VideoSetup	videowarningMenu
-
-				show 			tabWindowSound
-				hide			tabWindowGameplay
-				hide			tabWindowVisuals
-				hide			tabWindowViewCamera
-				hide			tabWindowHUD2D
-				hide			tabWindowEffects
-				hide			tabWindowRenderer
-				hide			tabWindowPostprocess
-				hide			tabWindowNetPerf
-				hide			applyChanges
-				hide			applyPPChanges
-				hide			applySoundChanges
-				hide			vidrestart
-
-
-				setitemcolor	setup_submenu		forecolor	.682 .682 1 1
-				setitemcolor	tabButtonSound	forecolor	1 0.2 0 1
-			}
-		}
-
-		//	================================
-		//	GAMEPLAY TAB
-		//	================================
-
-		itemDef {// Pain events (cg_oldPainSounds)
-			COMMON( painsounds, tabWindowGameplay, ITEM_TYPE_YESNO, 108 20 192 20 )
-      		type				ITEM_TYPE_YESNO
-			text				"Old pain events:"
-			cvar				"cg_oldPainSounds"
-			textalignx			5
-			descText			"Use old method of detecting pain events for yourself"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Auto switch (cg_autoswitch)
-			COMMON( autoswitch, tabWindowGameplay, ITEM_TYPE_MULTI, 108 40 192 20 )
-			text				"Auto switch:"
-			cvar				"cg_autoswitch"
-			cvarFloatList		{ "Never" 0 "Safe weapons only" 1 "Always switch" 2 }
-			textalignx			25
-			descText			"Automatically switch weapons when you pick them up"// (0 = never switch, 1 = switch to "safe" weapons, 2 = always switch)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Ragdoll (broadsword)
-			COMMON( ragdoll, tabWindowGameplay, ITEM_TYPE_MULTI, 108 60 192 20 )
-			text				"Ragdoll:"
-			cvar				"broadsword"
-			cvarFloatList		{ "Never" 0 "Enabled" 1 "Crazy" 2 }
-			textalignx			45
-			descText			"Use ragdoll deaths"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Jump Sounds (cg_jumpSounds)
-			COMMON( jumpsounds, tabWindowGameplay, ITEM_TYPE_YESNO, 108 80 192 20 )
-			text				"Jump sounds:"
-			cvar				"cg_jumpSounds"
-			textalignx			25
-			descText			"Play a sound when someone jumps"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Defer players (cg_deferPlayers)
-			COMMON( deferplayers, tabWindowGameplay, ITEM_TYPE_YESNO, 108 100 192 20 )
-			text				"Defer players:"
-			cvar				"cg_deferPlayers"
-			textalignx			15
-			descText			"Only load player models when checking scoreboard (avoids random freezes)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Team chat only (cg_teamChatsOnly)
-			COMMON( teamchatonly, tabWindowGameplay, ITEM_TYPE_YESNO, 108 120 192 20 )
-			text				"Team chat only:"
-			cvar				"cg_teamChatsOnly"
-			textalignx			10
-			descText			"Only show chat messages from team-mates in team gametypes"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Ghost predict (cg_attemptGhostPredict)
-			COMMON( ghostpredict, tabWindowGameplay, ITEM_TYPE_YESNO, 108 140 192 20 )
-			text				"Ghost prediction:"
-			cvar				"cg_attemptGhostPredict"
-			textalignx			0
-			descText			"Attempt to predict if you're ghosted and can walk smoothly through people"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Disable Taunts (cg_noTaunt)
-			COMMON( notaunt, tabWindowGameplay, ITEM_TYPE_YESNO, 108 160 192 20 )
-			text				"Disable taunts:"
-			cvar				"cg_noTaunt"
-			textalignx			10
-			descText			"Disable all taunt sounds"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Smart Entities (cg_smartEntities)
-			COMMON( smartentities, tabWindowGameplay, ITEM_TYPE_YESNO, 108 180 192 20 )
-			text				"Smart Entities:"
-			cvar				"cg_smartEntities"
-			textalignx			10
-			descText			"Increase performance by not rendering players behind walls"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Console log (cg_log)
-			COMMON( consolelog, tabWindowGameplay, ITEM_TYPE_EDITFIELD, 108 200 192 20 )
-			text				"Console log:"
-			cvar				"cg_log"
-			textalignx			25
-			descText			"Log console to file"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Chat log (cg_logChat)
-			COMMON( chatlog, tabWindowGameplay, ITEM_TYPE_EDITFIELD, 108 220 192 20 )
-			text				"Chat log:"
-			cvar				"cg_logChat"
-			textalignx			40
-			descText			"Log chat to file"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Sync console log (cg_logSync)
-			COMMON( syncconsolelog, tabWindowGameplay, ITEM_TYPE_YESNO, 108 240 192 20 )
-			text				"Sync console log:"
-			cvar				"cg_logSync"
-			textalignx			0
-			descText			"Immediately write console log to disk, or buffer"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Sync chat log (cg_logChatSync)
-			COMMON( syncchatlog, tabWindowGameplay, ITEM_TYPE_YESNO, 108 260 192 20 )
-			text				"Sync chat log:"
-			cvar				"cg_logChatSync"
-			textalignx			15
-			descText			"Immediately write chat log to disk, or buffer"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		//	================================
-		//	VISUALS TAB
-		//	================================
-
-		itemDef {// SFX Sabers (cg_saberBladeStyle)
-			COMMON( sfxsabers, tabWindowVisuals, ITEM_TYPE_YESNO, 108 20 192 20 )
-			text				"SFX Sabers:"
-			cvar				"cg_saberBladeStyle"
-			textalignx			40
-			descText			"Use SFX sabers or basejka sabers"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// basejka saber trail (cg_saberTrail)
-			COMMON( sabertrail, tabWindowVisuals, ITEM_TYPE_MULTI, 108 40 192 20 )
-			text				"Saber trail:"
-			cvar				"cg_saberTrail"
-			cvarFloatList		{ @MENUS_OFF 0 @MENUS_ON 1 "Refracted" 2 "Always" 3 }
-			cvarTest			"cg_saberBladeStyle"
-			hideCvar			{ "1" }
-			textalignx			35
-			descText			"Choose the saber trail type for basejka sabers"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// basejka saber trail length (cg_saberTrailLength)
-			COMMON( sabertraillength, tabWindowVisuals, ITEM_TYPE_SLIDER, 108 60 192 20 )
-			text				"Saber trail length:"
-			cvarfloat			"cg_saberTrailLength" 0.7 0.1 3.0
-			cvarTest			"cg_saberBladeStyle"
-			hideCvar			{ "1" }
-			SLIDER_DEFAULTS
-			textalignx			0
-			descText			"Choose the saber trail length for basejka sabers"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// basejka saber width (cg_saberWidth)
-			COMMON( saberwidth, tabWindowVisuals, ITEM_TYPE_SLIDER, 108 80 192 20 )
-			text				"Saber width:"
-			cvarfloat			"cg_saberWidth" 0.7 0.1 4.0
-			cvarTest			"cg_saberBladeStyle"
-			hideCvar			{ "1" }
-			SLIDER_DEFAULTS
-			textalignx			35
-			descText			"Choose the saber width for basejka sabers"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// SFX saber trail (N/A)
-			DISABLED( sfxsabertrail, tabWindowVisuals, ITEM_TYPE_MULTI, 108 40 192 20 )
-			text				"Saber trail:"
-			cvar				"cg_saberBladeStyle"
-			cvarFloatList		{ @MENUS_OFF 0 @MENUS_ON 1 }
-			cvarTest			"cg_saberBladeStyle"
-			hideCvar			{ "0" }
-			textalignx			35
-			descText			"SFX sabers always have a trail"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// SFX saber glow width (cg_saberBladeGlowMulti)
-			COMMON( sfxsaberglowwidth, tabWindowVisuals, ITEM_TYPE_SLIDER, 108 60 192 20 )
-			text				"Saber glow width:"
-			cvarfloat			"cg_saberBladeGlowMulti" 1.25 0.1 4.0
-			cvarTest			"cg_saberBladeStyle"
-			hideCvar			{ "0" }
-			SLIDER_DEFAULTS
-			textalignx			10
-			descText			"Choose the saber glow width for SFX sabers"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// SFX saber width (cg_saberBladeCoreMulti)
-			COMMON( sfxsaberwidth, tabWindowVisuals, ITEM_TYPE_SLIDER, 108 80 192 20 )
-			text				"Saber width:"
-			cvarfloat			"cg_saberBladeCoreMulti" 0.7 0.1 4.0
-			cvarTest			"cg_saberBladeStyle"
-			hideCvar			{ "0" }
-			SLIDER_DEFAULTS
-			textalignx			35
-			descText			"Choose the saber core width for SFX sabers"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Team RGB Sabers (cg_teamSabersRGB)
-			COMMON( teamrgbsaber, tabWindowVisuals, ITEM_TYPE_MULTI, 108 100 192 20 )
-			text				"Team RGB sabers:"
-			cvar				"cg_teamSabersRGB"
-			cvarFloatList		{ "Team colours always" 0 "RGB for self" 1 "RGB always" 2 }
-			textalignx			15
-			descText			"Force team colours for sabers, or allow RGB saber colours"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Speed Trail (cg_speedTrail)
-			COMMON( speedtrail, tabWindowVisuals, ITEM_TYPE_YESNO, 108 120 192 20 )
-			text				"Speed trail:"
-			cvar				"cg_speedTrail"
-			textalignx			35
-			descText			"Show a ghost effect behind players using force speed"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Sight Shell (cg_auraShell)
-			COMMON( sightshell, tabWindowVisuals, ITEM_TYPE_YESNO, 108 140 192 20 )
-			text				"Sight shell:"
-			cvar				"cg_auraShell"
-			textalignx			35
-			descText			"Show an outline around players when using force sight"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Repeater Orb (cg_repeaterOrb)
-			COMMON( repeaterorb, tabWindowVisuals, ITEM_TYPE_YESNO, 108 160 192 20 )
-			text				"Repeater Orb:"
-			cvar				"cg_repeaterOrb"
-			textalignx			30
-			descText			"Use a special effect for the heavy repeater's alternate fire"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Dismemberment (cg_dismember)
-			COMMON( dismemberment, tabWindowVisuals, ITEM_TYPE_MULTI, 108 180 192 20 )
-			text				"Dismemberment:"
-			cvar				"cg_dismember"
-			cvarFloatList		{ @MENUS_OFF 0 @MENUS_ON 1 "Violent" 2 }
-			textalignx			25
-			descText			"Choose the level of detail for dismemberment"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Force Models (cg_forceModel)
-			COMMON( forcemodel, tabWindowVisuals, ITEM_TYPE_YESNO, 108 200 192 20 )
-			text				"Force model:"
-			cvar				"cg_forceModel"
-			textalignx			35
-			descText			"Force all player models to be the same as yours"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Shield Style (cg_shieldStyle)
-			COMMON( shieldstyle, tabWindowVisuals, ITEM_TYPE_MULTI, 108 220 192 20 )
-			text				"Shield style:"
-			cvar				"cg_shieldStyle"
-			cvarFloatList		{ "basejka" -1 "SP Shield" 0 "Protect" 1 "Sight 1" 2 "Force shell" 3 "Sight 2" 4 "Half shield" 5 "Cloak" 6 }
-			textalignx			30
-			descText			"Shader to use for \"player hit\" shield effect"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Shield Test (cg_shieldTest)
-			COMMON( shieldtest, tabWindowVisuals, ITEM_TYPE_YESNO, 108 240 192 20 )
-			text				"Shield test:"
-			cvar				"cg_shieldTest"
-			cvarTest			"cg_shieldStyle"
-			hideCvar			{ "-1" }
-			textalignx			35
-			descText			"Always show the \"player hit\" shield effect (for customisation)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Shield Colour Background
-			name				shieldcolourBackground
-			group				tabWindowVisuals
-			style				WINDOW_STYLE_SHADER
-			rect				203 261 95 18
-			background			EDITFIELD_BACKGROUND
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Shield Colour (cg_shieldColour)
-			COMMON( shieldcolour, tabWindowVisuals, ITEM_TYPE_EDITFIELD, 108 260 192 20 )
-			text				"Shield colour:"
-			cvar				"cg_shieldColour"
-			cvarTest			"cg_shieldStyle"
-			hideCvar			{ "-1" }
-			textalignx			25
-			descText			"Colour of the \"player hit\" shield effect + force transparency"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Shield Layers Background
-			name				shieldlayersBackground
-			group				tabWindowVisuals
-			style				WINDOW_STYLE_SHADER
-			rect				203 281 20 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-			cvarTest			"cg_shieldStyle"
-			hideCvar			{ "-1" }
-		}
-		itemDef {// Shield Layers (cg_shieldLayers)
-			COMMON( shieldlayers, tabWindowVisuals, ITEM_TYPE_NUMERICFIELD, 108 280 192 20 )
-			text				"Shield layers:"
-			cvar				"cg_shieldLayers"
-			cvarTest			"cg_shieldStyle"
-			hideCvar			{ "-1" }
-			textalignx			25
-			descText			"How many times to render the \"player hit\" shield effect"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Duel Style (cg_duelShaderStyle)
-			COMMON( duelstyle, tabWindowVisuals, ITEM_TYPE_MULTI, 108 300 192 20 )
-			text				"Duel style:"
-			cvar				"cg_duelShaderStyle"
-			cvarFloatList		{ "Sight 1" 0 "Protect" 1 "SP Shield" 2 "Force shell" 3 "Sight 2" 4 "Half shield" 5 "Cloak" 6 }
-			textalignx			40
-			descText			"Shader to use for dueling players"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Duel Test (cg_duelShaderTest)
-			COMMON( dueltest, tabWindowVisuals, ITEM_TYPE_YESNO, 108 320 192 20 )
-			text				"Duel test:"
-			cvar				"cg_duelShaderTest"
-			textalignx			45
-			descText			"Always show the duel effect (for customisation)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Duel Colour Background
-			name				duelcolourBackground
-			group				tabWindowVisuals
-			style				WINDOW_STYLE_SHADER
-			rect				203 341 95 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Duel Colour (cg_duelColour)
-			COMMON( duelcolour, tabWindowVisuals, ITEM_TYPE_EDITFIELD, 108 340 192 20 )
-			text				"Duel colour:"
-			cvar				"cg_duelColour"
-			textalignx			35
-			maxchars			17
-			maxPaintChars		17
-			descText			"Colour of the duel effect + force transparency"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Dueling Sabers (cg_showDuelSabers)
-			COMMON( duelsabers, tabWindowVisuals, ITEM_TYPE_YESNO, 108 360 192 20 )
-			text				"Dueling sabers:"
-			cvar				"cg_showDuelSabers"
-			textalignx			20
-			descText			"Hide or show sabers of dueling players"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Alt-dim Visibility (cg_altDimA)
-			COMMON( altdimvis, tabWindowVisuals, ITEM_TYPE_SLIDER, 108 380 192 20 )
-			text				"Altdim visibility:"
-			cvarFloat			"cg_altDimA" 96 0 255
-			SLIDER_DEFAULTS
-			textalignx			5
-			descText			"Adjust the transparency of players not in the same dimension as you"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		//################
-		// Second column
-		//################
-
-		itemDef {// Strafe Trail (cg_strafeTrail)
-			COMMON( strafetrail, tabWindowVisuals, ITEM_TYPE_MULTI, 368 20 192 20 )
-			text				"Strafe trail:"
-			cvar				"cg_strafeTrail"
-			cvarFloatList		{ @MENUS_OFF 0 "Ghost" 1 "Line" 2 }
-			textalignx			5
-			descText			"Show a trail behind fast-moving players"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Strafe Trail Weights Background
-			name				strafetrailweightsBackground
-			group				tabWindowVisuals
-			style				WINDOW_STYLE_SHADER
-			rect				438 41 55 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-			cvarTest			"cg_strafeTrail"
-			hideCvar			{ "0" }
-		}
-		itemDef {// Strafe Trail Weights (cg_strafeTrailWeights)
-			COMMON( strafetrailweights, tabWindowVisuals, ITEM_TYPE_EDITFIELD, 368 40 192 20 )
-			text				"Trail weights:"
-			cvar				"cg_strafeTrailWeights"
-			cvarTest			"cg_strafeTrail"
-			hideCvar			{ "0" }
-			textalignx			0
-			maxchars			9
-			maxpaintchars		9
-			descText			"Set the minimum and maximum speed for drawing strafe trails"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Strafe Helper (cg_strafeHelper)
-			COMMON( strafehelper, tabWindowVisuals, ITEM_TYPE_MULTI, 368 60 192 20 )
-			text				"Strafe helper:"
-			cvar				"cg_strafeHelper"
-			cvarFloatList		{ @MENUS_OFF 0 @MENUS_ON 1 "Inverted" 2 }
-			textalignx			0
-			descText			"Show the ideal angles for various strafing styles"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Strafe Velocity (cg_strafeHelperVelocity)
-			COMMON( strafevelocity, tabWindowVisuals, ITEM_TYPE_YESNO, 368 80 192 20 )
-			text				"SH velocity:"
-			cvar				"cg_strafeHelperVelocity"
-			textalignx			10
-			descText			"Show velocity vector"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Strafe Helper Colour Background
-			name				strafehelpercolourBackground
-			group				tabWindowVisuals
-			style				WINDOW_STYLE_SHADER
-			rect				438 101 85 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Strafe Helper Colour (cg_strafeHelperColor)
-			COMMON( strafehelpercolour, tabWindowVisuals, ITEM_TYPE_EDITFIELD, 368 100 192 20 )
-			text				"SH colour:"
-			cvar				"cg_strafeHelperColor"
-			textalignx			20
-			maxchars			15
-			maxpaintchars		15
-			descText			"Colour of the strafe helper lines"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Strafe Helper Radius (cg_strafeHelperRadius)
-			COMMON( strafehelperradius, tabWindowVisuals, ITEM_TYPE_SLIDER, 368 120 192 20 )
-			text				"SH radius:"
-			cvarFloat			"cg_strafeHelperRadius" 1 0 6
-			SLIDER_DEFAULTS
-			textalignx			20
-			descText			"Radius of the strafe helper lines"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Strafe Helper Length (cg_strafeHelperLength)
-			COMMON( strafehelperlength, tabWindowVisuals, ITEM_TYPE_SLIDER, 368 140 192 20 )
-			text				"SH length:"
-			cvarFloat			"cg_strafeHelperLength" 100 32 384
-			SLIDER_DEFAULTS
-			textalignx			20
-			descText			"Length of the strafe helper lines"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Strafe Helper Angle (cg_strafeHelperAngle)
-			COMMON( strafehelperangle, tabWindowVisuals, ITEM_TYPE_SLIDER, 368 160 192 20 )
-			text				"SH angle:"
-			cvarFloat			"cg_strafeHelperAngle" 20 0 180
-			SLIDER_DEFAULTS
-			textalignx			25
-			descText			"Angle between strafe helper lines"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-
-		//	================================
-		//	VIEW / CAMERA TAB
-		//	================================
-
-		itemDef {// Third Person (cg_thirdPerson)
-			COMMON( thirdperson, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 20 192 20 )
-			text				"Third person:"
-			cvar				"cg_thirdPerson"
-			textalignx			15
-			descText			"Use third person camera mode"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Action Cam (cg_thirdPersonSpecialCam)
-			COMMON( actioncam, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 40 192 20 )
-			text				"Action cam:"
-			cvar				"cg_thirdPersonSpecialCam"
-			textalignx			25
-			descText			"Use dramatic \"action cam\" for special saber moves"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Field of View (cg_fov)
-			COMMON( fov, tabWindowViewCamera, ITEM_TYPE_SLIDER, 108 60 192 20 )
-			text				"Field of view:"
-			cvarfloat			"cg_fov" 80.0 40.0 180.0
-			SLIDER_DEFAULTS
-			textalignx			10
-			descText			"Field of view"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Draw Gun (cg_drawGun)
-			COMMON( drawgun, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 80 192 20 )
-			text				"Draw gun:"
-			cvar				"cg_drawGun"
-			textalignx			35
-			descText			"Hide/show current weapon in first-person view"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Gun Align Background
-			name				gunalignBackground
-			group				tabWindowViewCamera
-			style				WINDOW_STYLE_SHADER
-			rect				188 101 95 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Gun Align (cg_gunAlign)
-			COMMON( gunalign, tabWindowViewCamera, ITEM_TYPE_EDITFIELD, 108 100 192 20 )
-			text				"Gun align:"
-			cvar				"cg_gunAlign"
-			textalignx			30
-			descText			"Alignment of first-person weapon model"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Smooth Camera (cg_smoothCamera)
-			COMMON( smoothcamera, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 120 192 20 )
-			text				"Smooth camera:"
-			cvar				"cg_smoothCamera"
-			textalignx			10
-			descText			"Use a smooth third-person camera"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// View Bob Height (cg_bobup)
-			COMMON( bobup, tabWindowViewCamera, ITEM_TYPE_SLIDER, 108 140 192 20 )
-			text				"View bob height:"
-			cvarFloat			"cg_bobup" 0.005 0.0 0.03
-			SLIDER_DEFAULTS
-			textalignx			0
-			descText			"View swaying factor for height"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// View Bob Pitch (cg_bobpitch)
-			COMMON( bobpitch, tabWindowViewCamera, ITEM_TYPE_SLIDER, 108 160 192 20 )
-			text				"View bob pitch:"
-			cvarFloat			"cg_bobpitch" 0.002 0.0 0.015
-			SLIDER_DEFAULTS
-			textalignx			5
-			descText			"View swaying factor for pitch"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// View Bob Roll (cg_bobroll)
-			COMMON( bobroll, tabWindowViewCamera, ITEM_TYPE_SLIDER, 108 180 192 20 )
-			text				"View bob roll:"
-			cvarFloat			"cg_bobroll" 0.002 0.0 0.015
-			SLIDER_DEFAULTS
-			textalignx			10
-			descText			"View swaying factor for roll"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// View Bob Fall (cg_bobfall)
-			COMMON( bobfall, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 200 192 20 )
-			text				"View bob fall:"
-			cvar				"cg_bobfall"
-			textalignx			10
-			descText			"Bob camera when landing on the ground"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Gun Bobbing (cg_gunBobEnable)
-			COMMON( gunbobenable, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 220 192 20 )
-			text				"Gun bobbing:"
-			cvar				"cg_gunBobEnable"
-			textalignx			20
-			descText			"Enable weapon viewmodel bob when running"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Gun Bob Amount Background
-			name				gunbobamountBackground
-			group				tabWindowViewCamera
-			style				WINDOW_STYLE_SHADER
-			rect				188 241 105 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Gun Bob Amount (cg_gunBob)
-			COMMON( gunbobamount, tabWindowViewCamera, ITEM_TYPE_EDITFIELD, 108 240 192 20 )
-			text				"Bob amount:"
-			cvar				"cg_gunBob"
-			textalignx			25
-			maxchars			19
-			maxpaintchars		19
-			descText			"Control the pitch/yaw/roll amount of weapon viewmodel bobbing"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Gun Drift (cg_gunIdleDriftEnable)
-			COMMON( gunidledriftenable, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 260 192 20 )
-			text				"Gun drift:"
-			cvar				"cg_gunIdleDriftEnable"
-			textalignx			30
-			descText			"Enable weapon viewmodel drift when idle"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Drift Amount Background
-			name				driftamountBackground
-			group				tabWindowViewCamera
-			style				WINDOW_STYLE_SHADER
-			rect				188 281 110 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Drift Amount (cg_gunIdleDrift)
-			COMMON( driftamount, tabWindowViewCamera, ITEM_TYPE_NUMERICFIELD, 108 280 192 20 )
-			text				"Drift amount:"
-			cvar				"cg_gunIdleDrift"
-			textalignx			15
-			maxchars			20
-			maxpaintchars		20
-			descText			"Control the pitch/yaw/roll + speed of gun idle drift"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// View Shake (cg_viewShake)
-			COMMON( viewshake, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 300 192 20 )
-			text				"View shake:"
-			cvar				"cg_viewShake"
-			textalignx			25
-			descText			"Enable view shaking (e.g. when charging pistol)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// View Kick (cg_viewKickDamage)
-			COMMON( viewkick, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 320 192 20 )
-			text				"View kick:"
-			cvar				"cg_viewKickDamage"
-			textalignx			30
-			descText			"Enable view kicking when taking damage"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Instant Duck (cg_instantDuck)
-			COMMON( instantduck, tabWindowViewCamera, ITEM_TYPE_YESNO, 108 340 192 20 )
-			text				"Instant duck:"
-			cvar				"cg_instantDuck"
-			textalignx			15
-			descText			"Instantly move the camera when ducking, or interpolate the camera position over time"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		//################
-		// Second column
-		//################
-
-		itemDef {// True Guns (cg_trueGuns)
-			COMMON( trueguns, tabWindowViewCamera, ITEM_TYPE_YESNO, 368 20 192 20 )
-			text				"True guns:"
-			cvar				"cg_trueGuns"
-			textalignx			45
-			descText			"Use a realistic view for guns in first person"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// True Roll (cg_trueRoll)
-			COMMON( trueroll, tabWindowViewCamera, ITEM_TYPE_MULTI, 368 40 192 20 )
-			text				"True roll:"
-			cvar				"cg_trueRoll"
-			cvarFloatList		{ @MENUS_OFF 0 "Simple" 1 "Advanced" 2 }
-			textalignx			45
-			descText			"Affect the camera's roll in trueview"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// True Flip (cg_trueFlip)
-			COMMON( trueflip, tabWindowViewCamera, ITEM_TYPE_MULTI, 368 60 192 20 )
-			text				"True flip:"
-			cvar				"cg_trueFlip"
-			cvarFloatList		{ @MENUS_OFF 0 "Simple" 1 "Advanced" 2 }
-			textalignx			45
-			descText			"Affect the camera's pitch in trueview"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// True Spin (cg_trueSpin)
-			COMMON( truespin, tabWindowViewCamera, ITEM_TYPE_MULTI, 368 80 192 20 )
-			text				"True spin:"
-			cvar				"cg_trueSpin"
-			cvarFloatList		{ @MENUS_OFF 0 "Simple" 1 "Advanced" 2 }
-			textalignx			45
-			descText			"Affect the camera's yaw in trueview"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// True Move Roll (cg_trueMoveRoll)
-			COMMON( truemoveroll, tabWindowViewCamera, ITEM_TYPE_YESNO, 368 100 192 20 )
-			text				"True move roll:"
-			cvar				"cg_trueMoveRoll"
-			textalignx			20
-			descText			"Affect the camera's roll in trueview for all animations"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// True Saber Only (cg_trueSaberOnly)
-			COMMON( truesaberonly, tabWindowViewCamera, ITEM_TYPE_YESNO, 368 120 192 20 )
-			text				"True saber only:"
-			cvar				"cg_trueSaberOnly"
-			textalignx			15
-			descText			"Only show your saber blade when in trueview with lightsaber"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Invert True Saber (cg_trueInvertSaber)
-			COMMON( trueinvertsaber, tabWindowViewCamera, ITEM_TYPE_YESNO, 368 140 192 20 )
-			text				"Invert true saber:"
-			cvar				"cg_trueInvertSaber"
-			textalignx			5
-			descText			"Invert first/third person when using saber"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// True Eye Offset (cg_trueEyePosition)
-			COMMON( trueeyeoffset, tabWindowViewCamera, ITEM_TYPE_SLIDER, 368 160 192 20 )
-			text				"True eye offset:"
-			cvarFloat			"cg_trueEyePosition" 0 -8 8
-			SLIDER_DEFAULTS
-			textalignx			15
-			descText			"Offset your eye position to avoid camera clipping"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// True FoV (cg_trueFOV)
-			COMMON( trueeyeoffset, tabWindowViewCamera, ITEM_TYPE_SLIDER, 368 180 192 20 )
-			text				"True FoV:"
-			cvarFloat			"cg_trueFOV" 80 40 180
-			SLIDER_DEFAULTS
-			textalignx			50
-			descText			"Field of view when using trueview"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-
-		//	================================
-		//	HUD / 2D TAB
-		//	================================
-
-		itemDef {// Draw 2D (cg_draw2D)
-			COMMON( draw2d, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 20 192 20 )
-			text				"Draw 2D:"
-			cvar				"cg_draw2D"
-			textalignx			55
-			descText			"Toggle visibility of all 2D elements"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// HUD Style (cg_hudFiles)
-			COMMON( hudstyle, tabWindowHUD2D, ITEM_TYPE_MULTI, 108 40 192 20 )
-			text				"HUD style:"
-			cvar				"cg_hudFiles"
-			cvarStrList			{ "Graphical", "ui/jahud.txt", "Simple", "1" }
-			textalignx			45
-			descText			"Choose between a graphical or simplified HUD"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// New Scoreboard (cg_newScoreboard)
-			COMMON( newscoreboard, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 60 192 20 )
-			text				"New scoreboard:"
-			cvar				"cg_newScoreboard"
-			textalignx			20
-			descText			"Choose between the basejka scoreboard or the new scoreboard"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Player Status (cg_drawStatus)
-			COMMON( playerstatus, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 80 192 20 )
-			text				"Player status:"
-			cvar				"cg_drawStatus"
-			textalignx			25
-			descText			"Toggle visibility of player status 2D elements (health, armor, force, ammo)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Map Timer (cg_drawTimer)
-			COMMON( maptimer, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 100 192 20 )
-			text				"Map timer:"
-			cvar				"cg_drawTimer"
-			textalignx			45
-			descText			"Show the elapsed map time in the top-right corner"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// FPS counter (cg_drawFPS)
-			COMMON( fpscounter, tabWindowHUD2D, ITEM_TYPE_MULTI, 108 120 192 20 )
-			text				"FPS counter:"
-			cvar				"cg_drawFPS"
-			cvarFloatList		{ @MENUS_OFF 0 "Simple" 1 "Advanced" 2 }
-			textalignx			35
-			descText			"Show your current FPS (Frames per second) in the top-right to measure performance"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Show Lagometer (cg_lagometer)
-			COMMON( showlagometer, tabWindowHUD2D, ITEM_TYPE_MULTI, 108 140 192 20 )
-			text				"Show lagometer:"
-			cvar				"cg_lagometer"
-			cvarFloatList		{ @MENUS_OFF 0 "Simple" 1 "Advanced" 2 }
-			textalignx			20
-			descText			"Show your snapshot ping and dropped packets in a small graph"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Lagometer Position Background
-			name				lagometerpositionBackground
-			group				tabWindowHUD2D
-			style				WINDOW_STYLE_SHADER
-			rect				203 161 45 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Lagometer position (cg_hudLagometerPos)
-			COMMON( lagometerposition, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 108 160 192 20 )
-			text				"Lagometer position:"
-			cvar				"cg_hudLagometerPos"
-			textalignx			0
-			maxchars			7
-			maxpaintchars		7
-			descText			"Position of the lagometer"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Show Radar (cg_drawRadar)
-			COMMON( showradar, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 180 192 20 )
-			text				"Show radar:"
-			cvar				"cg_drawRadar"
-			textalignx			40
-			descText			"Show the radar in team gametypes"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Show Leader (cg_drawEnemyInfo)
-			COMMON( showleader, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 200 192 20 )
-			text				"Show leader:"
-			cvar				"cg_drawEnemyInfo"
-			textalignx			35
-			descText			"Show the leader in the top-right corner"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Crosshair (N/A)
-			COMMON( crosshair, tabWindowHUD2D, ITEM_TYPE_OWNERDRAW, 108 220 192 20 )
-			ownerdraw			UI_CROSSHAIR
-			text				"Crosshair:"
-			textalignx			45
-			descText			"Choose which crosshair to use"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Crosshair Size (cg_crosshairSize)
-			COMMON( crosshairsize, tabWindowHUD2D, ITEM_TYPE_SLIDER, 108 240 192 20 )
-			text				"Crosshair size:"
-			cvarFloat			"cg_crosshairSize" 24 8 64
-			SLIDER_DEFAULTS
-			textalignx			20
-			descText			"Size of your crosshair"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Crosshair Health (cg_crosshairHealth)
-			COMMON( crosshairhealth, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 260 192 20 )
-			text				"Crosshair health:"
-			cvar				"cg_crosshairHealth"
-			textalignx			10
-			descText			"Colour your crosshair based on your health"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Crosshair Names (cg_drawCrosshairNames)
-			COMMON( crosshairnames, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 280 192 20 )
-			text				"Crosshair names:"
-			cvar				"cg_drawCrosshairNames"
-			textalignx			15
-			maxchars			20
-			maxpaintchars		20
-			descText			"Display names of enemies when looking at them"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Dynamic Crosshair (cg_dynamicCrosshair)
-			COMMON( dynamiccrosshair, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 300 192 20 )
-			text				"Dynamic crosshair:"
-			cvar				"cg_dynamicCrosshair"
-			textalignx			5
-			descText			"Show crosshair where your weapon is pointing (dynamic), or at the center of the screen (static)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Precise Crosshair (cg_dynamicCrosshairPrecision)
-			COMMON( precisecrosshair, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 320 192 20 )
-			text				"Precise crosshair:"
-			cvar				"cg_dynamicCrosshairPrecision"
-			textalignx			5
-			descText			"Performs collisions against Ghoul2 player models for a more precise (dynamic) crosshair"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Vehicle Crosshair (cg_drawVehLeadIndicator)
-			COMMON( vehiclecrosshair, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 340 192 20 )
-			text				"Vehicle crosshair:"
-			cvar				"cg_drawVehLeadIndicator"
-			textalignx			5
-			descText			"Show the ideal spot to shoot enemy fighters (vehicles)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Team Icons (cg_drawFriend)
-			COMMON( teamicons, tabWindowHUD2D, ITEM_TYPE_YESNO, 108 360 192 20 )
-			text				"Team icons:"
-			cvar				"cg_drawFriend"
-			textalignx			40
-			descText			"Show team icons above allies in team games"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Score Plums (cg_scorePlums)
-			COMMON( scoreplums, tabWindowHUD2D, ITEM_TYPE_MULTI, 108 380 192 20 )
-			text				"Score plums:"
-			cvar				"cg_scorePlums"
-			cvarFloatList		{ @MENUS_OFF 0 @MENUS_ON 1 "Always on frags" 2 }
-			textalignx			35
-			descText			"Show score plums"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		//################
-		// Second column
-		//################
-
-		itemDef {// 3D Models (cg_draw3dIcons)
-			COMMON( models, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 20 192 20 )
-			text				"3D models:"
-			cvar				"cg_draw3dIcons"
-			textalignx			40
-			descText			"Use 3D models for certain HUD elements (Flag carrier)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// 2D Icons (cg_drawIcons)
-			COMMON( icons, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 40 192 20 )
-			text				"2D icons:"
-			cvar				"cg_drawIcons"
-			textalignx			40
-			descText			"Use 2D icons for certain HUD elements (Flag carrier)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Team Scores (cg_drawScores)
-			COMMON( teamscores, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 60 192 20 )
-			text				"Team scores:"
-			cvar				"cg_drawScores"
-			textalignx			25
-			descText			"Show scores in team gametypes"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Team Overlay (cg_drawTeamOverlay)
-			COMMON( teamoverlay, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 80 192 20 )
-			text				"Team overlay:"
-			cvar				"cg_drawTeamOverlay"
-			textalignx			20
-			descText			"Show team overlay in team gametypes (health, armor, weapon, location)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Chat Time Background
-			name				chattimeBackground
-			group				tabWindowHUD2D
-			style				WINDOW_STYLE_SHADER
-			rect				453 101 40 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Chat Time (cg_chatBox)
-			COMMON( chattime, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 100 192 20 )
-			text				"Chat time:"
-			cvar				"cg_chatBox"
-			textalignx			35
-			maxchars			6
-			maxpaintchars		6
-			descText			"How long (in milliseconds) to show chatbox messages (1 = infinite)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// New Chatbox (cg_newChatbox)
-			COMMON( newchatbox, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 120 192 20 )
-			text				"New chatbox:"
-			cvar				"cg_newChatbox"
-			textalignx			25
-			descText			"Use the new JA++ chatbox or the basejka chatbox"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Chat Tabs (cg_chatTabs)
-			COMMON( chattabs, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 140 192 20 )
-			text				"Chat tabs:"
-			cvar				"cg_chatTabs"
-			textalignx			35
-			descText			"Enable use of tabs on the chatbox"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Chat Vars Background
-			name				chatvarsBackground
-			group				tabWindowHUD2D
-			style				WINDOW_STYLE_SHADER
-			rect				453 161 90 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Chat Vars (cg_hudChat)
-			COMMON( chatvars, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 160 192 20 )
-			text				"Chat vars:"
-			cvar				"cg_hudChat"
-			textalignx			35
-			maxchars			16
-			maxpaintchars		16
-			descText			"Set the position, text size, and width of the chatbox"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Chat BG Background
-			name				chatbgBackground
-			group				tabWindowHUD2D
-			style				WINDOW_STYLE_SHADER
-			rect				453 181 90 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Chat BG (cg_hudChatBackground)
-			COMMON( chatbg, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 180 192 20 )
-			text				"Chat BG:"
-			cvar				"cg_hudChatBackground"
-			textalignx			45
-			maxchars			18
-			maxpaintchars		18
-			descText			"Set the colour of the chatbox background"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Chat timestamp (cg_chatTimeStamp)
-			COMMON( chattimestamp, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 200 192 20 )
-			text				"Chat timestamp:"
-			cvar				"cg_chatTimeStamp"
-			textalignx			10
-			descText			"Timestamp messages in the chatbox"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Timestamp Colour (cg_chatTimeColour)
-			COMMON( timestampcolour, tabWindowHUD2D, ITEM_TYPE_MULTI, 368 220 192 20 )
-			text				"Timestamp colour:"
-			cvar				"cg_chatTimeColour"
-			cvarFloatList		{ "^0Black" 0, "^1Red" 1, "^2Green" 2, "^3Yellow" 3, "^4Blue" 4, "^5Cyan" 5, "^6Magenta" 6, "^7White" 7 }
-			textalignx			0
-			descText			"Set the colour of the chatbox timestamp"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Chat Line Height Background
-			name				chatlhBackground
-			group				tabWindowHUD2D
-			style				WINDOW_STYLE_SHADER
-			rect				453 241 25 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Chat Line Height (cg_chatLH)
-			COMMON( chatlh, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 240 192 20 )
-			text				"Chat line height:"
-			cvar				"cg_chatLH"
-			textalignx			0
-			maxchars			3
-			maxpaintchars		3
-			descText			"Control the spacing between lines in the chatbox"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Chat Lines Background
-			name				chatlinesBackground
-			group				tabWindowHUD2D
-			style				WINDOW_STYLE_SHADER
-			rect				453 261 25 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Chat Lines (cg_chatLines)
-			COMMON( chatlines, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 260 192 20 )
-			text				"Chat lines:"
-			cvar				"cg_chatLines"
-			textalignx			30
-			maxchars			3
-			maxpaintchars		3
-			descText			"How many lines to show in the chatbox before you have to scroll"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Stats HUD (cg_statsHUD)
-			COMMON( statshud, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 280 192 20 )
-			text				"Stats HUD:"
-			cvar				"cg_statsHUD"
-			textalignx			35
-			descText			"Show statistics about the current game"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Stats Position Background
-			name				statsposBackground
-			group				tabWindowHUD2D
-			style				WINDOW_STYLE_SHADER
-			rect				453 301 45 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Stats Position (cg_hudStatsPos)
-			COMMON( statspos, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 300 192 20 )
-			text				"Stats position:"
-			cvar				"cg_hudStatsPos"
-			textalignx			10
-			maxchars			7
-			maxpaintchars		7
-			descText			"Position of the statistics HUD"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Stats Size Background
-			name				statssizeBackground
-			group				tabWindowHUD2D
-			style				WINDOW_STYLE_SHADER
-			rect				453 321 45 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Stats Size (cg_hudStatsScale)
-			COMMON( statssize, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 320 192 20 )
-			text				"Stats size:"
-			cvar				"cg_hudStatsScale"
-			textalignx			30
-			maxchars			7
-			maxpaintchars		7
-			descText			"Size of the statistics HUD"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Movement Keys (cg_hudMovementKeys)
-			COMMON( movekeys, tabWindowHUD2D, ITEM_TYPE_YESNO, 368 340 192 20 )
-			text				"Movement keys:"
-			cvar				"cg_hudMovementKeys"
-			textalignx			15
-			descText			"Show which movement keys are being pressed"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Keys Position Background
-			name				keysposBackground
-			group				tabWindowHUD2D
-			style				WINDOW_STYLE_SHADER
-			rect				453 361 45 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Keys Position (cg_hudMovementKeysPos)
-			COMMON( keyspos, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 360 192 20 )
-			text				"Keys position:"
-			cvar				"cg_hudMovementKeysPos"
-			textalignx			15
-			maxchars			7
-			maxpaintchars		7
-			descText			"Position of the movement keys HUD"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Keys Size Background
-			name				keyssizeBackground
-			group				tabWindowHUD2D
-			style				WINDOW_STYLE_SHADER
-			rect				453 381 45 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Keys Size (cg_hudMovementKeysScale)
-			COMMON( keyssize, tabWindowHUD2D, ITEM_TYPE_EDITFIELD, 368 380 192 20 )
-			text				"Keys size:"
-			cvar				"cg_hudMovementKeysScale"
-			textalignx			35
-			maxchars			7
-			maxpaintchars		7
-			descText			"Size of the movement keys HUD"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-
-		//	================================
-		//	EFFECTS TAB
-		//	================================
-
-		itemDef {// Simple Items (cg_simpleItems)
-			COMMON( simpleitems, tabWindowEffects, ITEM_TYPE_YESNO, 108 20 192 20 )
-      		type				ITEM_TYPE_YESNO
-			text				"Simple items:"
-			cvar				"cg_simpleItems"
-			textalignx			20
-			descText			"Replace 3D models for weapons and items with simple icons"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Marks (cg_marks)
-			COMMON( marks, tabWindowEffects, ITEM_TYPE_MULTI, 108 40 192 20 )
-			text				"Marks:"
-			cvar				"cg_marks"
-			cvarFloatList		{ @MENUS_OFF 0 "Expensive" 1 "Fast" 2 }
-			textalignx			55
-			descText			"Add weapon scarring effects on walls"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Ghoul2 Marks Background
-			name				g2marksBackground
-			group				tabWindowEffects
-			style				WINDOW_STYLE_SHADER
-			rect				193 61 20 18
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Ghoul2 Marks (cg_ghoul2Marks)
-			COMMON( g2marks, tabWindowEffects, ITEM_TYPE_NUMERICFIELD, 108 60 192 20 )
-			text				"Ghoul2 marks:"
-			cvar				"cg_ghoul2Marks"
-			textalignx			20
-			descText			"How many weapon scarring effects to show on player models"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Saber Marks (cg_saberContact)
-			COMMON( sabermarks, tabWindowEffects, ITEM_TYPE_YESNO, 108 80 192 20 )
-			text				"Saber marks:"
-			cvar				"cg_saberContact"
-			textalignx			25
-			descText			"Show saber marks on walls"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Footsteps (cg_footsteps)
-			COMMON( footsteps, tabWindowEffects, ITEM_TYPE_MULTI, 108 100 192 20 )
-			text				"Footsteps:"
-			cvar				"cg_footsteps"
-			cvarFloatList		{ @MENUS_OFF 0, "Sounds" 1, "+ FX" 2, "+ FX + Marks" 3, "+ FX + Force marks" 4 }
-			textalignx			35
-			descText			"Choose the level of detail for footsteps"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Shadows (cg_shadows)
-			COMMON( shadows, tabWindowEffects, ITEM_TYPE_MULTI, 108 120 192 20 )
-			text				"Shadows:"
-			cvar				"cg_shadows"
-			cvarFloatList		{ @MENUS_OFF 0, "Blob" 1, "Volumetric" 2, "Stencil" 3 }
-			textalignx			45
-			descText			"Choose the level of detail for shadows"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Refraction (cg_renderToTextureFX)
-			COMMON( refraction, tabWindowEffects, ITEM_TYPE_YESNO, 108 140 192 20 )
-			text				"Refraction:"
-			cvar				"cg_renderToTextureFX"
-			textalignx			30
-			descText			"Use expensive refraction effects"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Disable Skybox (r_fastSky)
-			COMMON( skybox, tabWindowEffects, ITEM_TYPE_YESNO, 108 160 192 20 )
-			text				"Disable skybox:"
-			cvar				"r_fastSky"
-			textalignx			10
-			descText			"Disable skybox rendering to increase performance"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Dynamic Lighting (r_dynamicLight)
-			COMMON( dynamiclight, tabWindowEffects, ITEM_TYPE_YESNO, 108 180 192 20 )
-			text				"Dynamic lighting:"
-			cvar				"r_dynamicLight"
-			textalignx			0
-			descText			"Enable Real-time light sources"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Dynamic Glow (r_dynamicGlow)
-			COMMON( dynamicglow, tabWindowEffects, ITEM_TYPE_YESNO, 108 200 192 20 )
-			text				"Dynamic glow:"
-			cvar				"r_dynamicGlow"
-			textalignx			20
-			descText			"Use expensive dynamic glow effect (Recommend OFF, use bloom!)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Glow Passes Background
-			name				glowpassesBackground
-			group				tabWindowEffects
-			style				WINDOW_STYLE_SHADER
-			rect				193 221 20 18
-			background			EDITFIELD_BACKGROUND
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Glow Passes (r_dynamicGlowPasses)
-			COMMON( glowpasses, tabWindowEffects, ITEM_TYPE_NUMERICFIELD, 108 220 192 20 )
-			text				"Glow passes:"
-			cvar				"r_dynamicGlowPasses"
-			textalignx			25
-			maxchars			2
-			maxpaintchars		2
-			descText			"How many times to apply the dynamic glow effect"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Glow separation (r_dynamicGlowDelta)
-			COMMON( glowseparation, tabWindowEffects, ITEM_TYPE_SLIDER, 108 240 192 20 )
-			text				"Glow separation:"
-			cvarFloat			"r_dynamicGlowDelta" 0.8 0.0 4.0
-			SLIDER_DEFAULTS
-			textalignx			5
-			descText			"Spread between dynamic glow passes"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Glow Intensity (r_dynamicGlowIntensity)
-			COMMON( glowintensity, tabWindowEffects, ITEM_TYPE_SLIDER, 108 260 192 20 )
-			text				"Glow intensity:"
-			cvarFloat			"r_dynamicGlowIntensity" 1.13 0.0 2.0
-			SLIDER_DEFAULTS
-			textalignx			10
-			descText			"Intensity of the glow effect"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Glow Soften (r_dynamicGlowSoft)
-			COMMON( glowsoften, tabWindowEffects, ITEM_TYPE_YESNO, 108 280 192 20 )
-			text				"Glow soften:"
-			cvar				"r_dynamicGlowSoft"
-			textalignx			25
-			descText			"Intensity of the glow effect"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Glow Width (r_dynamicGlowWidth)
-			COMMON( glowwidth, tabWindowEffects, ITEM_TYPE_NUMERICFIELD, 108 300 192 20 )
-			text				"Glow width:"
-			cvar				"r_dynamicGlowWidth"
-			textalignx			30
-			descText			"Width of the dynamic glow texture"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Glow Height (r_dynamicGlowHeight)
-			COMMON( glowheight, tabWindowEffects, ITEM_TYPE_NUMERICFIELD, 108 320 192 20 )
-			text				"Glow height:"
-			cvar				"r_dynamicGlowHeight"
-			textalignx			25
-			descText			"Height of the dynamic glow texture"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-
-		//	================================
-		//	RENDERER TAB
-		//	================================
-
-		itemDef 
-		{// Resolution (r_mode)
-			name				resolution
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_MULTI
-			text				"Resolution:"
-			cvarFloatList		{  @MENUS_640_X_480 3 @MENUS_800_X_600 4  @MENUS_1024_X_768 6 @MENUS_1152_X_864 7  @MENUS_1280_X_1024 8  @MENUS_1600_X_1200 9  @MENUS_2048_X_1536 10 @MENUS_2400_X_600 12 "Custom resolution" -1 }
-			cvar				"ui_r_mode"
-			rect				108 20 192 20
-			font 				7
-			textscale 			.375
-			textalignx			40
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			@MENUS_CHANGE_THE_DISPLAY_RESOLUTION
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 20 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{
-				play			"sound/interface/button1"
-				setcvar			ui_r_modified 1
-				show			applyChanges
-			}
-		}
-
-		itemDef 
-		{// Custom resolution text
-			name				wxh
-			group				tabWindowRenderer
-			text				"Width x Height:"
-			rect				108 40 192 20
-			textalignx			20
-			textaligny			0
-			outlinecolor		1 .5 .5 .5
-			backcolor			0 0 0 0
-			font				7
-			textscale			0.375
-			forecolor			.615 .615 .956 1
-			border				0
-			bordercolor			1 1 1 1
-			visible				0
-			cvarTest			ui_r_mode
-			showCvar			{ "-1" }
-			decoration
-		}
-		itemDef
-		{// Custom resolution extra text
-			name				x
-			group				tabWindowRenderer
-			text				"X"
-			rect				242 40 8 20
-			textalign			ITEM_ALIGN_CENTER
-			textaligny			2
-			outlinecolor		1 .5 .5 .5
-			font				7
-			textscale			0.375
-			forecolor			.615 .615 .956 1
-			visible				0
-			cvarTest			ui_r_mode
-			showCvar			{ "-1" }
-			decoration
-		}
-		itemDef 
-		{// Custom width background
-			name				customWidthBackground
-			group				tabWindowRenderer
-			style				WINDOW_STYLE_SHADER
-			rect				208 40 28 20
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-			cvarTest			ui_r_mode
-			showCvar			{ "-1" }
-		}
-		itemDef
-		{// Custom width field
-			name				customWidth
-			group				tabWindowRenderer
-			type				ITEM_TYPE_EDITFIELD
-			style 				0
-			text				""
-			descText			""
-			textaligny			2
-			textalignx			4
-			cvar				"r_customWidth"
-			maxchars			6
-			maxPaintChars		6
-			rect				208 40 28 20
-			font				7
-			textscale			0.375
-			forecolor			1 1 1 1
-			visible				0
-			cvarTest			ui_r_mode
-			showCvar			{ "-1" }
-			action 
-			{
-				play			"sound/interface/button1"
-				setcvar			ui_r_modified	1
-				show			applyChanges
-			}
-		}
-		itemDef 
-		{// Custom height background
-			name				customHeightBackground
-			group				tabWindowRenderer
-			style				WINDOW_STYLE_SHADER
-			rect				248 40 28 20
-			background			"gfx/menus/menu_box_ingame"
-			background			EDITFIELD_BACKGROUND
-			border				0
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-			cvarTest			ui_r_mode
-			showCvar			{ "-1" }
-			action 
-			{
-				play			"sound/interface/button1"
-				setcvar			ui_r_modified 1
-				show			applyChanges
-			}
-		}
-		itemDef
-		{// Custom height field
-			name				customHeight
-			group				tabWindowRenderer
-			type				ITEM_TYPE_EDITFIELD
-			style 				0
-			text				""
-			descText			""
-			textaligny			2
-			textalignx			4
-			cvar				"r_customHeight"
-			maxchars			6
-			maxPaintChars		6
-			rect				248 40 28 20
-			font				7
-			textscale			0.375
-			forecolor			1 1 1 1
-			visible				0
-			cvarTest			ui_r_mode
-			showCvar			{ "-1" }
-			action 
-			{
-				play			"sound/interface/button1"
-				setcvar			ui_r_modified	1
-				show			applyChanges
-			}
-		}
-
-		itemDef 
-		{// Fullscreen (r_fullscreen)
-			name				fullscreen
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_YESNO
-			text				"Fullscreen:"
-			cvarFloatList		{ @MENUS_YES 1 @MENUS_NO 0 }
-			cvar				"ui_r_fullscreen"
-			rect				108 60 192 20
-			font 				7
-			textscale 			.375
-			textalignx			40
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			"Play fullscreen or in a window"
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 60 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{
-				play			"sound/interface/button1"
-				setcvar			ui_r_modified 1
-				show			applyChanges
-			}
-		}
-
-		itemDef 
-		{// Color format (r_colorbits)
-			name				colorbits
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_MULTI
-			text				"Color format:"
-			cvarFloatList		{ "Native" 0 "16-bit" 16 "32-bit" 32 }
-			cvar				"ui_r_colorbits"
-			rect				108 80 192 20
-			font 				7
-			textscale 			.375
-			textalignx			30
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			"Change the color depth"
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 80 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{
-				play			"sound/interface/button1"
-				setcvar			ui_r_modified 1
-				show			applyChanges
-			}
-		}
-
-		itemDef 
-		{// Texture format (r_texturebits)
-			name				texturebits
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_MULTI
-			text				"Texture format:"
-			cvarFloatList		{ "Native" 0 "16-bit" 16 "32-bit" 32 }
-			cvar				"ui_r_texturebits"
-			rect				108 100 192 20
-			font 				7
-			textscale 			.375
-			textalignx			20
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			"Change the color depth for textures"
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 100 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{
-				play			"sound/interface/button1"
-				setcvar			ui_r_modified 1
-				show			applyChanges
-			}
-		}
-
-		itemDef 
-		{// Depth Format (r_depthbits)
-			name				depthbits
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_MULTI
-			text				"Depth format:"
-			cvarFloatList		{ "Native" 0 "8-bit" 8 "16-bit" 16 "24-bit" 24 "32-bit" 32 }
-			cvar				"ui_r_depthbits"
-			rect				108 120 192 20
-			font 				7
-			textscale 			.375
-			textalignx			30
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			"Precision of the depth buffer (high values avoid Z-fighting)"
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 120 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{
-				play			"sound/interface/button1"
-				setcvar			ui_r_modified 1
-				show			applyChanges
-			}
-		}
-
-		itemDef 
-		{// Stencil Format (r_stencilbits)
-			name				stencilbits
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_MULTI
-			text				"Stencil format:"
-			cvarFloatList		{ "Native" 0 "8-bit" 8 "16-bit" 16 "24-bit" 24 "32-bit" 32 }
-			cvar				"ui_r_stencilbits"
-			rect				108 140 192 20
-			font 				7
-			textscale 			.375
-			textalignx			20
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			"Precision of the stencil buffer (for shadows)"
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 140 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{
-				play			"sound/interface/button1"
-				setcvar			ui_r_modified 1
-				show			applyChanges
-			}
-		}
-
-		itemDef 
-		{// Model Detail (r_lodbias)
-			name				lodbias
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_MULTI
-			text				"Model detail:"
-			cvarFloatList		{ @MENUS_HIGH 0 @MENUS_MEDIUM 1 @MENUS_LOW 2 }
-			cvar				"r_lodbias"
-			rect				108 160 192 20
-			font 				7
-			textscale 			.375
-			textalignx			30
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			"Change the number of polygons displayed on player and weapon models"
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 160 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action				{ play "sound/interface/button1" }
-		}
-
-		itemDef 
-		{// Map Detail (r_subdivisions)
-			name				subdivisions
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_MULTI
-			text				"Map detail:"
-			cvarFloatList		{ @MENUS_VERY_HIGH 1 @MENUS_HIGH 4 @MENUS_MEDIUM 12 @MENUS_LOW 20 "Pr0" 80 }
-			cvar				"ui_r_subdivisions"
-			rect				108 180 192 20
-			font 				7
-			textscale 			.375
-			textalignx			40
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			"Change the number of polygons displayed on certain map geometry"
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 180 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{
-				play			"sound/interface/button1"
-				setcvar			ui_r_modified 1
-				show			applyChanges
-			}
-		}
-
-		itemDef 
-		{// Texture Quality (r_picmip)
-			name				picmip
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_MULTI
-			text				"Texture quality:"
-			cvarFloatList		{ @MENUS_VERY_HIGH 0 @MENUS_HIGH 1 @MENUS_MEDIUM 2 @MENUS_LOW 4 "Pr0" 16 }
-			cvar				"ui_r_picmip"
-			rect				108 200 192 20
-			font 				7
-			textscale 			.375
-			textalignx			15
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			"Force low resolution textures"
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 200 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{
-				play			"sound/interface/button1"
-				setcvar			ui_r_modified 1
-				show			applyChanges
-			}
-		}
-
-		itemDef 
-		{// Full Bright (r_fullbright)
-			name				fullbright
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_YESNO
-			text				"Full bright:"
-			cvar				"r_fullbright"
-			rect				108 220 192 20
-			font 				7
-			textscale 			.375
-			textalignx			35
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			"Disable the lightmap, making all map geometry \"fullbright\""
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 220 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action				{ play "sound/interface/button1" }
-		}
-
-		itemDef 
-		{// Texture Brightness (r_intensity)
-			name				intensity
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_SLIDER
-			text				"Texture brightness:"
-			cvarfloat			"ui_r_intensity" 1 0 2
-			rect				108 240 192 20
-			slider				92.0 20.0 8.0 20.0
-			font 				7
-			textscale 			.375
-			textalignx			0
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			"Control the brightness of textures"
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 240 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{
-				play			"sound/interface/button1"
-				setcvar			ui_r_modified 1
-				show			applyChanges
-			}
-		}
-
-		itemDef 
-		{// Texture Filtering (r_textureMode)
-			name				filtering
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_MULTI
-			text				"Texture filtering:"
-			cvarStrList			{ "NEAREST", "GL_NEAREST", @MENUS_BILINEAR, "GL_LINEAR_MIPMAP_NEAREST", @MENUS_TRILINEAR, "GL_LINEAR_MIPMAP_LINEAR" }
-			cvar				"r_textureMode"
-			rect				108 260 192 20
-			font 				7
-			textscale 			.375
-			textalignx			5
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			"Filtering mode of textures (crisp or smooth)"
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 260 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action				{ play "sound/interface/button1" }
-		}
-
-		itemDef 
-		{// Anisotropy (r_ext_texture_filter_anisotropic)
-			name				anisotropy
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_SLIDER
-			text				"Anisotropy:"
-			cvarfloat			"r_ext_texture_filter_anisotropic" 16 1 16
-			rect				108 280 192 20
-			slider				92.0 20.0 8.0 20.0
-			font 				7
-			textscale 			.375
-			textalignx			40
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			"Control the brightness of textures"
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 280 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action				{ play "sound/interface/button1" }
-		}
-
-		itemDef 
-		{// Detail Textures (r_detailtextures)
-			name				detailtex
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_YESNO
-			text				"Detail textures:"
-			cvar				"ui_r_detailtextures"
-			rect				108 300 192 20
-			font 				7
-			textscale 			.375
-			textalignx			15
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			"Show textures considered to be detail/non-essential"
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 300 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{
-				play			"sound/interface/button1"
-				setcvar			ui_r_modified 1
-				show			applyChanges
-			}
-		}
-
-		itemDef 
-		{// Compress Textures (r_ext_compress_textures)
-			name				compresstex
-			group				tabWindowRenderer
-      		type				ITEM_TYPE_YESNO
-			text				"Compress textures:"
-			cvar				"ui_r_ext_compress_textures"
-			rect				108 320 192 20
-			font 				7
-			textscale 			.375
-			textalignx			5
-			border				0
-			bordercolor			1 1 1 1
-			forecolor			.615 .615 .956 1
-			descText			"Compress textures to save memory with a small performance hit"
-			visible				0
-			mouseEnter			{ setitemrect highlight 108 320 192 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action 
-			{
-				play			"sound/interface/button1"
-				setcvar			ui_r_modified 1
-				show			applyChanges
-			}
-		}
-
-
-
-		itemDef
-		{// APPLY CHANGES
-			name				applyChanges
-			text				@MENUS_APPLY_CHANGES
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			rect				323 380 90 20
-			font				7
-			textscale			0.5
-			textalignx			0
-			textaligny			0
-			textstyle			3
-			forecolor			1 0 0 1
-			backcolor			0 0 1 0
-			visible				0
-			mouseEnter			{ setitemrect highlight 323 380 90 20 }
-			mouseExit			{ setitemrect highlight 0 0 0 0 }
-			action
-			{
-				play			"sound/interface/button1"
-				show			vidrestart
-				hide			tabWindowRenderer
-				setitemrect		highlight 0 0 0 0
-			}
-		}
-
-		//	================================
-		//	VID_RESTART PROMPT
-		//	================================
-		//----------------------------------------------------------------------------------------------
-		//
-		//	VIDEO RESTART
-		//
-		//----------------------------------------------------------------------------------------------
-		// Faint red box
-		itemDef 
-		{
-			name				vidrestart_background
-			group				vidrestart
-			style				WINDOW_STYLE_SHADER
-			rect				210 41 302 252	
-			background			"gfx/menus/menu_boxred"					// Frame
-			forecolor			1 1 1 1
-			visible				0
-			decoration
-		}
-
-		itemDef 
-		{
-			name				vidrestart_text1
-			group				vidrestart
-			text				@MENUS_THIS_WILL_APPLY_VIDEO
-			text2				@MENUS_AND_RETURNTO_GAME
-			rect				210 100 300 20
-			textalign			ITEM_ALIGN_CENTER
-			text2aligny			18
-			textalignx			150
-			font				2
-			textscale			1        
-			forecolor			1 1 0 1
-			visible				0
-			decoration
-		}
-
-		itemDef 
-		{
-			name				vidrestart_text2
-			group				vidrestart
-			text				@MENUS_VID_RESTART3
-			rect				210 160 256 20
-			textalign			ITEM_ALIGN_CENTER
-			textalignx			150
-			font				2
-			textscale			1        
-			forecolor			1 1 0 1
-			visible				0
-		}
-
-
-
-		itemDef 
-		{
-			name			vidrestart_yes_button
-			style			WINDOW_STYLE_SHADER
-			rect			367 241 120 32 
-			background		"gfx/menus/menu_buttonback"			// Frame around button
-			forecolor		1 1 1 1
-			decoration
-			visible			0 
-		}
-
-		// YES button
-		itemDef 
-		{
-			name				vidrestart_yes
-			group				vidrestart
-			text				@MENUS_YES
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			rect				367 241 120 32 
-			font				2
-			textscale			1        
-			textalign			ITEM_ALIGN_CENTER
-			textalignx			60
-			textaligny			0
-			descText			@MENUS_APPLY_CHANGES_AND_THEN
-			forecolor			1 .682 0 1
-			visible				-1
-
-			action 
-			{ 
-				play			"sound/interface/button1.wav"
-				close			all
-				uiScript		updatevideosetup
-			}
-			mouseEnter			{ show vidrestart_yes_button }
-			mouseExit			{ hide vidrestart_yes_button }	  	  
-
-		}
-	
-		itemDef 
-		{
-			name			vidrestart_no_button
-			style			WINDOW_STYLE_SHADER
-			rect			240 241 120 32 
-			background		"gfx/menus/menu_buttonback"			// Frame around button
-			forecolor		1 1 1 1
-			decoration
-			visible		0
-			// appearance_slot 3
-		}
-
-		// CANCEL button
-		itemDef 
-		{
-			name				vidrestart_no
-			group				vidrestart
-			text				@MENUS_NO
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			rect				240 241 120 32 
-			font				2
-			textscale			1        
-			textalign			ITEM_ALIGN_CENTER
-			textalignx			60
-			textaligny			-1
-			descText			@MENUS_DO_NOT_APPLY_CHANGES
-			forecolor			1 .682 0 1
-			visible			0
-			action 
-			{ 
-				play			"sound/interface/button1"
-				hide			setup_background
-				hide 			vidrestart
-				show			video
-				hide			video2
-				show			applyChanges
-				hide			vidrestart_yes_button
-				hide			vidrestart_no_button
-			}
-			mouseEnter			{ show vidrestart_no_button }
-			mouseExit			{ hide vidrestart_no_button }	  	  
-		}
-
-
-		//	================================
-		//	POST-PROCESS TAB
-		//	================================
-
-		itemDef {// Post Processing (r_postprocess_enable)
-			COMMON( postprocess, tabWindowPostprocess, ITEM_TYPE_YESNO, 108 20 192 20 )
-			text				"Post processing:"
-			cvar				"r_postprocess_enable"
-			textalignx			10
-			descText			"Enable or disable expensive post processing effects"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Bloom (r_postprocess_bloom)
-			COMMON( bloom, tabWindowPostprocess, ITEM_TYPE_YESNO, 108 40 192 20 )
-			text				"Bloom:"
-			cvar				"r_postprocess_bloom"
-			textalignx			60
-			descText			"Enable bloom effect"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Brightpass Method (r_postprocess_brightPassStyle)
-			COMMON( brightpassmethod, tabWindowPostprocess, ITEM_TYPE_MULTI, 108 60 192 20 )
-			text				"Brightpass method:"
-			cvar				"r_postprocess_brightPassStyle"
-			cvarFloatList		{ "Subtract" 1, "Multiply" 2, "Blend" 3 }
-			textalignx			0
-			descText			"How to determine bright pixels"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Bloom Threshold (r_postprocess_brightPassThres)
-			COMMON( bloomthres, tabWindowPostprocess, ITEM_TYPE_SLIDER, 108 80 192 20 )
-			text				"Bloom threshold:"
-			cvarFloat			"r_postprocess_brightPassThres" 0.5 0.0 1.0
-			SLIDER_DEFAULTS
-			textalignx			10
-			descText			"Pixels brighter than this will be subject to blooming"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Bloom Intensity (r_postprocess_bloomMulti)
-			COMMON( bloomintensity, tabWindowPostprocess, ITEM_TYPE_SLIDER, 108 100 192 20 )
-			text				"Bloom intensity:"
-			cvarFloat			"r_postprocess_bloomMulti" 1.0 0.0 4.0
-			SLIDER_DEFAULTS
-			textalignx			10
-			descText			"Intensity of the bloom texture"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Scene Intensity (r_postprocess_bloomSceneMulti)
-			COMMON( sceneintensity, tabWindowPostprocess, ITEM_TYPE_SLIDER, 108 120 192 20 )
-			text				"Scene intensity:"
-			cvarFloat			"r_postprocess_bloomSceneMulti" 1.0 0.0 4.0
-			textalignx			10
-			SLIDER_DEFAULTS
-			descText			"Intensity of the scene texture"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Bloom Saturation (r_postprocess_bloomSat)
-			COMMON( bloomsaturation, tabWindowPostprocess, ITEM_TYPE_SLIDER, 108 140 192 20 )
-			text				"Bloom saturation:"
-			cvarFloat			"r_postprocess_bloomSat" 1.0 0.0 4.0
-			SLIDER_DEFAULTS
-			textalignx			5
-			descText			"Saturation of the bloom texture"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Scene Saturation (r_postprocess_bloomSceneSat)
-			COMMON( scenesaturation, tabWindowPostprocess, ITEM_TYPE_SLIDER, 108 160 192 20 )
-			text				"Scene Saturation:"
-			cvarFloat			"r_postprocess_bloomSceneSat" 1.0 0.0 4.0
-			SLIDER_DEFAULTS
-			textalignx			5
-			descText			"Saturation of the scene texture"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Bloom Method (r_postprocess_bloomStyle)
-			COMMON( bloommethod, tabWindowPostprocess, ITEM_TYPE_MULTI, 108 180 192 20 )
-			text				"Bloom method:"
-			cvar				"r_postprocess_bloomStyle"
-			cvarFloatList		{ "Additive" 1, "Blend" 2 }
-			textalignx			25
-			descText			"How to apply the bloom texture"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Bloom Size Background
-			name				bloomsizeBackground
-			group				tabWindowPostprocess
-			style				WINDOW_STYLE_SHADER
-			rect				198 201 30 18
-			background			EDITFIELD_BACKGROUND
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Bloom Size (r_postprocess_bloomSize)
-			COMMON( bloomsize, tabWindowPostprocess, ITEM_TYPE_NUMERICFIELD, 108 200 192 20 )
-			text				"Bloom size:"
-			cvar				"r_postprocess_bloomSize"
-			textalignx			35
-			maxchars			4
-			maxpaintchars		4
-			descText			"Size of the bloom texture (0 = native resolution)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_CHANGEPP
-		}
-
-		itemDef {// Bloom Steps Background
-			name				bloomstepsBackground
-			group				tabWindowPostprocess
-			style				WINDOW_STYLE_SHADER
-			rect				198 221 15 18
-			background			EDITFIELD_BACKGROUND
-			visible				0
-			BORDER_DEFAULTS
-			decoration
-		}
-		itemDef {// Bloom Steps (r_postprocess_bloomSteps)
-			COMMON( bloomsteps, tabWindowPostprocess, ITEM_TYPE_NUMERICFIELD, 108 220 192 20 )
-			text				"Bloom steps:"
-			cvar				"r_postprocess_bloomSteps"
-			textalignx			30
-			maxchars			1
-			maxpaintchars		1
-			descText			"How many times to downscale the bloom texture before blurring"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_CHANGEPP
-		}
-
-		itemDef {// Blur Size (r_postprocess_bloomBlurStyle)
-			COMMON( blursize, tabWindowPostprocess, ITEM_TYPE_MULTI, 108 240 192 20 )
-			text				"Blur size:"
-			cvar				"r_postprocess_bloomBlurStyle"
-			cvarFloatList		{ "3x3" 1, "6x6" 2, "6x3" 3, "3x6" 4 }
-			textalignx			40
-			descText			"Size of the gaussian blur used by bloom"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Apply post-process changes (postprocess_reload)
-			COMMON( applyPPChanges, tabWindowPostprocess, ITEM_TYPE_BUTTON, 323 380 90 20 )
-			text				@MENUS_APPLY_CHANGES
-			style				WINDOW_STYLE_EMPTY
-			textalignx			0
-			descText			"Reload the post-processing system to apply changes"
-			TEXT_APPLY MISC_DEFAULTS
-			action				{ exec "postprocess_reload"; play "sound/interface/button1" }
-		}
-
-
-		//	================================
-		//	NET / PERF TAB
-		//	================================
-
-		itemDef {// Transfer Rate (rate)
-			COMMON( transferrate, tabWindowNetPerf, ITEM_TYPE_NUMERICFIELD, 108 20 192 20 )
-			text				"Transfer rate:"
-			cvar				"rate"
-			textalignx			20
-			maxchars			5
-			maxpaintchars		5
-			descText			"Maximum bytes per second (Recommend 25000, minimum 16000)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Incoming packets (snaps)
-			COMMON( incomingpackets, tabWindowNetPerf, ITEM_TYPE_NUMERICFIELD, 108 40 192 20 )
-			text				"Incoming packets:"
-			cvar				"snaps"
-			textalignx			5
-			maxchars			3
-			maxpaintchars		3
-			descText			"How many snapshots to process per second (Recommend matching sv_fps, default 20)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Outgoing Packets (cl_maxPackets)
-			COMMON( outgoingpackets, tabWindowNetPerf, ITEM_TYPE_NUMERICFIELD, 108 60 192 20 )
-			text				"Outgoing packets:"
-			cvar				"cl_maxPackets"
-			textalignx			5
-			maxchars			3
-			maxpaintchars		3
-			descText			"How many movement packets to send per second (Recommend equal-to or half of your FPS)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Duplicate Packets (cl_packetDup)
-			COMMON( duplicatepackets, tabWindowNetPerf, ITEM_TYPE_NUMERICFIELD, 108 80 192 20 )
-			text				"Duplicate packets:"
-			cvar				"cl_packetDup"
-			textalignx			0
-			maxchars			1
-			maxpaintchars		1
-			descText			"Duplicate outgoing packets to compensate for packetloss (Recommend 1 or 2)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Max FPS (com_maxFPS)
-			COMMON( maxfps, tabWindowNetPerf, ITEM_TYPE_NUMERICFIELD, 108 100 192 20 )
-			text				"Max FPS:"
-			cvar				"com_maxFPS"
-			textalignx			50
-			maxchars			4
-			maxpaintchars		4
-			descText			"Set your maximum framerate (Recommend 125)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Vertical Sync (r_swapInterval)
-			COMMON( sceneintensity, tabWindowNetPerf, ITEM_TYPE_YESNO, 108 120 192 20 )
-			text				"Vertical sync:"
-			cvar				"r_swapInterval"
-			textalignx			20
-			descText			"Synchronise framerate with monitor refresh rate (Recommend OFF for max speed, ON for smooth picture with input lag)"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-
-		//	================================
-		//	SOUND TAB
-		//	================================
-
-		itemDef {// Sound Quality (s_khz)
-			COMMON( soundquality, tabWindowSound, ITEM_TYPE_MULTI, 108 20 192 20 )
-			text				"Sound quality:"
-			cvar				"s_khz"
-			cvarFloatList		{ @MENUS_LOW 11 @MENUS_MEDIUM 22 @MENUS_HIGH 44 }
-			textalignx			15
-			descText			"Choose the bitrate for sounds"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_CHANGESOUND
-		}
-
-		itemDef {// Stereo Separation (s_separation)
-			COMMON( stereoseparation, tabWindowSound, ITEM_TYPE_SLIDER, 108 40 192 20 )
-			text				"Stero separation:"
-			cvarFloat			"s_separation" 0.5 0.0 1.0
-			SLIDER_DEFAULTS
-			textalignx			0
-			descText			"How far to spread spatialised sounds over headphones/2+ speakers"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Music Volume (s_musicVolume)
-			COMMON( musicvolume, tabWindowSound, ITEM_TYPE_SLIDER, 108 60 192 20 )
-			text				"Music volume:"
-			cvarFloat			"s_musicVolume" 0.25 0.0 1.0
-			SLIDER_DEFAULTS
-			textalignx			20
-			descText			"Volume control for background music"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Effects Volume (s_volume)
-			COMMON( effectsvolume, tabWindowSound, ITEM_TYPE_SLIDER, 108 80 192 20 )
-			text				"Effects volume:"
-			cvarFloat			"s_volume" 0.5 0.0 1.0
-			SLIDER_DEFAULTS
-			textalignx			10
-			descText			"Volume control for various effects"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Voice Volume (s_volumeVoice)
-			COMMON( voicevolume, tabWindowSound, ITEM_TYPE_SLIDER, 108 100 192 20 )
-			text				"Voice volume:"
-			cvarFloat			"s_volumeVoice" 1.0 0.0 1.0
-			SLIDER_DEFAULTS
-			textalignx			20
-			descText			"Volume control for character voices"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_DEFAULTS
-		}
-
-		itemDef {// Use EAX (s_UseOpenAL)
-			COMMON( useeax, tabWindowSound, ITEM_TYPE_YESNO, 108 120 192 20 )
-			text				"Use EAX:"
-			cvar				"s_UseOpenAL"
-			textalignx			45
-			descText			"Use Creative Labs Enhanced Audio"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_CHANGESOUND
-		}
-
-		itemDef {// Language (s_language)
-			COMMON( language, tabWindowSound, ITEM_TYPE_MULTI, 108 140 192 20 )
-			text				"Language:"
-			cvar				"s_language"
-			cvarStrList			{ "English", "english", @MENUS_LANG_FRENCH, "francais", "Deutsch", "deutsch", "Español", "espanol" }
-			textalignx			40
-			descText			"Set your locale for voices"
-			TEXT_DEFAULTS MISC_DEFAULTS BUTTON_CHANGESOUND
-		}
-
-		itemDef {// Apply sound changes (snd_restart)
-			COMMON( applySoundChanges, tabWindowSound, ITEM_TYPE_BUTTON, 323 380 90 20 )
-			text				@MENUS_APPLY_CHANGES
-			style				WINDOW_STYLE_EMPTY
-			textalignx			0
-			descText			"Reload the sound system to apply changes"
-			TEXT_APPLY MISC_DEFAULTS
-			action				{ exec "snd_restart"; play "sound/interface/button1" }
-		}
+		*/
 	}
 }

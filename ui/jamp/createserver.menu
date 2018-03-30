@@ -1,0 +1,718 @@
+// create server
+{
+	menuDef {
+		name			"createserver"
+		fullScreen		MENU_TRUE
+		rect			0 0 640 480
+		visible			1
+		focusColor		1 1 1 1
+		descX			320
+		descY			385
+		descScale		1
+		descColor		1 .682 0 .8
+		descAlignment	ITEM_ALIGN_CENTER
+
+		onEsc {
+			setcvartocvar	password g_password
+			close			createserver
+			open			multiplayermenu
+			uiscript		checkservername
+		}
+
+		onOpen {
+			setcvartocvar	password g_password
+			uiScript		loadArenas
+			hide			accept_alt
+			show			accept
+			hide			back_alt
+			show			back
+			hide			grpmessage
+			uiScript		setBotButtons
+			uiscript		clampmaxplayers
+			uiscript		checkservername
+		}
+
+		// main background
+		/*
+		rect		156 154 320 240
+		background	"gfx/menus/main_centerblue"
+
+		rect		0 0 160 480
+		background	"gfx/menus/menu_side_text"
+
+		rect		480 0 160 480
+		background	"gfx/menus/menu_side_text_right"
+
+		rect		0 0 640 480
+		background	"gfx/menus/main_background"
+		*/
+
+		// map screenshot
+		itemDef {
+			name		mappreview
+			style		0
+			ownerdraw	UI_STARTMAPCINEMATIC
+			rect		0 0 640 480
+			forecolor	1 1 1 1
+			visible		1
+			decoration
+		}
+
+		itemDef {
+			name		background
+			style		WINDOW_STYLE_SHADER
+			rect		0 0 640 480
+			background	"gfx/menus/datapad2"
+			forecolor	1 1 1 .5
+			visible		1
+			decoration
+		}
+
+		// button glow
+		itemDef {
+			name		highlight
+			rect		0 0 0 0
+
+			///*
+			style		WINDOW_STYLE_SHADER
+		//	background	"gfx/menus/menu_blendbox"
+		//	background	"gfx/menus/menu_blendbox_extended"
+		//	background	"gfx/menus/menu_box_ingame"
+			background	"gfx/menus/menu_buttonback"
+		//	background	"powerups/rezout"
+			forecolor	1 1 1 1
+		//	forecolor	1 .682 0 1
+			//*/
+
+			/*
+			style		WINDOW_STYLE_FILLED
+			backcolor	1 1 1 .15
+			border		0
+			*/
+
+			visible		1
+			decoration
+		}
+
+		// create server title
+		itemDef {
+			name		create_title
+			group		none
+			style		WINDOW_STYLE_SHADER
+			background	"gfx/menus/menu_blendbox"
+			text		@MENUS_CREATE_A_NEW_MULTIPLAYER
+			rect		82 8 475 21
+			font		3
+			textscale	0.75
+			textalign	ITEM_ALIGN_LEFT
+			textalignx	144
+			forecolor	.549 .854 1 1
+			visible		1
+			decoration
+		}
+
+		// gametype selection
+		itemDef {
+			name		gametypefield
+			style		0
+			ownerdraw	UI_NETGAMETYPE
+			text		@MENUS_GAME_TYPE
+			descText	@MENUS_ALLOWS_YOU_TO_SELECT
+			textstyle	0
+			rect		5 25 255 26
+			textalign	ITEM_ALIGN_LEFT
+			textalignx	10
+			textaligny	-3
+			font		2
+			textscale	.9
+			forecolor	.615 .615 .956 1
+			visible		1
+			border		0
+			bordercolor	1 1 1 1
+			action {
+				play		"sound/interface/button1"
+				uiScript	setBotButtons
+			}
+			mouseEnter {
+				setitemrect	highlight 5 25 255 26
+			}
+			mouseExit {
+				setitemrect	highlight 0 0 0 0
+			}
+		}
+
+		// server name
+		itemDef {
+			name			expert
+			group			grpsettings
+			type			ITEM_TYPE_EDITFIELD
+			text			@MENUS_SERVER_NAME_1 // @HOST_NAME
+			cvar			"sv_hostname"
+			maxChars		32
+			maxPaintChars	18
+			rect			260 25 310 26
+			textalign		ITEM_ALIGN_LEFT
+			textalignx		10
+			textaligny		-3
+			font			2
+			textscale		.9
+			forecolor		.615 .615 .956 1
+			visible			1
+			border			0
+			bordercolor		.79 .64 .22 1
+			descText		@MENUS_ENTER_THE_NAME_FOR_YOUR
+			mouseEnter {
+				setitemrect	highlight 260 25 310 26
+			}
+			mouseExit {
+				setitemrect	highlight 0 0 0 0
+				uiscript	checkservername
+			}
+			action {
+				play		"sound/interface/button1"
+				uiscript	checkservername
+			}
+		}
+
+		// game settings
+
+		// general rules
+		itemDef {
+			name		rules_title
+			group		none
+			text		@MENUS_GENERAL_RULES
+			rect		10 55 180 20
+			font		3
+			textscale	0.8
+			textalign	ITEM_ALIGN_CENTER
+			textalignx	90
+			textaligny	-2
+			forecolor	.549 .854 1 1
+			visible		1
+			decoration
+		}
+
+		// minimum bots/players
+		itemDef {
+			name		expert
+			group		grpsettings
+			type		ITEM_TYPE_NUMERICFIELD
+			maxchars	4
+			text		@MENUS_PLAYERS
+			descText	@MENUS_PLAYERS_INFO
+			cvar		"bot_minplayers"
+			rect		10 75 180 20
+			textalign	ITEM_ALIGN_RIGHT
+			textalignx	145
+			textaligny	0
+			font		4
+			textscale	1
+			forecolor	.615 .615 .956 1
+			cvarTest	"ui_netGameType"
+			hideCvar	{ "7" }
+			visible		1
+			action {
+				play	"sound/interface/button1"
+			}
+			mouseEnter {
+				setitemrect	highlight 10 75 180 20
+			}
+			mouseExit {
+				setitemrect	highlight 0 0 0 0
+			}
+		}
+
+		// team switching
+		itemDef {
+			name		expert
+			group		grpsettings
+			type		ITEM_TYPE_YESNO
+			text		@MENUS_TEAM_SWITCHING
+			cvar		"g_siegeTeamSwitch"
+			cvarTest	"ui_netGameType"
+			showCvar	{ "7" }
+			rect		10 75 180 20
+			textalign	ITEM_ALIGN_RIGHT
+			textalignx	145
+			textaligny	0
+			font		4
+			textscale	1
+			forecolor	.615 .615 .956 1
+			visible		1
+			descText	@MENUS_TEAM_SWITCHING_DESC
+			action {
+				play	"sound/interface/button1"
+			}
+			mouseEnter {
+				setitemrect	highlight 10 75 180 20
+			}
+			mouseExit {
+				setitemrect	highlight 0 0 0 0
+			}
+		}
+
+		// max players
+		itemDef {
+			name		expert
+			group		grpsettings
+			type		ITEM_TYPE_NUMERICFIELD
+			text		@MENUS_MAXIMUM_PLAYERS
+			cvar		"sv_maxclients"
+			rect		10 95 180 20
+			textalign	ITEM_ALIGN_RIGHT
+			textalignx	145
+			textaligny	0
+			font		4
+			textscale	1
+			maxchars	6
+			forecolor	.615 .615 .956 1
+			visible		1
+			descText	@MENUS_SETS_THE_MAXIMUM_NUMBER
+			action {
+				play	"sound/interface/button1"
+			}
+			mouseEnter {
+				setitemrect	highlight 10 95 180 20
+			}
+			mouseExit {
+				setitemrect	highlight 0 0 0 0
+				uiscript	clampmaxplayers
+			}
+		}
+
+		// even teams
+		itemDef {
+			name		expert
+			group		grpsettings
+			type		ITEM_TYPE_YESNO
+			text		@MENUS_EVEN_TEAMS
+			cvar		"g_teamforcebalance"
+			cvarTest	"ui_netGameType"
+			showCvar	{ "6"; "7"; "8"; "9" }
+			rect		10 115 180 20
+			textalign	ITEM_ALIGN_RIGHT
+			textalignx	145
+			textaligny	0
+			font		4
+			textscale	1
+			forecolor	.615 .615 .956 1
+			visible		1
+			descText	@MENUS_THIS_OPTION_RE_BALANCES
+			action {
+				play	"sound/interface/button1"
+			}
+			mouseEnter {
+				setitemrect	highlight 10 115 180 20
+			}
+			mouseExit {
+				setitemrect	highlight 0 0 0 0
+			}
+		}
+
+		// skill button
+		itemDef {
+			name		difficultyfield
+			style		0
+			ownerdraw	UI_SKILL
+			text		@MENUS_SKILL
+			descText	@MENUS_ADJUSTS_THE_DIFFICULTY
+			rect		10 135 180 20
+			textalign	ITEM_ALIGN_RIGHT
+			textalignx	200
+			textaligny	0
+			font		4
+			textscale	1
+			forecolor	.615 .615 .956 1
+			visible		1
+			cvarTest	"ui_netGameType"
+			hideCvar	{ "5"; "7" }
+			action {
+				play	"sound/interface/button1"
+			}
+			mouseEnter {
+				setitemrect	highlight 10 135 180 20
+			}
+			mouseExit {
+				setitemrect	highlight 0 0 0 0
+			}
+		}
+
+		// end game rules
+		itemDef {
+			name		rules_title
+			group		none
+			text		@MENUS_ENDGAME_RULES
+			rect		10 155 180 20
+			font		3
+			textscale	0.8
+			textalign	ITEM_ALIGN_CENTER
+			textalignx	90
+			textaligny	-2
+			forecolor	.549 .854 1 1
+			visible		1
+			decoration
+		}
+
+		// cooperative rules (special case)
+		itemDef {
+			name		create_title
+			group		none
+			text		"Complete the mission"
+			rect		10 175 180 20
+			font		5
+			textalign	ITEM_ALIGN_CENTER
+			textalignx	90
+			textaligny	-2
+			textscale	0.5
+			forecolor	.549 .854 1 1
+			cvarTest	"ui_netGameType"
+			showCvar	{ "5" }
+			visible		1
+			decoration
+		}
+
+		// time limit
+		itemDef {
+			name		normal
+			group		grpsettings
+			type		ITEM_TYPE_NUMERICFIELD
+			text		@MENUS_TIME_LIMIT
+			cvar		"timelimit"
+			rect		10 175 180 20
+			textalign	ITEM_ALIGN_RIGHT
+			textalignx	145
+			textaligny	0
+			font		4
+			textscale	1
+			maxchars	4
+			forecolor	.615 .615 .956 1
+			visible		1
+			descText	@MENUS_THIS_VALUE_ADJUSTS_THE
+			cvarTest	"ui_netGameType"
+			hideCvar	{ "5" }
+			action {
+				play	"sound/interface/button1"
+			}
+			mouseEnter {
+				setitemrect	highlight 10 175 180 20
+			}
+			mouseExit {
+				setitemrect	highlight 0 0 0 0
+			}
+		}
+
+		// kill limit / capture limit / duel limit
+		itemDef {
+			name		normal
+			group		grpsettings
+			type		ITEM_TYPE_NUMERICFIELD
+			text		@MENUS_KILL_LIMIT
+			cvar		"fraglimit"
+			cvarTest	"ui_netGameType"
+			hideCvar	{ "3"; "4"; "5"; "8"; "9" }
+			rect		10 195 180 20
+			textalign	ITEM_ALIGN_RIGHT
+			textalignx	145
+			textaligny	0
+			font		4
+			textscale	1
+			maxchars	4
+			forecolor	.615 .615 .956 1
+			visible		1
+			descText	@MENUS_ESTABLISH_THE_NUMBER
+			action {
+				play	"sound/interface/button1"
+			}
+			mouseEnter {
+				setitemrect	highlight 10 195 180 20
+			}
+			mouseExit {
+				setitemrect	highlight 0 0 0 0
+			}
+		}
+
+		itemDef {
+			name		normal
+			group		grpsettings
+			type		ITEM_TYPE_NUMERICFIELD
+			text		@MENUS_CAPTURE_LIMIT
+			cvar		"capturelimit"
+			cvarTest	"ui_netGameType"
+			showCvar	{ "8"; "9" }
+			rect		10 195 180 20
+			textalign	ITEM_ALIGN_RIGHT
+			textalignx	145
+			textaligny	0
+			font		4
+			textscale	1
+			maxchars	6
+			forecolor	.615 .615 .956 1
+			visible		1
+			descText	@MENUS_THIS_IS_THE_NUMBER_OF
+			action {
+				play	"sound/interface/button1"
+			}
+			mouseEnter {
+				setitemrect	highlight 10 195 180 20
+			}
+			mouseExit {
+				setitemrect	highlight 0 0 0 0
+			}
+		}
+
+		itemDef {
+			name		normal
+			group		grpsettings
+			type		ITEM_TYPE_NUMERICFIELD
+			text		@MENUS_DUEL_LIMIT
+			descText	@MENUS_VALUE_ADJUSTS_THE_TOTAL
+			cvar		"duel_fraglimit"
+			cvarTest	"ui_netGameType"
+			showCvar	{ "3", "4" }
+			rect		10 215 180 20
+			textalign	ITEM_ALIGN_RIGHT
+			textalignx	145
+			textaligny	0
+			font		4
+			textscale	1
+			maxchars	6
+			forecolor	.615 .615 .956 1
+			visible		1
+			action {
+				play	"sound/interface/button1"
+			}
+			mouseEnter {
+				setitemrect	highlight 10 215 180 20
+			}
+			mouseExit {
+				setitemrect	highlight 0 0 0 0
+			}
+		}
+
+
+		#define BOT_BUTTON_COMMON \
+			style		0 \
+			textalign	ITEM_ALIGN_LEFT \
+			textalignx	20 \
+			textaligny	-4 \
+			font		4 \
+			textscale	1 \
+			border		0 \
+			bordercolor 0 0 0 0 \
+			visible		1 \
+			action { \
+				play	"sound/interface/button1" \
+			}
+
+		#define BOT_BUTTON1( _rect, _ownerdraw, _text, _desc ) \
+		itemDef { \
+			rect		_rect \
+			ownerdraw	_ownerdraw \
+			text		_text \
+			descText	_desc \
+			mouseEnter { \
+				setitemrect highlight _rect \
+			} \
+			mouseExit { \
+				setitemrect highlight 0 0 0 0 \
+			} \
+			BOT_BUTTON_COMMON \
+			name		humanbotfield \
+			forecolor	0.65 0.65 1 1 \
+		}
+		#define BOT_BUTTON2( _rect, _ownerdraw, _text, _desc ) \
+		itemDef { \
+			rect		_rect \
+			ownerdraw	_ownerdraw \
+			text		_text \
+			descText	_desc \
+			mouseEnter { \
+				setitemrect highlight _rect \
+			} \
+			mouseExit { \
+				setitemrect highlight 0 0 0 0 \
+			} \
+			BOT_BUTTON_COMMON \
+			name		humanbotfield \
+			forecolor	1 0.2 0.2 1 \
+		}
+		#define BOT_BUTTON3( _rect, _ownerdraw, _text, _desc ) \
+		itemDef { \
+			rect		_rect \
+			ownerdraw	_ownerdraw \
+			text		_text \
+			descText	_desc \
+			BOT_BUTTON_COMMON \
+			name		humanbotnonfield \
+			forecolor	0.65 0.65 1 1 \
+		}
+		#define BOT_BUTTON4( _rect, _ownerdraw, _text, _desc ) \
+		itemDef { \
+			rect		_rect \
+			ownerdraw	_ownerdraw \
+			text		_text \
+			descText	_desc \
+			BOT_BUTTON_COMMON \
+			name		humanbotnonfield \
+			forecolor	1 0.2 0.2 1 \
+		}
+
+		/*
+		480 162 196 20
+		480 176 196 20
+		480 190 196 20
+		*/
+
+		// bot list for non-teammates
+		BOT_BUTTON1( 480 190 140 14,	UI_BLUETEAM1,	@MENUS_1_1,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON2( 480 204 140 14,	UI_REDTEAM1,	@MENUS_2_1,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON1( 480 218 140 14,	UI_BLUETEAM2,	@MENUS_3_1,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON2( 480 232 140 14,	UI_REDTEAM2,	@MENUS_4_1,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON1( 480 246 140 14,	UI_BLUETEAM3,	@MENUS_5_1,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON2( 480 260 140 14,	UI_REDTEAM3,	@MENUS_6_1,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON1( 480 274 140 14,	UI_BLUETEAM4,	@MENUS_7_1,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON2( 480 288 140 14,	UI_REDTEAM4,	@MENUS_8_1,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON1( 480 302 140 14,	UI_BLUETEAM5,	@MENUS_9_1,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON2( 480 316 140 14,	UI_REDTEAM5,	@MENUS_10,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON1( 480 330 140 14,	UI_BLUETEAM6,	@MENUS_11,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON2( 480 344 140 14,	UI_REDTEAM6,	@MENUS_12,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON1( 480 358 140 14,	UI_BLUETEAM7,	@MENUS_13,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON2( 480 372 140 14,	UI_REDTEAM7,	@MENUS_14,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON1( 480 386 140 14,	UI_BLUETEAM8,	@MENUS_15,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+		BOT_BUTTON2( 480 428 140 14,	UI_REDTEAM8,	@MENUS_16,	@MENUS_CLICK_FOR_HUMAN_BOTS )
+
+		// humanbotnonfield
+		BOT_BUTTON3( 480 190 140 14,	UI_REDTEAM1,	@MENUS_1_1,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON4( 480 204 140 14,	UI_BLUETEAM1,	@MENUS_2_1,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON3( 480 218 140 14,	UI_REDTEAM2,	@MENUS_3_1,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON4( 480 232 140 14,	UI_BLUETEAM2,	@MENUS_4_1,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON3( 480 246 140 14,	UI_REDTEAM3,	@MENUS_5_1,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON4( 480 260 140 14,	UI_BLUETEAM3,	@MENUS_6_1,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON3( 480 274 140 14,	UI_REDTEAM4,	@MENUS_7_1,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON4( 480 288 140 14,	UI_BLUETEAM4,	@MENUS_8_1,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON3( 480 302 140 14,	UI_REDTEAM5,	@MENUS_9_1,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON4( 480 316 140 14,	UI_BLUETEAM5,	@MENUS_10,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON3( 480 330 140 14,	UI_REDTEAM6,	@MENUS_11,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON4( 480 344 140 14,	UI_BLUETEAM6,	@MENUS_12,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON3( 480 358 140 14,	UI_REDTEAM7,	@MENUS_13,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON4( 480 372 140 14,	UI_BLUETEAM7,	@MENUS_14,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON3( 480 386 140 14,	UI_REDTEAM8,	@MENUS_15,	@MENUS_ONLY_HUMANS )
+		BOT_BUTTON4( 480 428 140 14,	UI_BLUETEAM8,	@MENUS_16,	@MENUS_ONLY_HUMANS )
+
+		// map list
+		itemDef {
+			name			maplist
+			rect			440 36 180 125
+			type			ITEM_TYPE_LISTBOX
+			style			WINDOW_STYLE_FILLED
+			elementwidth	1
+			elementheight	17
+			font			5
+			textscale		0.5
+			elementtype		LISTBOX_TEXT
+			feeder			FEEDER_ALLMAPS
+			textstyle		6
+			border			4
+			bordercolor		.79 .64 .22 1.0
+			forecolor		.615 .615 .956 1
+			outlinecolor	.25 .464 .578 .5
+			descText		@MENUS_CHOOSE_YOUR_GAME
+			visible			1
+			columns			1 2 196 172
+			mouseEnter {
+				setitemcolor	maplist bordercolor .79 .64 .22 1
+			}
+			mouseExit {
+				setitemcolor	maplist bordercolor .79 .64 .22 .5
+			}
+		}
+
+		// bottom buttons options
+		itemDef {
+			name		back
+			text		@MENUS_BACK
+			descText	@MENUS_EXIT_TO_MAIN_MENU
+			type		ITEM_TYPE_BUTTON
+			font		3
+			textscale	1.1
+			textstyle	0
+			style		WINDOW_STYLE_FILLED
+			rect		10 420 200 32
+			textalign	1
+			textalignx	100
+			textaligny	2
+			textalign	ITEM_ALIGN_CENTER
+			forecolor	1 .682 0 1
+			visible		1
+			action {
+				play	"sound/interface/button1"
+				close	createserver
+				open	multiplayermenu
+			}
+			mouseEnter {
+				setitemrect	highlight 10 420 200 32
+			}
+			mouseExit {
+				setitemrect	highlight 0 0 0 0
+			}
+		}
+
+		itemDef {
+			name		accept
+			text		@MENUS_BEGIN
+			descText	@MENUS_START_SERVER
+			type		ITEM_TYPE_BUTTON
+			font		3
+			textscale	1.1
+			textstyle	0
+			style		WINDOW_STYLE_FILLED
+			rect		430 420 200 32
+			textalign	1
+			textalignx	100
+			textaligny	2
+			forecolor	1 .682 0 1
+			visible		1
+			action {
+				play			"sound/interface/button1"
+				uiScript		setSiegeNoBots
+				uiScript		weaponDisable // update the weapondisable cvar for duel or non-duel
+				uiScript		StartServer
+				setcvartocvar	password g_password
+				close			createserver
+			}
+			mouseEnter {
+				setitemrect	highlight 430 420 200 32
+			}
+			mouseExit {
+				setitemrect	highlight 0 0 0 0
+			}
+		}
+
+		itemDef {
+			name		advanced
+			text		@MENUS_ADVANCED
+			descText	@MENUS_UPDATE_ADVANCED_SERVER
+			type		ITEM_TYPE_BUTTON
+			font		3
+			textscale	1.1
+			textstyle	0
+			style		WINDOW_STYLE_FILLED
+			rect		220 420 200 32
+			textalign	1
+			textalignx	100
+			textaligny	2
+			forecolor	1 .682 0 1
+			visible		1
+			action {
+				play	"sound/interface/button1.wav"
+				open	advancedcreateserver
+			}
+			mouseEnter {
+				setitemrect	highlight 220 420 200 32
+			}
+			mouseExit {
+				setitemrect	highlight 0 0 0 0
+			}
+		}
+	}
+}
