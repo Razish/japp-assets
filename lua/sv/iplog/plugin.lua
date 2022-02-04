@@ -37,6 +37,19 @@ AddServerCommand( 'iplog', function( args )
 	end
 end )
 
+AddServerCommand('find', function(args)
+ if args[1] == nil then 
+    print ( 'Usage: \\find [IP_MASK]' )
+ end
+ if iplist[args[1]] == nil then
+    print ('^1IP Not found')
+ else
+    print(iplist[args[1]])
+ end
+end)
+
+
+
 AddListener( 'JPLUA_EVENT_CLIENTCONNECT', function( id, info, ip, firsttime )
 	if ip == 'Bot' or not firsttime then
 		return nil
