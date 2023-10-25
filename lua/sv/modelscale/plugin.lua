@@ -1,7 +1,8 @@
-local mscale = RegisterPlugin('ModelScale', '1.1.3', '13.5.0')
+local mscale = RegisterPlugin('ModelScale', '1.1.4', '13.5.0')
 
 -- key: player id
 -- value: scale amount
+-- set from modelscale command
 mscale.list = {}
 
 -- key: player model
@@ -9,6 +10,7 @@ mscale.list = {}
 -- loaded from modelscale.cfg
 mscale.predefined = {}
 
+local japp_modelScale = CreateCvar('japp_modelScale', '1', CvarFlags.ARCHIVE)
 local japp_modelScaleCmd = CreateCvar('japp_modelScaleCmd', '0', CvarFlags.ARCHIVE)
 local japp_modelScaleRange = CreateCvar('japp_modelScaleRange', '80 120', CvarFlags.ARCHIVE)
 
@@ -47,33 +49,43 @@ end)
 
 AddListener('JPLUA_EVENT_CLIENTSPAWN', function(ply, firstSpawn)
     local scale = 100
-    if mscale.list[ply.id] then
-        scale = math.floor(math.abs(mscale.list[ply.id] * 100))
-    elseif mscale.predefined[ply.model] then
-        scale = math.floor(math.abs(mscale.predefined[ply.model] * 100))
+    if japp_modelScale:GetBoolean() then
+        if japp_modelScaleCmd:GetBoolean() and mscale.list[ply.id] then
+            scale = math.floor(math.abs(mscale.list[ply.id]))
+        elseif mscale.predefined[ply.model] then
+            scale = math.floor(math.abs(mscale.predefined[ply.model] * 100))
+        end
     end
     ply.entity:Scale(scale)
 end)
 
 AddListener('JPLUA_EVENT_CLIENTUSERINFOCHANGED', function(clientNum, userinfo)
-    local ply = GetPlayer(clientNum)
-    if not ply then return end
-    local model = userinfo['model']
     local scale = 100
-    if mscale.predefined[model] then
-        print(
-            'modelscale: scaling ' .. userinfo['name'] .. ' by ' .. mscale.predefined[model] .. ' (model: ' .. model ..
-                ')')
-        scale = math.floor(math.abs(mscale.predefined[model] * 100))
-    elseif mscale.list[ply.id] then
-        scale = math.floor(math.abs(mscale.list[ply.id] * 100))
+    local ply = GetPlayer(clientNum)
+    if japp_modelScale:GetBoolean() then
+        if not ply then return end
+        local model = userinfo['model']
+
+        if japp_modelScaleCmd:GetBoolean() and mscale.list[ply.id] then
+            scale = math.floor(math.abs(mscale.list[ply.id]))
+        elseif mscale.predefined[model] then
+            scale = math.floor(math.abs(mscale.predefined[model] * 100))
+        end
+
+        if scale ~= 100 then
+            ply:ConsolePrint('modelscale: scaling ' .. userinfo['name'] .. ' by ' .. scale .. ' (model: ' .. model ..
+                                 ')\n')
+        end
     end
 
     ply.entity:Scale(scale)
 end)
 
 AddClientCommand('modelscale', function(ply, args)
-    if not japp_modelScaleCmd:GetBoolean() then return end
+    if not japp_modelScale:GetBoolean() or not japp_modelScaleCmd:GetBoolean() then
+        ply:ConsolePrint('modelscale is not enabled on this server\n')
+        return
+    end
 
     if #args == 1 then
         local scale = tonumber(args[1])
@@ -90,9 +102,9 @@ AddClientCommand('modelscale', function(ply, args)
     else
         local scale = 100
         if mscale.list[ply.id] then
-            scale = mscale.list[ply.id]
+            scale = math.floor(math.abs(mscale.list[ply.id]))
         elseif mscale.predefined[ply.model] then
-            scale = mscale.predefined[ply.model]
+            scale = math.floor(math.abs(mscale.predefined[ply.model] * 100))
         end
         ply:ConsolePrint(ChatColour.Cyan .. 'your model scale is: ' .. ChatColour.Yellow .. scale .. '\n')
     end
