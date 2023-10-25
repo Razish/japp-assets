@@ -1,17 +1,23 @@
---[[
-	JA++ Assets Package Script
-	by Raz0r
+#!/usr/bin/env lua
 
-	Requires lua 5.1, lua-filesystem, 7zip
+require 'lfs' -- lua filesystem
+
+--[[
+	JA++ assets package script
+
+	requirements:
+	- lua 5.4
+	- luafilesystem
+	- 7z or zip
 --]]
 
--- luacheck: globals lfs
-require "lfs" -- lua filesystem
+local nixy = true and package.config:find('/') or false
+local redirect_stdout = nixy and '>/dev/null' or '>nul'
+local redirect_all = nixy and '>/dev/null 2>&1' or '>nul 2>&1'
+local function test_cmd(cmd) return os.execute((nixy and 'command -v ' or 'where.exe ') .. cmd .. redirect_all) end
 
-if lfs == nil then
-	error( 'lua-filesystem not available for this version of lua (' .. _VERSION .. ')' )
-end
-
+-- LuaFormatter off
+-- this is formatted manually until #19 is resolved
 local paks = {
 	['sh'] = {
 		['lua'] = {
@@ -143,36 +149,39 @@ local paks = {
 		},
 	}
 }
+-- LuaFormatter on
 
-local linux = true and package.config:find( '/' ) or false
+for prefix, pak in pairs(paks) do
+    for pakname, files in pairs(pak) do
+        local filelist = ''
+        for _, file in pairs(files) do
+            if lfs.touch(file) == nil then
+                print('Missing file: ' .. file)
+            else
+                filelist = filelist .. ' ' .. file -- append file name
+            end
+        end
+        filelist = string.sub(filelist, 2) -- remove the leading space
 
-for prefix,pak in pairs( paks ) do
-	for pakname,files in pairs( pak ) do
-		local filelist = ''
-		for _,file in pairs( files ) do
-			if lfs.touch( file ) == nil then
-				print( 'Missing file: ' .. file )
-			else
-				filelist = filelist .. ' ' .. file -- append file name
-			end
-		end
-		filelist = string.sub( filelist, 2 ) -- remove the leading space
+        local outname = prefix .. '_' .. pakname .. '.pk3'
 
-		local outname = prefix .. '_' .. pakname .. '.pk3'
+        -- remove existing pak
+        if lfs.touch(outname) ~= nil then
+            print('removing existing pak "' .. outname .. '"')
+            os.remove(outname)
+        end
 
-		-- remove existing pak
-		if lfs.touch( outname ) ~= nil then
-			print( 'removing existing pak "' .. outname .. '"' )
-			os.remove( outname )
-		end
-
-		if #filelist ~= 0 then
-			print( 'creating "' .. outname .. '"' )
-			if linux ~= false then
-				os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >/dev/null 2>&1' )
-			else
-				os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >nul 2>&1' )
-			end
-		end
-	end
+        if #filelist ~= 0 then
+            print('creating "' .. outname .. '"')
+            local cmd = nil
+            if test_cmd('zip') then
+                cmd = 'zip ' .. outname .. ' ' .. filelist .. redirect_stdout
+            elseif test_cmd('7z') then
+                cmd = '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' ' .. redirect_stdout
+            else
+                error('can\'t find zip or 7z on PATH')
+            end
+            if os.execute(cmd) == nil then error() end
+        end
+    end
 end
